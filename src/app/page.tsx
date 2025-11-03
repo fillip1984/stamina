@@ -1,8 +1,8 @@
 "use client";
 
-import { DialogTitle } from "@radix-ui/react-dialog";
 import { format, startOfDay } from "date-fns";
 import { addDays } from "date-fns/addDays";
+import { ChevronDownIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import {
@@ -12,17 +12,23 @@ import {
   FaEye,
   FaPencil,
   FaPlus,
+  FaStopwatch20,
   FaTrash,
 } from "react-icons/fa6";
-import { GiDuration } from "react-icons/gi";
+import { GiDuration, GiStoneStack } from "react-icons/gi";
+import { LuTally4, LuTelescope } from "react-icons/lu";
 import { TbTargetArrow } from "react-icons/tb";
 import ThemeToggle from "~/components/theme/themeToggle";
 import { Button } from "~/components/ui/button";
+import { Calendar } from "~/components/ui/calendar";
 import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
 import {
@@ -34,62 +40,223 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "~/components/ui/empty";
+import { Input } from "~/components/ui/input";
+import {
   Item,
   ItemActions,
   ItemContent,
   ItemTitle,
 } from "~/components/ui/item";
+import { Label } from "~/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+import { Spinner } from "~/components/ui/spinner";
+import { Textarea } from "~/components/ui/textarea";
 import { api } from "~/trpc/react";
 import type { MeasurableType } from "~/trpc/types";
 import { calculateProgress } from "~/utils/progressUtil";
 
 export default function Home() {
   const utils = api.useUtils();
-  const { data: measurables } = api.measurable.findAll.useQuery();
-  const { mutateAsync: createMeasurable } = api.measurable.create.useMutation({
-    onSuccess: () => {
-      utils.measurable.findAll.invalidate();
-    },
-  });
+  const { data: measurables, isLoading } = api.measurable.findAll.useQuery();
+  const { mutateAsync: createMeasurable, isPending: isCreatingMeasurable } =
+    api.measurable.create.useMutation({
+      onSuccess: async () => {
+        await utils.measurable.findAll.invalidate();
+        // dialogCloseRef.current?.click();
+        setIsCreatingMeasurableModalOpen(false);
+        setName("");
+        setDescription("");
+        setType("Count_Down");
+        // setSetDate(null);
+        setDueDate(null);
+      },
+    });
 
-  // const [activities, setActivities] = useState<Activity[]>([]);
+  const [isCreatingMeasurableModalOpen, setIsCreatingMeasurableModalOpen] =
+    useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [name, setName] = useState("test");
+  const [description, setDescription] = useState("test");
+  const [type, setType] = useState<MeasurableType["type"]>("Count_Down");
+  // const [setDate, setSetDate] = useState<Date | null>(null);
+  const [dueDate, setDueDate] = useState<Date | null>(null);
+
+  // const dialogCloseRef = useRef<HTMLButtonElement>(null);
+
+  const handleCreate = () => {
+    createMeasurable({
+      name,
+      description,
+      type,
+      // setDate: setDate ?? new Date(),
+      dueDate: dueDate ?? undefined,
+    });
+  };
 
   return (
     <div className="flex grow flex-col">
       <div className="flex justify-end gap-2 p-2">
         <ThemeToggle />
-        <Dialog>
-          <DialogTrigger>
-            <Button className="rounded-full">
-              <FaPlus />
-            </Button>
-          </DialogTrigger>
+        <Button
+          className="rounded-full"
+          onClick={() => setIsCreatingMeasurableModalOpen(true)}
+        >
+          <FaPlus />
+        </Button>
+        <Dialog
+          open={isCreatingMeasurableModalOpen}
+          onOpenChange={() => setIsCreatingMeasurableModalOpen((prev) => !prev)}
+        >
           <DialogContent>
-            <DialogTitle>Create Measurable</DialogTitle>
-            <DialogFooter>
-              <DialogClose>
-                <Button
-                  onClick={async () => {
-                    await createMeasurable({
-                      name: "New Measurable",
-                      description: "Description",
-                      type: "Seeking",
-                    });
-                  }}
+            <DialogHeader>
+              <DialogTitle>Create Measurable</DialogTitle>
+              <DialogDescription>
+                Create a new measurable item.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-3">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  placeholder="Name..."
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="type">Type</Label>
+                <div className="flex justify-center gap-2">
+                  {[
+                    { label: "Count_Down", icon: <FaStopwatch20 /> },
+                    { label: "Tally", icon: <LuTally4 /> },
+                    { label: "Seeking", icon: <LuTelescope /> },
+                  ].map((t) => (
+                    <div
+                      onClick={() => setType(t.label as MeasurableType["type"])}
+                      className={`flex h-24 w-32 flex-col items-center justify-center gap-2 rounded-md ${type === t.label ? "border-accent bg-accent/40 border-2" : "border"} p-4`}
+                    >
+                      {t.label}
+                      {t.icon}
+                    </div>
+                  ))}
+                </div>
+                {/* Want to do selectable cards to explain the differences */}
+                {/* <Select
+                  id="type"
+                  value={type}
+                  onChange={(e) =>
+                    setType(e.target.value as MeasurableType["type"])
+                  }
                 >
-                  Create
+                  <option value="Count_Down">Count Down</option>
+                  <option value="Count_Up">Count Up</option>
+                  <option value="Tally">Tally</option>
+                </Select> */}
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="date" className="px-1">
+                  Due Date
+                </Label>
+                <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      id="date"
+                      className="w-48 justify-between font-normal"
+                    >
+                      {dueDate ? dueDate.toLocaleDateString() : "Select date"}
+                      <ChevronDownIcon />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-auto overflow-hidden p-0"
+                    align="start"
+                  >
+                    <Calendar
+                      mode="single"
+                      selected={dueDate ?? undefined}
+                      captionLayout="dropdown"
+                      onSelect={(date) => {
+                        setDueDate(date ?? null);
+                        setIsCalendarOpen(false);
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button
+                  variant="outline"
+                  // ref={dialogCloseRef}
+                  disabled={isCreatingMeasurable}
+                >
+                  Cancel
                 </Button>
               </DialogClose>
+              <Button onClick={handleCreate} disabled={isCreatingMeasurable}>
+                {isCreatingMeasurable ? <Spinner /> : "Create"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
       <div className="flex grow flex-col gap-1 overflow-hidden overflow-y-auto pb-24">
-        <div className="mx-auto flex grow flex-col gap-2">
-          {measurables?.map((measurable) => (
-            <Meter key={measurable.id} measurable={measurable} />
-          ))}
-        </div>
+        {isLoading && <Spinner className="mx-auto h-24 w-24" />}
+        {!isLoading && measurables && measurables.length === 0 && (
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <GiStoneStack />
+              </EmptyMedia>
+              <EmptyTitle>Nothing to show yet</EmptyTitle>
+              <EmptyDescription>
+                Try clicking some of the buttons to get started...
+              </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent>
+              <div className="flex gap-2">
+                <Button onClick={() => setIsCreatingMeasurableModalOpen(true)}>
+                  Create
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => alert("Work in progress...")}
+                >
+                  Import
+                </Button>
+              </div>
+            </EmptyContent>
+          </Empty>
+        )}
+        {!isLoading && measurables && measurables.length > 0 && (
+          <div className="mx-auto flex grow flex-col gap-2">
+            {measurables?.map((measurable) => (
+              <Meter key={measurable.id} measurable={measurable} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

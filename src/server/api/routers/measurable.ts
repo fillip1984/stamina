@@ -9,7 +9,7 @@ export const measurableRouter = createTRPCRouter({
       z.object({
         name: z.string(),
         description: z.string(),
-        type: z.nativeEnum(MeasurableTypeEnum),
+        type: z.enum(MeasurableTypeEnum),
         dueDate: z.date().optional(),
       }),
     )
@@ -18,9 +18,9 @@ export const measurableRouter = createTRPCRouter({
         data: {
           name: input.name,
           description: input.description,
+          type: input.type,
           setDate: new Date(),
           dueDate: input.dueDate,
-          type: input.type,
         },
       });
     }),
