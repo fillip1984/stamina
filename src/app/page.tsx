@@ -4,11 +4,26 @@ import { format, startOfDay } from "date-fns";
 import { addDays } from "date-fns/addDays";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import { FaCalendarWeek, FaCheck } from "react-icons/fa6";
+import {
+  FaCalendarWeek,
+  FaCheck,
+  FaEllipsisVertical,
+  FaEye,
+  FaPencil,
+  FaTrash,
+} from "react-icons/fa6";
 import { GiDuration } from "react-icons/gi";
 import { TbTargetArrow } from "react-icons/tb";
 import ThemeToggle from "~/components/theme/themeToggle";
 import { Button } from "~/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 import {
   Item,
   ItemActions,
@@ -96,25 +111,35 @@ export default function Home() {
       {
         id: (prev.length + 1).toString(),
         date: new Date(),
-        notes: `Completed measurable ${measureable.name} on ${new Date().toLocaleDateString()}`,
+        notes: `${measureable.type === "Tally" ? "Reset" : "Completed"} measurable: ${measureable.name} on ${new Date().toLocaleDateString()}`,
         measurableId: id,
       },
     ]);
 
     // increment setDate to tomorrow, dueDate to tomorrow + original duration
+    // if no previous due date, and type was seeking, set to elapsed duration
+    // if no previous due date, and type was tally, leave due date undefined
     const { duration, elapsedDuration } = calculateProgress(
       measureable.setDate,
       measureable.dueDate,
     );
     const newSetDate = startOfDay(addDays(new Date(), 1));
-    const newDueDate = startOfDay(
-      addDays(newSetDate, duration != 0 ? duration - 1 : elapsedDuration),
-    );
+    const newDueDate =
+      measureable.type === "Count Down"
+        ? startOfDay(addDays(newSetDate, duration - 1))
+        : measureable.type === "Seeking"
+          ? startOfDay(addDays(newSetDate, elapsedDuration))
+          : undefined;
     measureable.setDate = newSetDate;
     measureable.dueDate = newDueDate;
 
+    // if we were seeking for duration and have set a dueDate, change to count down
+    // if type was Count Down or Tally, leave alone
+    const newType =
+      measureable.type === "Seeking" ? "Count Down" : measureable.type;
+
     setMeasurables((prev) =>
-      prev.map((m) => (m.id === id ? { ...measureable } : m)),
+      prev.map((m) => (m.id === id ? { ...measureable, type: newType } : m)),
     );
   };
 
@@ -252,17 +277,44 @@ const Meter = ({
           )}
         </AnimatePresence>
       </ItemContent>
-      <ItemActions>
+      <ItemActions className="flex flex-col">
         <Button
           variant="outline"
           size="sm"
           onClick={() => handleComplete(measurable.id)}
           className="flex flex-col items-center gap-0"
         >
-          <div className="flex flex-col items-center gap-1">
+          <div>
             <FaCheck />
           </div>
         </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button variant="ghost" size="sm">
+              <FaEllipsisVertical />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <FaPencil />
+                Edit
+              </DropdownMenuItem>
+
+              <DropdownMenuItem>
+                <FaEye />
+                View Activity
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem variant="destructive">
+                <FaTrash />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </ItemActions>
     </Item>
   );
