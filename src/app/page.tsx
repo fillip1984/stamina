@@ -1,5 +1,6 @@
 "use client";
 
+import { DialogTitle } from "@radix-ui/react-dialog";
 import { format, startOfDay } from "date-fns";
 import { addDays } from "date-fns/addDays";
 import { AnimatePresence, motion } from "motion/react";
@@ -10,12 +11,20 @@ import {
   FaEllipsisVertical,
   FaEye,
   FaPencil,
+  FaPlus,
   FaTrash,
 } from "react-icons/fa6";
 import { GiDuration } from "react-icons/gi";
 import { TbTargetArrow } from "react-icons/tb";
 import ThemeToggle from "~/components/theme/themeToggle";
 import { Button } from "~/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogTrigger,
+} from "~/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,159 +39,126 @@ import {
   ItemContent,
   ItemTitle,
 } from "~/components/ui/item";
+import { api } from "~/trpc/react";
+import type { MeasurableType } from "~/trpc/types";
 import { calculateProgress } from "~/utils/progressUtil";
 
-type MeterTypes = "Seeking" | "Count Down" | "Tally";
-type Measurable = {
-  id: string;
-  name: string;
-  description: string;
-  type: MeterTypes;
-  setDate: Date;
-  dueDate?: Date;
-};
-
-type Activity = {
-  id: string;
-  date: Date;
-  notes: string;
-  measurableId: string;
-};
-
 export default function Home() {
-  const [measurables, setMeasurables] = useState<Measurable[]>([
-    {
-      id: "1",
-      name: "Clean downstairs bathroom",
-      description: "General cleaning of the downstairs bathroom",
-      type: "Count Down",
-      setDate: new Date("2025-10-31"),
-      dueDate: new Date("2025-11-10"),
+  const utils = api.useUtils();
+  const { data: measurables } = api.measurable.findAll.useQuery();
+  const { mutateAsync: createMeasurable } = api.measurable.create.useMutation({
+    onSuccess: () => {
+      utils.measurable.findAll.invalidate();
     },
-    {
-      id: "2",
-      name: "Clean upstairs bathroom",
-      description: "General cleaning of the upstairs bathroom",
-      type: "Count Down",
-      setDate: new Date("2025-10-31"),
-      dueDate: new Date("2025-11-01"),
-    },
-    {
-      id: "3",
-      name: "Clean kitchen",
-      description: "General cleaning of the kitchen",
-      type: "Count Down",
-      setDate: new Date("2025-10-31"),
-      dueDate: new Date("2025-11-15"),
-    },
-    {
-      id: "4",
-      name: "Clean living room",
-      description: "General cleaning of the living room",
-      type: "Count Down",
-      setDate: new Date("2025-09-30"),
-      dueDate: new Date("2025-11-01"),
-    },
-    {
-      id: "5",
-      name: "Clean master bedroom",
-      description: "General cleaning of the master bedroom",
-      type: "Seeking",
-      setDate: new Date("2025-10-31"),
-      dueDate: undefined,
-    },
-    {
-      id: "6",
-      name: "Quit smoking",
-      description: "Quit smoking for good",
-      type: "Tally",
-      setDate: new Date("2025-11-03"),
-      dueDate: undefined,
-    },
-  ]);
+  });
 
-  const handleComplete = (id: string) => {
-    const measureable = measurables.find((m) => m.id === id);
-    if (!measureable) return;
-    // TODO: show toast with error
-
-    setActivities((prev) => [
-      ...prev,
-      {
-        id: (prev.length + 1).toString(),
-        date: new Date(),
-        notes: `${measureable.type === "Tally" ? "Reset" : "Completed"} measurable: ${measureable.name} on ${new Date().toLocaleDateString()}`,
-        measurableId: id,
-      },
-    ]);
-
-    // increment setDate to tomorrow, dueDate to tomorrow + original duration
-    // if no previous due date, and type was seeking, set to elapsed duration
-    // if no previous due date, and type was tally, leave due date undefined
-    const { duration, elapsedDuration } = calculateProgress(
-      measureable.setDate,
-      measureable.dueDate,
-    );
-    const newSetDate = startOfDay(addDays(new Date(), 1));
-    const newDueDate =
-      measureable.type === "Count Down"
-        ? startOfDay(addDays(newSetDate, duration - 1))
-        : measureable.type === "Seeking"
-          ? startOfDay(addDays(newSetDate, elapsedDuration))
-          : undefined;
-    measureable.setDate = newSetDate;
-    measureable.dueDate = newDueDate;
-
-    // if we were seeking for duration and have set a dueDate, change to count down
-    // if type was Count Down or Tally, leave alone
-    const newType =
-      measureable.type === "Seeking" ? "Count Down" : measureable.type;
-
-    setMeasurables((prev) =>
-      prev.map((m) => (m.id === id ? { ...measureable, type: newType } : m)),
-    );
-  };
-
-  const [activities, setActivities] = useState<Activity[]>([]);
+  // const [activities, setActivities] = useState<Activity[]>([]);
 
   return (
     <div className="flex grow flex-col">
-      <div className="flex justify-end p-2">
+      <div className="flex justify-end gap-2 p-2">
         <ThemeToggle />
+        <Dialog>
+          <DialogTrigger>
+            <Button className="rounded-full">
+              <FaPlus />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogTitle>Create Measurable</DialogTitle>
+            <DialogFooter>
+              <DialogClose>
+                <Button
+                  onClick={async () => {
+                    await createMeasurable({
+                      name: "New Measurable",
+                      description: "Description",
+                      type: "Seeking",
+                    });
+                  }}
+                >
+                  Create
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
       <div className="flex grow flex-col gap-1 overflow-hidden overflow-y-auto pb-24">
         <div className="mx-auto flex grow flex-col gap-2">
-          {measurables.map((measurable) => (
-            <Meter
-              key={measurable.id}
-              measurable={measurable}
-              handleComplete={handleComplete}
-            />
+          {measurables?.map((measurable) => (
+            <Meter key={measurable.id} measurable={measurable} />
           ))}
-        </div>
-        <div>
-          <h4>Results</h4>
-          <ul>
-            {activities.map((activity) => (
-              <li key={activity.id}>{activity.notes}</li>
-            ))}
-          </ul>
         </div>
       </div>
     </div>
   );
 }
 
-const Meter = ({
-  measurable,
-  handleComplete,
-}: {
-  measurable: Measurable;
-  handleComplete: (id: string) => void;
-}) => {
-  const { daysRemaining, progress, overdue, duration, elapsedDuration } =
-    calculateProgress(measurable.setDate, measurable.dueDate);
+const Meter = ({ measurable }: { measurable: MeasurableType }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { daysRemaining, progress, overdue, duration, elapsedDuration } =
+    calculateProgress(measurable.setDate, measurable.dueDate ?? undefined);
+
+  const utils = api.useUtils();
+  const { mutateAsync: updateMeasurable } = api.measurable.update.useMutation({
+    onSuccess: () => {
+      utils.measurable.findAll.invalidate();
+    },
+  });
+  const { mutateAsync: deleteMeasurable } = api.measurable.delete.useMutation({
+    onSuccess: () => {
+      utils.measurable.findAll.invalidate();
+    },
+  });
+
+  const handleComplete = () => {
+    // const measureable = measurables.find((m) => m.id === id);
+    // if (!measureable) return;
+    // TODO: show toast with error
+
+    // setActivities((prev) => [
+    //   ...prev,
+    //   {
+    //     id: (prev.length + 1).toString(),
+    //     date: new Date(),
+    //     notes: `${measureable.type === "Tally" ? "Reset" : "Completed"} measurable: ${measureable.name} on ${new Date().toLocaleDateString()}`,
+    //     measurableId: id,
+    //   },
+    // ]);
+
+    // increment setDate to tomorrow, dueDate to tomorrow + original duration
+    // if no previous due date, and type was seeking, set to elapsed duration
+    // if no previous due date, and type was tally, leave due date undefined
+    const { duration, elapsedDuration } = calculateProgress(
+      measurable.setDate,
+      measurable.dueDate ?? undefined,
+    );
+    const newSetDate = startOfDay(addDays(new Date(), 1));
+    const newDueDate =
+      measurable.type === "Count_Down"
+        ? startOfDay(addDays(newSetDate, duration - 1))
+        : measurable.type === "Seeking"
+          ? startOfDay(addDays(newSetDate, elapsedDuration))
+          : undefined;
+    measurable.setDate = newSetDate;
+    measurable.dueDate = newDueDate ?? null;
+
+    // if we were seeking for duration and have set a dueDate, change to count down
+    // if type was Count_Down or Tally, leave alone
+    const newType =
+      measurable.type === "Seeking" ? "Count_Down" : measurable.type;
+
+    // setMeasurables((prev) =>
+    //   prev.map((m) => (m.id === id ? { ...measureable, type: newType } : m)),
+    // );
+    updateMeasurable({
+      ...measurable,
+      type: newType,
+      setDate: newSetDate,
+      dueDate: newDueDate ?? null,
+    });
+  };
 
   return (
     <Item
@@ -281,7 +257,7 @@ const Meter = ({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => handleComplete(measurable.id)}
+          onClick={handleComplete}
           className="flex flex-col items-center gap-0"
         >
           <div>
@@ -308,7 +284,10 @@ const Meter = ({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem variant="destructive">
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => deleteMeasurable(measurable.id)}
+              >
                 <FaTrash />
                 Delete
               </DropdownMenuItem>

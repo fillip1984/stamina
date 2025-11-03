@@ -10,11 +10,35 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
+model Measurable {
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
+    name        String
+    description String
+    type        MeasurableTypeEnum
+    setDate     DateTime
+    dueDate     DateTime?
+
     @@index([name])
+}
+
+model Result {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    date         DateTime
+    notes        String
+    measurableId String
+
+    @@index([date])
+    @@index([measurableId])
+}
+
+enum MeasurableTypeEnum {
+    Tally
+    Count_Down
+    Seeking
 }

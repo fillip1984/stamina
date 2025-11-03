@@ -6,7 +6,7 @@ import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
   title: "stamina",
-  description: "Clock based productivity tool",
+  description: "Count down based productivity tool",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
