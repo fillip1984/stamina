@@ -28,7 +28,6 @@ export const calculateProgress = (setDate: Date, dueDate?: Date) => {
   const progress = Math.round((elapsedDuration / duration) * 100);
   const overdue = currentDate > dueDate;
 
-  console.log({ setDate, dueDate, duration });
   return {
     duration,
     elapsedDuration,
