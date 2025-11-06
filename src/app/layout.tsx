@@ -1,8 +1,11 @@
 import "~/styles/globals.css";
 
 import { type Metadata } from "next";
-import { TRPCReactProvider } from "~/trpc/react";
 import { ThemeProvider } from "next-themes";
+import Nav from "~/components/nav";
+import { TRPCReactProvider } from "~/trpc/react";
+import CreateMeasurableDialog from "~/components/createMeasurableDialog";
+import { AppContextProvider } from "~/contexts/AppContext";
 
 export const metadata: Metadata = {
   title: "stamina",
@@ -17,14 +20,20 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body>
         <TRPCReactProvider>
-          <ThemeProvider
-            attribute={"class"}
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <div className="flex h-screen grow overflow-hidden">{children}</div>
-          </ThemeProvider>
+          <AppContextProvider>
+            <ThemeProvider
+              attribute={"class"}
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <div className="flex h-screen grow flex-col overflow-hidden">
+                <Nav />
+                {children}
+              </div>
+              <CreateMeasurableDialog />
+            </ThemeProvider>
+          </AppContextProvider>
         </TRPCReactProvider>
       </body>
     </html>

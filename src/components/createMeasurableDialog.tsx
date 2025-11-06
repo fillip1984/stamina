@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDownIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaStopwatch20 } from "react-icons/fa6";
 import { LuTally4, LuTelescope } from "react-icons/lu";
 import { Button } from "~/components/ui/button";
@@ -24,22 +24,24 @@ import {
 } from "~/components/ui/popover";
 import { Spinner } from "~/components/ui/spinner";
 import { Textarea } from "~/components/ui/textarea";
+import { AppContext } from "~/contexts/AppContext";
+
 import { api } from "~/trpc/react";
 import type { MeasurableType } from "~/trpc/types";
 
-export default function CreateMeasurableDialog({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
+export default function CreateMeasurableDialog() {
+  const {
+    isCreateMeasurableModalOpen,
+    openCreateMeasurableModal,
+    closeCreateMeasurableModal,
+  } = useContext(AppContext);
+
   const utils = api.useUtils();
   const { mutateAsync: createMeasurable, isPending: isCreatingMeasurable } =
     api.measurable.create.useMutation({
       onSuccess: async () => {
         await utils.measurable.findAll.invalidate();
-        onClose();
+        closeCreateMeasurableModal();
         setName("");
         setDescription("");
         setType("Countdown");
@@ -92,7 +94,16 @@ export default function CreateMeasurableDialog({
   }, [name, type, dueDate]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog
+      open={isCreateMeasurableModalOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          closeCreateMeasurableModal();
+        } else {
+          openCreateMeasurableModal();
+        }
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create Measurable</DialogTitle>
@@ -169,11 +180,7 @@ export default function CreateMeasurableDialog({
         </div>
         <DialogFooter>
           <DialogClose asChild>
-            <Button
-              variant="outline"
-              // ref={dialogCloseRef}
-              disabled={isCreatingMeasurable}
-            >
+            <Button variant="outline" disabled={isCreatingMeasurable}>
               Cancel
             </Button>
           </DialogClose>

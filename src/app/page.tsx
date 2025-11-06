@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { FaPlus } from "react-icons/fa6";
+import { useContext } from "react";
 import { GiStoneStack } from "react-icons/gi";
-import CreateMeasurableDialog from "~/components/createMeasurableDialog";
+
 import MeasureableCard from "~/components/measurableCard";
-import ThemeToggle from "~/components/theme/themeToggle";
 import { Button } from "~/components/ui/button";
 import {
   Empty,
@@ -16,30 +14,15 @@ import {
   EmptyTitle,
 } from "~/components/ui/empty";
 import { Spinner } from "~/components/ui/spinner";
+import { AppContext } from "~/contexts/AppContext";
+
 import { api } from "~/trpc/react";
 
 export default function Home() {
-  const utils = api.useUtils();
   const { data: measurables, isLoading } = api.measurable.findAll.useQuery();
-
-  const [isCreatingMeasurableModalOpen, setIsCreatingMeasurableModalOpen] =
-    useState(false);
 
   return (
     <div className="flex grow flex-col">
-      <div className="flex justify-end gap-2 p-2">
-        <ThemeToggle />
-        <Button
-          className="rounded-full"
-          onClick={() => setIsCreatingMeasurableModalOpen(true)}
-        >
-          <FaPlus />
-        </Button>
-        <CreateMeasurableDialog
-          isOpen={isCreatingMeasurableModalOpen}
-          onClose={() => setIsCreatingMeasurableModalOpen(false)}
-        />
-      </div>
       <div className="flex grow flex-col gap-1 overflow-hidden overflow-y-auto pb-24">
         {isLoading && <Spinner className="mx-auto h-24 w-24" />}
         {!isLoading && measurables && measurables.length > 0 && (
@@ -49,21 +32,15 @@ export default function Home() {
             ))}
           </div>
         )}
-        {!isLoading && measurables && measurables.length === 0 && (
-          <EmptyView
-            setIsCreatingMeasurableModalOpen={setIsCreatingMeasurableModalOpen}
-          />
-        )}
+        {!isLoading && measurables && measurables.length === 0 && <EmptyView />}
       </div>
     </div>
   );
 }
 
-const EmptyView = ({
-  setIsCreatingMeasurableModalOpen,
-}: {
-  setIsCreatingMeasurableModalOpen: (open: boolean) => void;
-}) => {
+const EmptyView = () => {
+  const { openCreateMeasurableModal } = useContext(AppContext);
+
   return (
     <Empty>
       <EmptyHeader>
@@ -77,9 +54,7 @@ const EmptyView = ({
       </EmptyHeader>
       <EmptyContent>
         <div className="flex gap-2">
-          <Button onClick={() => setIsCreatingMeasurableModalOpen(true)}>
-            Create
-          </Button>
+          <Button onClick={openCreateMeasurableModal}>Create</Button>
           <Button
             variant="outline"
             onClick={() => alert("Work in progress...")}
