@@ -48,8 +48,8 @@ export default function CreateMeasurableDialog({
     });
 
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [name, setName] = useState("test");
-  const [description, setDescription] = useState("test");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [type, setType] = useState<MeasurableType["type"]>("Countdown");
   const [dueDate, setDueDate] = useState<Date | null>(null);
 
