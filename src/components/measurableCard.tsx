@@ -1,7 +1,6 @@
 "use client";
 
-import { format, startOfDay } from "date-fns";
-import { addDays } from "date-fns/addDays";
+import { format } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import {
@@ -43,11 +42,12 @@ export default function MeasureableCard({
     calculateProgress(measurable.setDate, measurable.dueDate ?? undefined);
 
   const utils = api.useUtils();
-  const { mutateAsync: updateMeasurable } = api.measurable.update.useMutation({
-    onSuccess: () => {
-      utils.measurable.findAll.invalidate();
-    },
-  });
+  const { mutateAsync: completeMeasurable } =
+    api.measurable.complete.useMutation({
+      onSuccess: () => {
+        utils.measurable.findAll.invalidate();
+      },
+    });
   const { mutateAsync: deleteMeasurable } = api.measurable.delete.useMutation({
     onSuccess: () => {
       utils.measurable.findAll.invalidate();
@@ -55,40 +55,13 @@ export default function MeasureableCard({
   });
 
   const handleComplete = () => {
-    // increment setDate to tomorrow, dueDate to tomorrow + original duration
-    // if no previous due date, and type was seeking, set to elapsed duration
-    // if no previous due date, and type was tally, leave due date undefined
-    const { duration, elapsedDuration } = calculateProgress(
-      measurable.setDate,
-      measurable.dueDate ?? undefined,
-    );
-    const newSetDate = startOfDay(addDays(new Date(), 1));
-    const newDueDate =
-      measurable.type === "Countdown"
-        ? startOfDay(addDays(newSetDate, duration - 1))
-        : measurable.type === "Seeking"
-          ? startOfDay(addDays(newSetDate, elapsedDuration))
-          : undefined;
-    measurable.setDate = newSetDate;
-    measurable.dueDate = newDueDate ?? null;
-
-    // if we were seeking for duration and have set a dueDate, change to count down
-    // if type was Countdown or Tally, leave alone
-    const newType =
-      measurable.type === "Seeking" ? "Countdown" : measurable.type;
-
-    updateMeasurable({
-      ...measurable,
-      type: newType,
-      setDate: newSetDate,
-      dueDate: newDueDate ?? null,
-    });
+    completeMeasurable(measurable.id);
   };
 
   return (
     <Item
       variant="outline"
-      className="relative w-[600px] items-start overflow-hidden p-2"
+      className="bg-card relative w-[600px] items-start overflow-hidden p-2"
     >
       <ItemContent
         onClick={() => setIsExpanded((prev) => !prev)}
