@@ -1,4 +1,4 @@
-import { differenceInCalendarDays } from "date-fns";
+import { differenceInCalendarDays, endOfYear } from "date-fns";
 
 /**
  * Calculates progress metrics based on setDate and dueDate
@@ -6,20 +6,21 @@ import { differenceInCalendarDays } from "date-fns";
  * @param dueDate - The date when the measurable is due (optional)
  * @returns An object containing duration, elapsedDuration, daysRemaining, progress percentage, and overdue status
  *
- * If dueDate is not provided, all returned values will be zero or false.
+ * If dueDate is not provided, set dueDate to the end of the current year and calculate accordingly.
  */
 export const calculateProgress = (setDate: Date, dueDate?: Date) => {
   const currentDate = new Date();
   const elapsedDuration = differenceInCalendarDays(currentDate, setDate);
 
   if (!dueDate) {
-    return {
-      duration: 0,
-      elapsedDuration,
-      daysRemaining: 0,
-      progress: 0,
-      overdue: false,
-    };
+    //   return {
+    //     duration: 0,
+    //     elapsedDuration,
+    //     daysRemaining: 0,
+    //     progress: 0,
+    //     overdue: false,
+    //   };
+    dueDate = endOfYear(currentDate);
   }
 
   // include both start and end dates in duration and daysRemaining calculations

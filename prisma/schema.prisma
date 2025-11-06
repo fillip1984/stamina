@@ -39,6 +39,6 @@ model Result {
 
 enum MeasurableTypeEnum {
     Tally
-    Count_Down
+    Countdown
     Seeking
 }

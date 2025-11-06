@@ -4,7 +4,7 @@ import { format, startOfDay } from "date-fns";
 import { addDays } from "date-fns/addDays";
 import { ChevronDownIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FaCalendarWeek,
   FaCheck,
@@ -29,7 +29,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "~/components/ui/dialog";
 import {
   DropdownMenu,
@@ -73,12 +72,10 @@ export default function Home() {
     api.measurable.create.useMutation({
       onSuccess: async () => {
         await utils.measurable.findAll.invalidate();
-        // dialogCloseRef.current?.click();
         setIsCreatingMeasurableModalOpen(false);
         setName("");
         setDescription("");
-        setType("Count_Down");
-        // setSetDate(null);
+        setType("Countdown");
         setDueDate(null);
       },
     });
@@ -88,21 +85,46 @@ export default function Home() {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [name, setName] = useState("test");
   const [description, setDescription] = useState("test");
-  const [type, setType] = useState<MeasurableType["type"]>("Count_Down");
-  // const [setDate, setSetDate] = useState<Date | null>(null);
+  const [type, setType] = useState<MeasurableType["type"]>("Countdown");
   const [dueDate, setDueDate] = useState<Date | null>(null);
 
-  // const dialogCloseRef = useRef<HTMLButtonElement>(null);
+  const measurableTypes = [
+    {
+      label: "Countdown",
+      icon: <FaStopwatch20 />,
+      description: "A measurable that counts down to a due date.",
+    },
+    {
+      label: "Tally",
+      icon: <LuTally4 />,
+      description: "A measurable that tallies up days since being set.",
+    },
+    {
+      label: "Seeking",
+      icon: <LuTelescope />,
+      description:
+        "A measurable that we don't know how long the interval should be, due date is set open ended until you complete and then the duration is set.",
+    },
+  ];
 
   const handleCreate = () => {
     createMeasurable({
       name,
       description,
       type,
-      // setDate: setDate ?? new Date(),
       dueDate: dueDate ?? undefined,
     });
   };
+
+  const [validToCreate, setValidToCreate] = useState(false);
+  const validateForm = () => {
+    if (name.trim().length === 0) return false;
+    if (type === "Countdown" && !dueDate) return false;
+    return true;
+  };
+  useEffect(() => {
+    setValidToCreate(validateForm());
+  }, [name, type, dueDate]);
 
   return (
     <div className="flex grow flex-col">
@@ -146,64 +168,56 @@ export default function Home() {
               <div className="grid gap-2">
                 <Label htmlFor="type">Type</Label>
                 <div className="flex justify-center gap-2">
-                  {[
-                    { label: "Count_Down", icon: <FaStopwatch20 /> },
-                    { label: "Tally", icon: <LuTally4 /> },
-                    { label: "Seeking", icon: <LuTelescope /> },
-                  ].map((t) => (
+                  {measurableTypes.map((t) => (
                     <div
                       onClick={() => setType(t.label as MeasurableType["type"])}
-                      className={`flex h-24 w-32 flex-col items-center justify-center gap-2 rounded-md ${type === t.label ? "border-accent bg-accent/40 border-2" : "border"} p-4`}
+                      className={`flex h-24 w-32 flex-col items-center justify-center gap-2 rounded-md select-none ${type === t.label ? "border-accent bg-accent/40 border-2" : "border"} p-4`}
                     >
                       {t.label}
                       {t.icon}
                     </div>
                   ))}
                 </div>
-                {/* Want to do selectable cards to explain the differences */}
-                {/* <Select
-                  id="type"
-                  value={type}
-                  onChange={(e) =>
-                    setType(e.target.value as MeasurableType["type"])
-                  }
-                >
-                  <option value="Count_Down">Count Down</option>
-                  <option value="Count_Up">Count Up</option>
-                  <option value="Tally">Tally</option>
-                </Select> */}
+                <span className="text-muted-foreground h-10 text-sm">
+                  {measurableTypes.find((mt) => mt.label === type)?.description}
+                </span>
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="date" className="px-1">
-                  Due Date
-                </Label>
-                <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      id="date"
-                      className="w-48 justify-between font-normal"
-                    >
-                      {dueDate ? dueDate.toLocaleDateString() : "Select date"}
-                      <ChevronDownIcon />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="w-auto overflow-hidden p-0"
-                    align="start"
+              {type === "Countdown" && (
+                <div className="grid gap-2">
+                  <Label htmlFor="date" className="px-1">
+                    Due Date
+                  </Label>
+                  <Popover
+                    open={isCalendarOpen}
+                    onOpenChange={setIsCalendarOpen}
                   >
-                    <Calendar
-                      mode="single"
-                      selected={dueDate ?? undefined}
-                      captionLayout="dropdown"
-                      onSelect={(date) => {
-                        setDueDate(date ?? null);
-                        setIsCalendarOpen(false);
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        id="date"
+                        className="w-48 justify-between font-normal"
+                      >
+                        {dueDate ? dueDate.toLocaleDateString() : "Select date"}
+                        <ChevronDownIcon />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-auto overflow-hidden p-0"
+                      align="start"
+                    >
+                      <Calendar
+                        mode="single"
+                        selected={dueDate ?? undefined}
+                        captionLayout="dropdown"
+                        onSelect={(date) => {
+                          setDueDate(date ?? null);
+                          setIsCalendarOpen(false);
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              )}
             </div>
             <DialogFooter>
               <DialogClose asChild>
@@ -215,7 +229,10 @@ export default function Home() {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button onClick={handleCreate} disabled={isCreatingMeasurable}>
+              <Button
+                onClick={handleCreate}
+                disabled={!validToCreate || isCreatingMeasurable}
+              >
                 {isCreatingMeasurable ? <Spinner /> : "Create"}
               </Button>
             </DialogFooter>
@@ -280,20 +297,6 @@ const Meter = ({ measurable }: { measurable: MeasurableType }) => {
   });
 
   const handleComplete = () => {
-    // const measureable = measurables.find((m) => m.id === id);
-    // if (!measureable) return;
-    // TODO: show toast with error
-
-    // setActivities((prev) => [
-    //   ...prev,
-    //   {
-    //     id: (prev.length + 1).toString(),
-    //     date: new Date(),
-    //     notes: `${measureable.type === "Tally" ? "Reset" : "Completed"} measurable: ${measureable.name} on ${new Date().toLocaleDateString()}`,
-    //     measurableId: id,
-    //   },
-    // ]);
-
     // increment setDate to tomorrow, dueDate to tomorrow + original duration
     // if no previous due date, and type was seeking, set to elapsed duration
     // if no previous due date, and type was tally, leave due date undefined
@@ -303,7 +306,7 @@ const Meter = ({ measurable }: { measurable: MeasurableType }) => {
     );
     const newSetDate = startOfDay(addDays(new Date(), 1));
     const newDueDate =
-      measurable.type === "Count_Down"
+      measurable.type === "Countdown"
         ? startOfDay(addDays(newSetDate, duration - 1))
         : measurable.type === "Seeking"
           ? startOfDay(addDays(newSetDate, elapsedDuration))
@@ -312,13 +315,10 @@ const Meter = ({ measurable }: { measurable: MeasurableType }) => {
     measurable.dueDate = newDueDate ?? null;
 
     // if we were seeking for duration and have set a dueDate, change to count down
-    // if type was Count_Down or Tally, leave alone
+    // if type was Countdown or Tally, leave alone
     const newType =
-      measurable.type === "Seeking" ? "Count_Down" : measurable.type;
+      measurable.type === "Seeking" ? "Countdown" : measurable.type;
 
-    // setMeasurables((prev) =>
-    //   prev.map((m) => (m.id === id ? { ...measureable, type: newType } : m)),
-    // );
     updateMeasurable({
       ...measurable,
       type: newType,
@@ -338,7 +338,6 @@ const Meter = ({ measurable }: { measurable: MeasurableType }) => {
       >
         <ItemTitle>{measurable.name}</ItemTitle>
         <span className="text-muted-foreground flex items-center gap-1 text-xs">
-          {/* <CiTextAlignLeft /> */}
           {measurable.description}
         </span>
         <div className="relative my-2 flex h-8 w-full items-center justify-center overflow-hidden rounded-2xl border">
@@ -359,7 +358,9 @@ const Meter = ({ measurable }: { measurable: MeasurableType }) => {
 
           {(measurable.type === "Tally" || measurable.type === "Seeking") && (
             <div className="flex items-center gap-1">
-              <span className="text-xl font-bold">{elapsedDuration + 1}</span>
+              <span className="text-xl font-bold">
+                {elapsedDuration > 0 ? elapsedDuration : 0}
+              </span>
               {measurable.type === "Tally" ? (
                 <span className="text-xs">days and counting</span>
               ) : (
@@ -410,11 +411,15 @@ const Meter = ({ measurable }: { measurable: MeasurableType }) => {
                 {measurable.setDate.toLocaleDateString()} -{" "}
                 {measurable.dueDate
                   ? measurable.dueDate.toLocaleDateString()
-                  : "Seeking"}
+                  : measurable.type === "Seeking"
+                    ? "Seeking"
+                    : "Open ended"}
               </span>
               <span className="flex items-center gap-1">
                 <GiDuration />
-                {duration > 0 ? `${duration} days` : "No duration set"}
+                {measurable.type === "Countdown"
+                  ? `${duration} days`
+                  : "No duration set"}
               </span>
             </motion.div>
           )}
