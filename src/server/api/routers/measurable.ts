@@ -25,7 +25,18 @@ export const measurableRouter = createTRPCRouter({
       });
     }),
   findAll: publicProcedure.query(async ({ ctx }) => {
-    return ctx.db.measurable.findMany();
+    const measurables = await ctx.db.measurable.findMany({
+      orderBy: { dueDate: "desc" },
+    });
+
+    measurables.sort((a, b) => {
+      if (!a.dueDate && !b.dueDate) return 0;
+      if (!a.dueDate) return -1;
+      if (!b.dueDate) return 1;
+      return a.dueDate.getTime() - b.dueDate.getTime();
+    });
+
+    return measurables;
   }),
   findById: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     return ctx.db.measurable.findUnique({
