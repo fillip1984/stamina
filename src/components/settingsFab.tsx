@@ -16,7 +16,8 @@ import {
 } from "./ui/dropdown-menu";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
-import type { ChangeEvent } from "react";
+import { useContext, useEffect, useRef, type ChangeEvent } from "react";
+import { AppContext } from "~/contexts/AppContext";
 
 export default function SettingsFab() {
   const router = useRouter();
@@ -65,17 +66,23 @@ export default function SettingsFab() {
     },
   });
 
+  // const { showImportFileBrowser } = useContext(AppContext);
+  // useEffect(() => {
+  //   if (showImportFileBrowser) {
+  //     triggerFileBrowse();
+  //   }
+  // }, [showImportFileBrowser]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const triggerFileBrowse = () => {
+    fileInputRef.current?.click();
+  };
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.target.files) {
       Array.from(e.target.files).forEach((file) => processFile(file));
     }
-  };
-
-  const triggerFileBrowse = () => {
-    const fileInput = document.getElementById("importFileInput");
-    fileInput?.click();
   };
 
   const processFile = (file: File) => {
@@ -142,7 +149,7 @@ export default function SettingsFab() {
         </DropdownMenuGroup>
       </DropdownMenuContent>
       <input
-        id="importFileInput"
+        ref={fileInputRef}
         type="file"
         accept=".json"
         multiple={true}

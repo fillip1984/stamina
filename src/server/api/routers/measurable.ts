@@ -13,7 +13,7 @@ export const measurableRouter = createTRPCRouter({
         name: z.string(),
         description: z.string(),
         type: z.enum(MeasurableTypeEnum),
-        dueDate: z.date().optional(),
+        dueDate: z.date().nullable(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -46,29 +46,27 @@ export const measurableRouter = createTRPCRouter({
       where: { id: input },
     });
   }),
-  // update: publicProcedure
-  //   .input(
-  //     z.object({
-  //       id: z.string(),
-  //       name: z.string().min(1).optional(),
-  //       description: z.string().min(1).optional(),
-  //       type: z.enum(MeasurableTypeEnum).optional(),
-  //       setDate: z.date(),
-  //       dueDate: z.date().nullable(),
-  //     }),
-  //   )
-  //   .mutation(async ({ ctx, input }) => {
-  //     return ctx.db.measurable.update({
-  //       where: { id: input.id },
-  //       data: {
-  //         name: input.name,
-  //         description: input.description,
-  //         type: input.type,
-  //         setDate: input.setDate,
-  //         dueDate: input.dueDate,
-  //       },
-  //     });
-  //   }),
+  update: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string().min(1).optional(),
+        description: z.string().min(1).optional(),
+        type: z.enum(MeasurableTypeEnum).optional(),
+        dueDate: z.date().nullable(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.measurable.update({
+        where: { id: input.id },
+        data: {
+          name: input.name,
+          description: input.description,
+          type: input.type,
+          dueDate: input.dueDate,
+        },
+      });
+    }),
   complete: publicProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
@@ -79,14 +77,15 @@ export const measurableRouter = createTRPCRouter({
         throw new Error("Measurable not found");
       }
 
-      // increment setDate to tomorrow, dueDate to tomorrow + original duration
+      // increment setDate to previous dueDate
       // if no previous due date, and type was seeking, set to elapsed duration
       // if no previous due date, and type was tally, leave due date undefined
       const { duration, elapsedDuration } = calculateProgress(
         measurable.setDate,
         measurable.dueDate ?? undefined,
       );
-      const newSetDate = startOfDay(addDays(new Date(), 1));
+      // const newSetDate = startOfDay(addDays(new Date(), 1));
+      const newSetDate = startOfDay(measurable.dueDate ?? new Date());
       const newDueDate =
         measurable.type === "Countdown"
           ? startOfDay(addDays(newSetDate, duration - 1))

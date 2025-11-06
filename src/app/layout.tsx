@@ -4,7 +4,7 @@ import { type Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import Nav from "~/components/nav";
 import { TRPCReactProvider } from "~/trpc/react";
-import CreateMeasurableDialog from "~/components/createMeasurableDialog";
+import CreateMeasurableDialog from "~/components/measurableDialog";
 import { AppContextProvider } from "~/contexts/AppContext";
 import Fabs from "~/components/fabs";
 

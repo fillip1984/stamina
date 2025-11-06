@@ -29,14 +29,21 @@ import { AppContext } from "~/contexts/AppContext";
 import { api } from "~/trpc/react";
 import type { MeasurableType } from "~/trpc/types";
 
-export default function CreateMeasurableDialog() {
+export default function MeasurableDialog() {
   const {
     isCreateMeasurableModalOpen,
     openCreateMeasurableModal,
     closeCreateMeasurableModal,
+    measurableIdToEdit,
   } = useContext(AppContext);
 
   const utils = api.useUtils();
+  const { data: measurableToEdit } = api.measurable.findById.useQuery(
+    measurableIdToEdit!,
+    {
+      enabled: !!measurableIdToEdit,
+    },
+  );
   const { mutateAsync: createMeasurable, isPending: isCreatingMeasurable } =
     api.measurable.create.useMutation({
       onSuccess: async () => {
@@ -49,11 +56,42 @@ export default function CreateMeasurableDialog() {
       },
     });
 
+  const { mutateAsync: updateMeasurable, isPending: isUpdatingMeasurable } =
+    api.measurable.update.useMutation({
+      onSuccess: async () => {
+        await utils.measurable.findAll.invalidate();
+        closeCreateMeasurableModal();
+        setName("");
+        setDescription("");
+        setType("Countdown");
+        setDueDate(null);
+      },
+    });
+
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [id, setId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState<MeasurableType["type"]>("Countdown");
   const [dueDate, setDueDate] = useState<Date | null>(null);
+  useEffect(() => {
+    if (measurableToEdit) {
+      setId(measurableToEdit.id);
+      setName(measurableToEdit.name);
+      setDescription(measurableToEdit.description);
+      setType(measurableToEdit.type);
+      if (measurableToEdit.dueDate) {
+        setDueDate(new Date(measurableToEdit.dueDate));
+      } else {
+        setDueDate(null);
+      }
+    } else {
+      setName("");
+      setDescription("");
+      setType("Countdown");
+      setDueDate(null);
+    }
+  }, [measurableToEdit]);
 
   const measurableTypes = [
     {
@@ -74,13 +112,23 @@ export default function CreateMeasurableDialog() {
     },
   ];
 
-  const handleCreate = () => {
-    createMeasurable({
-      name,
-      description,
-      type,
-      dueDate: dueDate ?? undefined,
-    });
+  const handleCreateOrUpdate = () => {
+    if (id) {
+      updateMeasurable({
+        id,
+        name,
+        description,
+        type,
+        dueDate: dueDate,
+      });
+    } else {
+      createMeasurable({
+        name,
+        description,
+        type,
+        dueDate: dueDate,
+      });
+    }
   };
 
   const [validToCreate, setValidToCreate] = useState(false);
@@ -185,10 +233,18 @@ export default function CreateMeasurableDialog() {
             </Button>
           </DialogClose>
           <Button
-            onClick={handleCreate}
-            disabled={!validToCreate || isCreatingMeasurable}
+            onClick={handleCreateOrUpdate}
+            disabled={
+              !validToCreate || isCreatingMeasurable || isUpdatingMeasurable
+            }
           >
-            {isCreatingMeasurable ? <Spinner /> : "Create"}
+            {isCreatingMeasurable || isUpdatingMeasurable ? (
+              <Spinner />
+            ) : id ? (
+              "Update"
+            ) : (
+              "Create"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

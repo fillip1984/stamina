@@ -2,7 +2,7 @@
 
 import { format } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   FaCalendarWeek,
   FaCheck,
@@ -28,6 +28,7 @@ import {
   ItemContent,
   ItemTitle,
 } from "~/components/ui/item";
+import { AppContext } from "~/contexts/AppContext";
 import { api } from "~/trpc/react";
 import type { MeasurableType } from "~/trpc/types";
 import { calculateProgress } from "~/utils/progressUtil";
@@ -56,6 +57,11 @@ export default function MeasureableCard({
 
   const handleComplete = () => {
     completeMeasurable(measurable.id);
+  };
+
+  const { setMeasurableIdToEdit } = useContext(AppContext);
+  const handleEdit = () => {
+    setMeasurableIdToEdit(measurable.id);
   };
 
   return (
@@ -175,7 +181,7 @@ export default function MeasureableCard({
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleEdit}>
                 <FaPencil />
                 Edit
               </DropdownMenuItem>

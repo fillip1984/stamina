@@ -15,11 +15,13 @@ model Measurable {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    name        String
-    description String
-    type        MeasurableTypeEnum
-    setDate     DateTime
-    dueDate     DateTime?
+    name             String
+    description      String
+    type             MeasurableTypeEnum
+    setDate          DateTime
+    dueDate          DateTime?
+    suggestedDayTime Daytime?
+    suggestedDay     DayOfWeek?
 
     @@index([name])
 }
@@ -41,4 +43,21 @@ enum MeasurableTypeEnum {
     Tally
     Countdown
     Seeking
+}
+
+enum Daytime {
+    Morning
+    Afternoon
+    Evening
+    Night
+}
+
+enum DayOfWeek {
+    Sunday
+    Monday
+    Tuesday
+    Wednesday
+    Thursday
+    Friday
+    Saturday
 }
