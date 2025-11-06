@@ -6,6 +6,7 @@ import Nav from "~/components/nav";
 import { TRPCReactProvider } from "~/trpc/react";
 import CreateMeasurableDialog from "~/components/createMeasurableDialog";
 import { AppContextProvider } from "~/contexts/AppContext";
+import Fabs from "~/components/fabs";
 
 export const metadata: Metadata = {
   title: "stamina",
@@ -27,11 +28,12 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <div className="flex h-screen grow flex-col overflow-hidden">
+              <div className="relative flex h-screen grow flex-col overflow-hidden">
                 <Nav />
                 {children}
               </div>
               <CreateMeasurableDialog />
+              <Fabs />
             </ThemeProvider>
           </AppContextProvider>
         </TRPCReactProvider>

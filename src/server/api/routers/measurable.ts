@@ -3,6 +3,7 @@ import { addDays, startOfDay } from "date-fns";
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import type { MeasurableType } from "~/trpc/types";
 import { calculateProgress } from "~/utils/progressUtil";
 
 export const measurableRouter = createTRPCRouter({
@@ -124,4 +125,38 @@ export const measurableRouter = createTRPCRouter({
       where: { id: input },
     });
   }),
+  exportData: publicProcedure.mutation(async ({ ctx }) => {
+    const result = await ctx.db.measurable.findMany({
+      select: {
+        name: true,
+        description: true,
+        type: true,
+        setDate: true,
+        dueDate: true,
+      },
+    });
+
+    return result;
+  }),
+  importData: publicProcedure
+    .input(z.object({ dataUrl: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const dataUrl = input.dataUrl;
+      const data = dataUrl.split(",")[1]!;
+      const buffer = Buffer.from(data, "base64");
+      const string = buffer.toString();
+      const json = JSON.parse(string) as MeasurableType[];
+
+      for (const measurable of json) {
+        const result = await ctx.db.measurable.create({
+          data: {
+            name: measurable.name,
+            description: measurable.description,
+            type: measurable.type,
+            setDate: measurable.setDate,
+            dueDate: measurable.dueDate,
+          },
+        });
+      }
+    }),
 });
