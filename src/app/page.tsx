@@ -69,7 +69,7 @@ export default function Home() {
   }, [measurables, selectedFilter]);
 
   return (
-    <>
+    <ScrollableContainer scrollToTopButton={true}>
       {isLoading && <Spinner className="mx-auto h-24 w-24" />}
 
       {/* TODO: maybe: https://theodorusclarence.com/blog/list-animation */}
@@ -101,29 +101,28 @@ export default function Home() {
               All
             </Button>
           </div>
-          <ScrollableContainer scrollToTopButton={true}>
-            <div className="flex flex-col gap-2">
-              <AnimatePresence>
-                {filteredMeasurables?.map((measurable, i) => (
-                  <motion.div
-                    key={measurable.id}
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{
-                      delayChildren: 0.2,
-                    }}
-                  >
-                    <MeasureableCard measurable={measurable} />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          </ScrollableContainer>
+
+          <div className="flex flex-col gap-2">
+            <AnimatePresence>
+              {filteredMeasurables?.map((measurable, i) => (
+                <motion.div
+                  key={measurable.id}
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{
+                    delayChildren: 0.2,
+                  }}
+                >
+                  <MeasureableCard measurable={measurable} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
         </>
       )}
       {!isLoading && measurables && measurables.length === 0 && <EmptyView />}
-    </>
+    </ScrollableContainer>
   );
 }
 

@@ -54,13 +54,12 @@ export default function ScrollableContainer({
       {/* defaults to:
        *    flex --- because why not
        *    flex-col --- scrolling up and down
-       *    grow --- take available space
        *    items-center --- center children horizontally
        *    w-full --- full width on smaller screens
        *    md:mx-auto md:w-[800px] --- centered and constrained width on md+ screens
        *    px-4 --- padding on sides, especially the side with the scrollbar so it doesn't overlap content
        */}
-      <div className="flex w-full grow flex-col items-center px-4 md:mx-auto md:w-[800px]">
+      <div className="flex w-full flex-col items-center px-4 md:mx-auto md:w-[800px]">
         {children}
         {isScrollToTopVisible && <ScrollToTopButton onClick={scrollToTop} />}
       </div>
@@ -70,7 +69,7 @@ export default function ScrollableContainer({
 
 const ScrollToTopButton = ({ onClick }: { onClick: () => void }) => {
   return (
-    <div className="flex justify-center py-4 pb-24">
+    <div className="flex justify-center py-4">
       <Button
         variant={"outline"}
         size={"lg"}

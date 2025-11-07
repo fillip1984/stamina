@@ -4,6 +4,7 @@ Another productivity tool attempt
 
 ## TODOs
 
+- [ ] - add more color, like: https://sunshinestateamateur.com
 - [ ] - build import/export process
 - [ ] - build out results page to track progress
 - [ ] - create outcomes popups
