@@ -153,7 +153,7 @@ export default function SettingsFab() {
         type="file"
         accept=".json"
         multiple={true}
-        className="absolute -z-100 opacity-0"
+        className="hidden"
         onChange={handleFileChange}
       />
     </DropdownMenu>

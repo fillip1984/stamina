@@ -54,7 +54,7 @@ export default function ScrollableContainer({
       {/* defaults to:
        *    flex --- because why not
        *    flex-col --- scrolling up and down
-       *    items-center --- center children horizontally
+       *    items-center --- center children horizontally //TODO: this might be a mistake, if you keep finding yourself overriding this then remove it
        *    w-full --- full width on smaller screens
        *    md:mx-auto md:w-[800px] --- centered and constrained width on md+ screens
        *    px-4 --- padding on sides, especially the side with the scrollbar so it doesn't overlap content

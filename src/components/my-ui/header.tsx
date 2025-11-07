@@ -7,7 +7,7 @@ export default function Header({
   ...props
 }: React.ComponentProps<"div">) {
   return (
-    <div className={cn("my-4 flex gap-2", className)} {...props}>
+    <div className={cn("my-4 flex w-full gap-2", className)} {...props}>
       {/* TODO: leading icons */}
       {children}
       {/* TODO: icons directly after label */}
