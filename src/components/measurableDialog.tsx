@@ -164,6 +164,8 @@ export default function MeasurableDialog() {
   useEffect(() => {
     if (type !== "Countdown") return;
     if (!suggestedDay) return;
+    // only update if changed
+    if (measurableToEdit?.suggestedDay === suggestedDay) return;
 
     const today = new Date();
     const todayDayOfWeek = today.getDay(); // 0 (Sun) - 6 (Sat)
@@ -179,8 +181,10 @@ export default function MeasurableDialog() {
       setDueDate(nextDate);
     }
 
-    // default interval to 7 days
-    setInterval(7);
+    // default interval to 7 days, if not set
+    if (!interval) {
+      setInterval(7);
+    }
   }, [suggestedDay, type]);
 
   const measurableTypes = [
