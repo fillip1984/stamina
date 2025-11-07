@@ -10,6 +10,18 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+model Area {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    name        String
+    description String
+    measurables Measurable[]
+
+    @@index([name])
+}
+
 model Measurable {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
@@ -20,8 +32,11 @@ model Measurable {
     type             MeasurableTypeEnum
     setDate          DateTime
     dueDate          DateTime?
-    suggestedDayTime Daytime?
-    suggestedDay     DayOfWeek?
+    suggestedDayTime DaytimeEnum?
+    suggestedDay     DayOfWeekEnum?
+
+    area   Area?   @relation(fields: [areaId], references: [id], onDelete: SetNull)
+    areaId String?
 
     @@index([name])
 }
@@ -45,14 +60,14 @@ enum MeasurableTypeEnum {
     Seeking
 }
 
-enum Daytime {
+enum DaytimeEnum {
     Morning
     Afternoon
     Evening
     Night
 }
 
-enum DayOfWeek {
+enum DayOfWeekEnum {
     Sunday
     Monday
     Tuesday

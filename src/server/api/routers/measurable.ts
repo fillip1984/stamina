@@ -1,4 +1,4 @@
-import { MeasurableTypeEnum } from "@prisma/client";
+import { DayOfWeekEnum, DaytimeEnum, MeasurableTypeEnum } from "@prisma/client";
 import { addDays, startOfDay } from "date-fns";
 import { z } from "zod";
 
@@ -14,6 +14,9 @@ export const measurableRouter = createTRPCRouter({
         description: z.string(),
         type: z.enum(MeasurableTypeEnum),
         dueDate: z.date().nullable(),
+        areaId: z.string().nullable(),
+        suggestedDay: z.enum(DayOfWeekEnum).nullable(),
+        suggestedDayTime: z.enum(DaytimeEnum).nullable(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -24,6 +27,9 @@ export const measurableRouter = createTRPCRouter({
           type: input.type,
           setDate: new Date(),
           dueDate: input.dueDate,
+          areaId: input.areaId,
+          suggestedDay: input.suggestedDay,
+          suggestedDayTime: input.suggestedDayTime,
         },
       });
     }),
@@ -54,6 +60,9 @@ export const measurableRouter = createTRPCRouter({
         description: z.string().min(1).optional(),
         type: z.enum(MeasurableTypeEnum).optional(),
         dueDate: z.date().nullable(),
+        areaId: z.string().nullable(),
+        suggestedDay: z.enum(DayOfWeekEnum).nullable(),
+        suggestedDayTime: z.enum(DaytimeEnum).nullable(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -64,6 +73,9 @@ export const measurableRouter = createTRPCRouter({
           description: input.description,
           type: input.type,
           dueDate: input.dueDate,
+          areaId: input.areaId,
+          suggestedDay: input.suggestedDay,
+          suggestedDayTime: input.suggestedDayTime,
         },
       });
     }),
@@ -86,7 +98,7 @@ export const measurableRouter = createTRPCRouter({
       );
       // const newSetDate = startOfDay(addDays(new Date(), 1));
       const newSetDate = startOfDay(measurable.dueDate ?? new Date());
-      const newDueDate =
+      let newDueDate =
         measurable.type === "Countdown"
           ? startOfDay(addDays(newSetDate, duration - 1))
           : measurable.type === "Seeking"

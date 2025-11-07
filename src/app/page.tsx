@@ -20,7 +20,7 @@ import { Spinner } from "~/components/ui/spinner";
 import { AppContext } from "~/contexts/AppContext";
 
 import { api } from "~/trpc/react";
-import type { MeasurableSectionType, MeasurableType } from "~/trpc/types";
+import type { MeasurableType } from "~/trpc/types";
 
 export default function Home() {
   const { data: measurables, isLoading } = api.measurable.findAll.useQuery();
@@ -37,7 +37,7 @@ export default function Home() {
     } else if (selectedFilter === "Today") {
       setFilteredMeasurables(
         measurables.filter(
-          (measurable) => measurable.dueDate && isToday(measurable.dueDate),
+          (measurable) => !measurable.dueDate || isToday(measurable.dueDate),
         ),
       );
     } else if (selectedFilter === "Tomorrow") {
@@ -46,10 +46,10 @@ export default function Home() {
       setFilteredMeasurables(
         measurables.filter(
           (measurable) =>
-            measurable.dueDate &&
-            measurable.dueDate.getDate() === tomorrow.getDate() &&
-            measurable.dueDate.getMonth() === tomorrow.getMonth() &&
-            measurable.dueDate.getFullYear() === tomorrow.getFullYear(),
+            !measurable.dueDate ||
+            (measurable.dueDate.getDate() === tomorrow.getDate() &&
+              measurable.dueDate.getMonth() === tomorrow.getMonth() &&
+              measurable.dueDate.getFullYear() === tomorrow.getFullYear()),
         ),
       );
     } else if (selectedFilter === "This week") {
@@ -59,9 +59,8 @@ export default function Home() {
       setFilteredMeasurables(
         measurables.filter(
           (measurable) =>
-            measurable.dueDate &&
-            measurable.dueDate >= now &&
-            measurable.dueDate <= endOfWeek,
+            !measurable.dueDate ||
+            (measurable.dueDate >= now && measurable.dueDate <= endOfWeek),
         ),
       );
     }

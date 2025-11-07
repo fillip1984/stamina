@@ -1,8 +1,12 @@
 "use client";
 
 import { createContext, useEffect, useState } from "react";
+import { Button } from "~/components/ui/button";
+import type { AreaType } from "~/trpc/types";
 
 type AppContextType = {
+  area: AreaType;
+  setArea: (area: AreaType) => void;
   isCreateMeasurableModalOpen: boolean;
   openCreateMeasurableModal: () => void;
   closeCreateMeasurableModal: () => void;
@@ -11,8 +15,14 @@ type AppContextType = {
   // isShowImportFileBrowser: boolean;
   // showImportFileBrowser?: () => void;
 };
-
+export const UncategorizedArea: AreaType = {
+  id: "Uncategorized",
+  name: "Uncategorized",
+  description: "Uncategorized area",
+};
 export const AppContext = createContext<AppContextType>({
+  area: UncategorizedArea,
+  setArea: (area: AreaType) => {},
   isCreateMeasurableModalOpen: false,
   openCreateMeasurableModal: () => {},
   closeCreateMeasurableModal: () => {},
@@ -27,6 +37,7 @@ export function AppContextProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const [area, setArea] = useState<AreaType>(UncategorizedArea);
   const [isCreateMeasurableModalOpen, setIsCreateMeasurableModalOpen] =
     useState(false);
   const [measurableIdToEdit, setMeasurableIdToEdit] = useState<string>("");
@@ -40,6 +51,8 @@ export function AppContextProvider({
   return (
     <AppContext.Provider
       value={{
+        area: area,
+        setArea,
         isCreateMeasurableModalOpen,
         openCreateMeasurableModal: () => setIsCreateMeasurableModalOpen(true),
         closeCreateMeasurableModal: () => {
