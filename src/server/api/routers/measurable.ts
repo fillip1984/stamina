@@ -1,5 +1,5 @@
 import { DayOfWeekEnum, DaytimeEnum, MeasurableTypeEnum } from "@prisma/client";
-import { addDays, startOfDay } from "date-fns";
+import { addDays, interval, startOfDay } from "date-fns";
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
@@ -12,24 +12,26 @@ export const measurableRouter = createTRPCRouter({
       z.object({
         name: z.string(),
         description: z.string(),
-        type: z.enum(MeasurableTypeEnum),
-        dueDate: z.date().nullable(),
         areaId: z.string().nullable(),
+        type: z.enum(MeasurableTypeEnum),
         suggestedDay: z.enum(DayOfWeekEnum).nullable(),
         suggestedDayTime: z.enum(DaytimeEnum).nullable(),
+        dueDate: z.date().nullable(),
+        interval: z.number().min(1).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       return ctx.db.measurable.create({
         data: {
+          setDate: new Date(),
           name: input.name,
           description: input.description,
-          type: input.type,
-          setDate: new Date(),
-          dueDate: input.dueDate,
           areaId: input.areaId,
+          type: input.type,
           suggestedDay: input.suggestedDay,
           suggestedDayTime: input.suggestedDayTime,
+          dueDate: input.dueDate,
+          interval: input.interval,
         },
       });
     }),
@@ -58,11 +60,12 @@ export const measurableRouter = createTRPCRouter({
         id: z.string(),
         name: z.string().min(1).optional(),
         description: z.string().min(1).optional(),
-        type: z.enum(MeasurableTypeEnum).optional(),
-        dueDate: z.date().nullable(),
         areaId: z.string().nullable(),
+        type: z.enum(MeasurableTypeEnum).optional(),
         suggestedDay: z.enum(DayOfWeekEnum).nullable(),
         suggestedDayTime: z.enum(DaytimeEnum).nullable(),
+        dueDate: z.date().nullable(),
+        interval: z.number().min(1).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -71,11 +74,12 @@ export const measurableRouter = createTRPCRouter({
         data: {
           name: input.name,
           description: input.description,
-          type: input.type,
-          dueDate: input.dueDate,
           areaId: input.areaId,
+          type: input.type,
           suggestedDay: input.suggestedDay,
           suggestedDayTime: input.suggestedDayTime,
+          dueDate: input.dueDate,
+          interval: input.interval,
         },
       });
     }),
@@ -94,13 +98,13 @@ export const measurableRouter = createTRPCRouter({
       // if no previous due date, and type was tally, leave due date undefined
       const { interval, elapsedDays } = calculateProgress(
         measurable.setDate,
-        measurable.dueDate ?? undefined,
+        measurable.dueDate ?? new Date(),
       );
-      // const newSetDate = startOfDay(addDays(new Date(), 1));
+      const effectiveInterval = measurable.interval ?? interval;
       const newSetDate = startOfDay(measurable.dueDate ?? new Date());
       let newDueDate =
         measurable.type === "Countdown"
-          ? startOfDay(addDays(newSetDate, interval - 1))
+          ? startOfDay(addDays(newSetDate, effectiveInterval))
           : measurable.type === "Seeking"
             ? startOfDay(addDays(newSetDate, elapsedDays))
             : undefined;
@@ -118,6 +122,7 @@ export const measurableRouter = createTRPCRouter({
             type: newType,
             setDate: measurable.setDate,
             dueDate: measurable.dueDate,
+            interval: newType === "Countdown" ? effectiveInterval : undefined,
           },
         }),
         ctx.db.result.create({

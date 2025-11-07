@@ -32,6 +32,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { api } from "~/trpc/react";
 import type { AreaType, MeasurableType } from "~/trpc/types";
 import Combobox from "./ui/combobox";
+import { set } from "zod";
 
 export default function MeasurableDialog() {
   const {
@@ -56,8 +57,12 @@ export default function MeasurableDialog() {
         closeCreateMeasurableModal();
         setName("");
         setDescription("");
+        setAreaId(null);
         setType("Countdown");
+        setSuggestedDay(null);
+        setSuggestedDayTime(null);
         setDueDate(null);
+        setInterval(undefined);
       },
     });
 
@@ -79,7 +84,7 @@ export default function MeasurableDialog() {
   const [description, setDescription] = useState("");
   const [areaId, setAreaId] = useState<string | null>(null);
   const [type, setType] = useState<MeasurableType["type"]>("Countdown");
-  const [suggestDayTime, setSuggestDayTime] = useState<DaytimeEnum | null>(
+  const [suggestedDayTime, setSuggestedDayTime] = useState<DaytimeEnum | null>(
     null,
   );
   const [suggestedDay, setSuggestedDay] = useState<DayOfWeekEnum | null>(null);
@@ -93,21 +98,23 @@ export default function MeasurableDialog() {
         id,
         name,
         description,
-        type,
-        dueDate: dueDate,
         areaId: effectiveArea?.id ?? null,
+        type,
         suggestedDay: suggestedDay,
-        suggestedDayTime: suggestDayTime,
+        suggestedDayTime: suggestedDayTime,
+        dueDate: dueDate,
+        interval,
       });
     } else {
       createMeasurable({
         name,
         description,
-        type,
-        dueDate: dueDate,
         areaId: effectiveArea?.id ?? null,
-        suggestedDay: suggestedDay,
-        suggestedDayTime: suggestDayTime,
+        type,
+        suggestedDay,
+        suggestedDayTime,
+        dueDate,
+        interval,
       });
     }
   };
@@ -116,7 +123,6 @@ export default function MeasurableDialog() {
   const validateForm = () => {
     if (name.trim().length === 0) return false;
     if (type === "Countdown" && !dueDate) return false;
-    if (areaId === null) return false;
 
     return true;
   };
@@ -130,19 +136,22 @@ export default function MeasurableDialog() {
       setId(measurableToEdit.id);
       setName(measurableToEdit.name);
       setDescription(measurableToEdit.description);
-      setType(measurableToEdit.type);
-      setDueDate(measurableToEdit.dueDate);
-      setSuggestDayTime(measurableToEdit.suggestedDayTime);
-      setSuggestedDay(measurableToEdit.suggestedDay);
       setAreaId(measurableToEdit.areaId ?? "");
+      setType(measurableToEdit.type);
+      setSuggestedDay(measurableToEdit.suggestedDay);
+      setSuggestedDayTime(measurableToEdit.suggestedDayTime);
+      setDueDate(measurableToEdit.dueDate);
+      setInterval(measurableToEdit.interval ?? undefined);
     } else {
+      setId(null);
       setName("");
       setDescription("");
+      setAreaId(null);
       setType("Countdown");
-      setDueDate(null);
-      setSuggestDayTime(null);
+      setSuggestedDayTime(null);
       setSuggestedDay(null);
-      setAreaId("");
+      setDueDate(null);
+      setInterval(undefined);
     }
   }, [measurableToEdit]);
 
@@ -215,10 +224,10 @@ export default function MeasurableDialog() {
       }}
     >
       <DialogContent>
-        <DialogHeader>
+        {/* <DialogHeader>
           <DialogTitle>Create Measurable</DialogTitle>
           <DialogDescription>Create a new measurable item.</DialogDescription>
-        </DialogHeader>
+        </DialogHeader> */}
         <div className="grid gap-3">
           <div className="grid gap-2">
             <Label htmlFor="name">Name</Label>
@@ -279,7 +288,7 @@ export default function MeasurableDialog() {
               {measurableTypes.find((mt) => mt.label === type)?.description}
             </span>
           </div>
-          <AnimatePresence>
+          <AnimatePresence initial={false}>
             {type === "Countdown" && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
@@ -313,9 +322,9 @@ export default function MeasurableDialog() {
                       </span>
                     </Label>
                     <Combobox
-                      value={suggestDayTime}
+                      value={suggestedDayTime}
                       setValue={(value) =>
-                        setSuggestDayTime(value as DaytimeEnum | null)
+                        setSuggestedDayTime(value as DaytimeEnum | null)
                       }
                       options={[
                         { id: "Morning", label: "Morning" },
@@ -364,11 +373,18 @@ export default function MeasurableDialog() {
                   </div>
                   <div className="grid gap-2">
                     <Label>Interval</Label>
-                    <span className="text-muted-foreground text-sm">
+                    <Input
+                      type="number"
+                      value={interval}
+                      onChange={(e) => setInterval(Number(e.target.value))}
+                      placeholder="days"
+                      className="w-24"
+                    />
+                    {/*<span className="text-muted-foreground text-sm">
                       {interval
                         ? `Every ${interval} day${interval > 1 ? "s" : ""}`
                         : ""}
-                    </span>
+                    </span>*/}
                   </div>
                 </div>
               </motion.div>
@@ -389,7 +405,7 @@ export default function MeasurableDialog() {
           >
             {isCreatingMeasurable || isUpdatingMeasurable ? (
               <Spinner />
-            ) : id ? (
+            ) : measurableIdToEdit ? (
               "Update"
             ) : (
               "Create"
