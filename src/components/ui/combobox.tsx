@@ -25,7 +25,7 @@ export default function Combobox({
 }: {
   value: string | null;
   setValue: (value: string | null) => void;
-  options: Array<{ id: string; label: string }>;
+  options: Array<{ id: string | null; label: string }>;
   searchable?: boolean;
   placeholder?: string;
 }) {
@@ -54,7 +54,7 @@ export default function Combobox({
               {options.map((option) => (
                 <CommandItem
                   key={option.id}
-                  value={option.id}
+                  value={option.id ?? ""}
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? null : currentValue);
                     setOpen(false);

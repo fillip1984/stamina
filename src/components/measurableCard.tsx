@@ -39,7 +39,7 @@ export default function MeasureableCard({
   measurable: MeasurableType;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { daysRemaining, progress, overdue, duration, elapsedDuration } =
+  const { daysRemaining, progress, overdue, interval, elapsedDays } =
     calculateProgress(measurable.setDate, measurable.dueDate ?? undefined);
 
   const utils = api.useUtils();
@@ -96,7 +96,7 @@ export default function MeasureableCard({
           {(measurable.type === "Tally" || measurable.type === "Seeking") && (
             <div className="flex items-center gap-1">
               <span className="text-xl font-bold">
-                {elapsedDuration > 0 ? elapsedDuration : 0}
+                {elapsedDays > 0 ? elapsedDays : 0}
               </span>
               {measurable.type === "Tally" ? (
                 <span className="text-xs">days and counting</span>
@@ -155,8 +155,8 @@ export default function MeasureableCard({
               <span className="flex items-center gap-1">
                 <GiDuration />
                 {measurable.type === "Countdown"
-                  ? `${duration} days`
-                  : "No duration set"}
+                  ? `${interval} days`
+                  : "No interval set"}
               </span>
             </motion.div>
           )}

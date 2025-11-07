@@ -34,6 +34,7 @@ model Measurable {
     dueDate          DateTime?
     suggestedDayTime DaytimeEnum?
     suggestedDay     DayOfWeekEnum?
+    interval         Int?
 
     area   Area?   @relation(fields: [areaId], references: [id], onDelete: SetNull)
     areaId String?

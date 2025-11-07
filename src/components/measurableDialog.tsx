@@ -25,7 +25,7 @@ import {
 } from "~/components/ui/popover";
 import { Spinner } from "~/components/ui/spinner";
 import { Textarea } from "~/components/ui/textarea";
-import { AppContext, UncategorizedArea } from "~/contexts/AppContext";
+import { AppContext } from "~/contexts/AppContext";
 
 import { differenceInCalendarDays } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
@@ -84,7 +84,7 @@ export default function MeasurableDialog() {
   );
   const [suggestedDay, setSuggestedDay] = useState<DayOfWeekEnum | null>(null);
   const [areaId, setAreaId] = useState<string | null>(null);
-  const [effectiveArea, setEffectiveArea] = useState<AreaType>();
+  const [effectiveArea, setEffectiveArea] = useState<AreaType | null>();
 
   useEffect(() => {
     if (measurableToEdit) {
@@ -95,7 +95,7 @@ export default function MeasurableDialog() {
       setDueDate(measurableToEdit.dueDate);
       setSuggestDayTime(measurableToEdit.suggestedDayTime);
       setSuggestedDay(measurableToEdit.suggestedDay);
-      setAreaId(measurableToEdit.areaId ?? "Uncategorized");
+      setAreaId(measurableToEdit.areaId ?? "");
     } else {
       setName("");
       setDescription("");
@@ -103,16 +103,12 @@ export default function MeasurableDialog() {
       setDueDate(null);
       setSuggestDayTime(null);
       setSuggestedDay(null);
-      setAreaId("Uncategorized");
+      setAreaId("");
     }
   }, [measurableToEdit]);
 
   useEffect(() => {
-    if (areaId === "Uncategorized") {
-      setEffectiveArea(UncategorizedArea);
-    } else if (areaId) {
-      setEffectiveArea(areas?.find((a) => a.id === areaId));
-    }
+    setEffectiveArea(areas?.find((a) => a.id === areaId));
   }, [areaId, areas]);
 
   const measurableTypes = [
@@ -125,7 +121,7 @@ export default function MeasurableDialog() {
       label: "Seeking",
       icon: <LuTelescope />,
       description:
-        "A measurable that we don't know how long the interval should be, due date is set open ended until you complete and then the duration is set.",
+        "A measurable that we don't know how long the interval should be, due date is set open ended until you complete and then the interval is set.",
     },
     {
       label: "Tally",
@@ -212,21 +208,21 @@ export default function MeasurableDialog() {
             <div className="grid gap-2">
               <Label htmlFor="area">Area</Label>
               <Combobox
-                value={areaId}
+                value={effectiveArea?.name ?? "Uncategorized"}
                 setValue={setAreaId}
-                options={[UncategorizedArea]
-                  .map((area) => ({ id: area.id, label: area.name }))
-                  .concat(
-                    areas?.map((area) => ({ id: area.id, label: area.name })) ||
-                      [],
-                  )}
+                options={[
+                  { id: "Uncategorized", label: "Uncategorized" },
+                ].concat(
+                  areas?.map((area) => ({ id: area.id, label: area.name })) ||
+                    [],
+                )}
                 placeholder="Select an area"
               />
             </div>
             <div className="grid gap-2">
               <Label>Area Description</Label>
               <span className="text-muted-foreground text-sm">
-                {effectiveArea?.description}
+                {effectiveArea?.description ?? "Uncategorized"}
               </span>
             </div>
           </div>
@@ -339,7 +335,7 @@ export default function MeasurableDialog() {
                     </Popover>
                   </div>
                   <div className="grid gap-2">
-                    <Label>Duration</Label>
+                    <Label>Interval</Label>
                     <span className="text-muted-foreground text-sm">
                       {`${differenceInCalendarDays(dueDate ?? new Date(), new Date())} days`}
                     </span>

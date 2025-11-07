@@ -90,9 +90,9 @@ export const measurableRouter = createTRPCRouter({
       }
 
       // increment setDate to previous dueDate
-      // if no previous due date, and type was seeking, set to elapsed duration
+      // if no previous due date, and type was seeking, set to elapsed days
       // if no previous due date, and type was tally, leave due date undefined
-      const { duration, elapsedDuration } = calculateProgress(
+      const { interval, elapsedDays } = calculateProgress(
         measurable.setDate,
         measurable.dueDate ?? undefined,
       );
@@ -100,14 +100,14 @@ export const measurableRouter = createTRPCRouter({
       const newSetDate = startOfDay(measurable.dueDate ?? new Date());
       let newDueDate =
         measurable.type === "Countdown"
-          ? startOfDay(addDays(newSetDate, duration - 1))
+          ? startOfDay(addDays(newSetDate, interval - 1))
           : measurable.type === "Seeking"
-            ? startOfDay(addDays(newSetDate, elapsedDuration))
+            ? startOfDay(addDays(newSetDate, elapsedDays))
             : undefined;
       measurable.setDate = newSetDate;
       measurable.dueDate = newDueDate ?? null;
 
-      // if we were seeking for duration and have set a dueDate, change to count down
+      // if we were seeking for interval and have set a dueDate, change to count down
       // if type was Countdown or Tally, leave alone
       const newType =
         measurable.type === "Seeking" ? "Countdown" : measurable.type;

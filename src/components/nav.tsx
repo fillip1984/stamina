@@ -7,7 +7,7 @@ import { useContext } from "react";
 import { SiGoogletasks } from "react-icons/si";
 import { TbCategory } from "react-icons/tb";
 import { Button } from "~/components/ui/button";
-import { UncategorizedArea, AppContext } from "~/contexts/AppContext";
+import { AppContext } from "~/contexts/AppContext";
 import { api } from "~/trpc/react";
 
 export default function Nav() {
@@ -30,9 +30,7 @@ export default function Nav() {
         </Button>
 
         <div className="flex grow gap-2 overflow-y-auto">
-          <Button onClick={() => setArea(UncategorizedArea)}>
-            Uncategorized
-          </Button>
+          <Button onClick={() => setArea(null)}>Uncategorized</Button>
           {areas?.map((area) => (
             <Link key={area.name} href={`/${area.name}`}>
               <Button variant="outline">{area.name}</Button>
