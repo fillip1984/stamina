@@ -9,7 +9,7 @@ export default function AreaPage() {
       </Header>
 
       <div className="flex flex-col gap-2">
-        {Array.from({ length: 10 }, (_, index) => (
+        {Array.from({ length: 5 }, (_, index) => (
           <div key={index} className="rounded border p-2">
             Area {index + 1} Lorem ipsum dolor sit amet consectetur adipisicing
             elit. Delectus quidem necessitatibus quis saepe magni quia aliquid

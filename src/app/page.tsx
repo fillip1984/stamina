@@ -101,7 +101,7 @@ export default function Home() {
               All
             </Button>
           </div>
-          <ScrollableContainer>
+          <ScrollableContainer scrollToTopButton={true}>
             <div className="flex flex-col gap-2">
               <AnimatePresence>
                 {filteredMeasurables?.map((measurable, i) => (
