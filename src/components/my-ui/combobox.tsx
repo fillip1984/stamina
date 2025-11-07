@@ -1,9 +1,11 @@
+"use client";
+
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
-import { Button } from "./button";
+import { Button } from "~/components/ui/button";
 import { Check, ChevronDownIcon } from "lucide-react";
 import {
   Command,
@@ -12,7 +14,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "./command";
+} from "~/components/ui/command";
 import { cn } from "~/lib/utils";
 import { useState } from "react";
 

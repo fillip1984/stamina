@@ -25,9 +25,11 @@ export default function Nav() {
     <div className="flex gap-1 overflow-hidden p-2">
       {/* leading menu items */}
       <div className="flex items-center gap-1 overflow-hidden">
-        <Button variant="outline" size={"icon"}>
-          <TbCategory />
-        </Button>
+        <Link href="/areas">
+          <Button variant="outline" size={"icon"}>
+            <TbCategory />
+          </Button>
+        </Link>
 
         <div className="flex grow gap-2 overflow-y-auto">
           <Button onClick={() => setArea(null)}>Uncategorized</Button>
