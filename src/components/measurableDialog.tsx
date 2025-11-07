@@ -27,7 +27,7 @@ import { Spinner } from "~/components/ui/spinner";
 import { Textarea } from "~/components/ui/textarea";
 import { AppContext } from "~/contexts/AppContext";
 
-import { differenceInCalendarDays } from "date-fns";
+import { nextDay, type Day } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
 import { api } from "~/trpc/react";
 import type { AreaType, MeasurableType } from "~/trpc/types";
@@ -42,13 +42,13 @@ export default function MeasurableDialog() {
   } = useContext(AppContext);
 
   const utils = api.useUtils();
+  const { data: areas } = api.area.findAll.useQuery();
   const { data: measurableToEdit } = api.measurable.findById.useQuery(
     measurableIdToEdit!,
     {
       enabled: !!measurableIdToEdit,
     },
   );
-  const { data: areas } = api.area.findAll.useQuery();
   const { mutateAsync: createMeasurable, isPending: isCreatingMeasurable } =
     api.measurable.create.useMutation({
       onSuccess: async () => {
@@ -77,58 +77,15 @@ export default function MeasurableDialog() {
   const [id, setId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [areaId, setAreaId] = useState<string | null>(null);
   const [type, setType] = useState<MeasurableType["type"]>("Countdown");
-  const [dueDate, setDueDate] = useState<Date | null>(null);
   const [suggestDayTime, setSuggestDayTime] = useState<DaytimeEnum | null>(
     null,
   );
   const [suggestedDay, setSuggestedDay] = useState<DayOfWeekEnum | null>(null);
-  const [areaId, setAreaId] = useState<string | null>(null);
+  const [dueDate, setDueDate] = useState<Date | null>(null);
+  const [interval, setInterval] = useState<number>();
   const [effectiveArea, setEffectiveArea] = useState<AreaType | null>();
-
-  useEffect(() => {
-    if (measurableToEdit) {
-      setId(measurableToEdit.id);
-      setName(measurableToEdit.name);
-      setDescription(measurableToEdit.description);
-      setType(measurableToEdit.type);
-      setDueDate(measurableToEdit.dueDate);
-      setSuggestDayTime(measurableToEdit.suggestedDayTime);
-      setSuggestedDay(measurableToEdit.suggestedDay);
-      setAreaId(measurableToEdit.areaId ?? "");
-    } else {
-      setName("");
-      setDescription("");
-      setType("Countdown");
-      setDueDate(null);
-      setSuggestDayTime(null);
-      setSuggestedDay(null);
-      setAreaId("");
-    }
-  }, [measurableToEdit]);
-
-  useEffect(() => {
-    setEffectiveArea(areas?.find((a) => a.id === areaId));
-  }, [areaId, areas]);
-
-  const measurableTypes = [
-    {
-      label: "Countdown",
-      icon: <ImHourGlass />,
-      description: "A measurable that counts down to a due date.",
-    },
-    {
-      label: "Seeking",
-      icon: <LuTelescope />,
-      description:
-        "A measurable that we don't know how long the interval should be, due date is set open ended until you complete and then the interval is set.",
-    },
-    {
-      label: "Tally",
-      icon: <LuTally4 />,
-      description: "A measurable that tallies up days since being set.",
-    },
-  ];
 
   const handleCreateOrUpdate = () => {
     if (id) {
@@ -166,6 +123,85 @@ export default function MeasurableDialog() {
   useEffect(() => {
     setValidToCreate(validateForm());
   }, [name, type, dueDate, areaId]);
+
+  // UX: when editing, populate fields or set defaults when creating new
+  useEffect(() => {
+    if (measurableToEdit) {
+      setId(measurableToEdit.id);
+      setName(measurableToEdit.name);
+      setDescription(measurableToEdit.description);
+      setType(measurableToEdit.type);
+      setDueDate(measurableToEdit.dueDate);
+      setSuggestDayTime(measurableToEdit.suggestedDayTime);
+      setSuggestedDay(measurableToEdit.suggestedDay);
+      setAreaId(measurableToEdit.areaId ?? "");
+    } else {
+      setName("");
+      setDescription("");
+      setType("Countdown");
+      setDueDate(null);
+      setSuggestDayTime(null);
+      setSuggestedDay(null);
+      setAreaId("");
+    }
+  }, [measurableToEdit]);
+
+  // UX: set effective area when areaId or areas change
+  useEffect(() => {
+    setEffectiveArea(areas?.find((a) => a.id === areaId));
+  }, [areaId, areas]);
+
+  // UX: set dueDate to next instance of suggestedDay when it is selected
+  useEffect(() => {
+    if (type !== "Countdown") return;
+    if (!suggestedDay) return;
+
+    const today = new Date();
+    const todayDayOfWeek = today.getDay(); // 0 (Sun) - 6 (Sat)
+    const targetDayOfWeek = daysOfWeek.findIndex(
+      (d) => d.label === suggestedDay,
+    );
+
+    // if today, set today
+    if (todayDayOfWeek === targetDayOfWeek) {
+      setDueDate(today);
+    } else {
+      const nextDate = nextDay(today, targetDayOfWeek as Day);
+      setDueDate(nextDate);
+    }
+
+    // default interval to 7 days
+    setInterval(7);
+  }, [suggestedDay, type]);
+
+  const measurableTypes = [
+    {
+      label: "Countdown",
+      icon: <ImHourGlass />,
+      description: "A measurable that counts down to a due date.",
+    },
+    {
+      label: "Seeking",
+      icon: <LuTelescope />,
+      description:
+        "A measurable that we don't know how long the interval should be, due date is set open ended until you complete and then the interval is set.",
+    },
+    {
+      label: "Tally",
+      icon: <LuTally4 />,
+      description: "A measurable that tallies up days since being set.",
+    },
+  ];
+
+  const daysOfWeek = [
+    { id: "Sunday", label: "Sunday" },
+    { id: "Monday", label: "Monday" },
+    { id: "Tuesday", label: "Tuesday" },
+    { id: "Wednesday", label: "Wednesday" },
+    { id: "Thursday", label: "Thursday" },
+    { id: "Friday", label: "Friday" },
+    { id: "Saturday", label: "Saturday" },
+  ];
 
   return (
     <Dialog
@@ -265,15 +301,7 @@ export default function MeasurableDialog() {
                       setValue={(value) =>
                         setSuggestedDay(value as DayOfWeekEnum | null)
                       }
-                      options={[
-                        { id: "Sunday", label: "Sunday" },
-                        { id: "Monday", label: "Monday" },
-                        { id: "Tuesday", label: "Tuesday" },
-                        { id: "Wednesday", label: "Wednesday" },
-                        { id: "Thursday", label: "Thursday" },
-                        { id: "Friday", label: "Friday" },
-                        { id: "Saturday", label: "Saturday" },
-                      ]}
+                      options={daysOfWeek}
                       placeholder="Select a day"
                     />
                   </div>
@@ -337,7 +365,9 @@ export default function MeasurableDialog() {
                   <div className="grid gap-2">
                     <Label>Interval</Label>
                     <span className="text-muted-foreground text-sm">
-                      {`${differenceInCalendarDays(dueDate ?? new Date(), new Date())} days`}
+                      {interval
+                        ? `Every ${interval} day${interval > 1 ? "s" : ""}`
+                        : ""}
                     </span>
                   </div>
                 </div>
