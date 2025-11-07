@@ -115,7 +115,7 @@ export const measurableRouter = createTRPCRouter({
       // if type was Countdown or Tally, leave alone
       const newType =
         measurable.type === "Seeking" ? "Countdown" : measurable.type;
-      const xxx = await ctx.db.$transaction([
+      const txResult = await ctx.db.$transaction([
         ctx.db.measurable.update({
           where: { id: input },
           data: {
@@ -134,7 +134,7 @@ export const measurableRouter = createTRPCRouter({
         }),
       ]);
 
-      return xxx;
+      return txResult;
     }),
   delete: publicProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
     return ctx.db.measurable.delete({
@@ -144,11 +144,15 @@ export const measurableRouter = createTRPCRouter({
   exportData: publicProcedure.mutation(async ({ ctx }) => {
     const result = await ctx.db.measurable.findMany({
       select: {
+        setDate: true,
         name: true,
         description: true,
+        areaId: true,
+        suggestedDay: true,
+        suggestedDayTime: true,
         type: true,
-        setDate: true,
         dueDate: true,
+        interval: true,
       },
     });
 
@@ -166,11 +170,15 @@ export const measurableRouter = createTRPCRouter({
       for (const measurable of json) {
         const result = await ctx.db.measurable.create({
           data: {
+            setDate: measurable.setDate,
             name: measurable.name,
             description: measurable.description,
+            areaId: measurable.areaId,
+            suggestedDay: measurable.suggestedDay,
+            suggestedDayTime: measurable.suggestedDayTime,
             type: measurable.type,
-            setDate: measurable.setDate,
             dueDate: measurable.dueDate,
+            interval: measurable.interval,
           },
         });
       }
