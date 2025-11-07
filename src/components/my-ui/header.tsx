@@ -12,6 +12,10 @@ export default function Header({
       {children}
       {/* TODO: icons directly after label */}
       {/* TODO: trailing icons */}
+
+      {/* TODO: Standardize on header size? */}
+      {/* TODO: add sticky option */}
+      {/* TODO: how about an abstract header that can be sticky, have leading, next to, and trailing areas... that can be be extended to Title, heading, subheading? */}
     </div>
   );
 }

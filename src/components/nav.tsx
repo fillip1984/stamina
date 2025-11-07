@@ -22,9 +22,9 @@ export default function Nav() {
   const { area, setArea } = useContext(AppContext);
 
   return (
-    <div className="flex gap-1 overflow-hidden p-2">
+    <div className="flex shrink-0 gap-1 overflow-hidden p-2">
       {/* leading menu items */}
-      <div className="flex items-center gap-1 overflow-hidden">
+      <div className="flex grow items-center gap-1 overflow-hidden">
         <Link href="/areas">
           <Button variant="outline" size={"icon"}>
             <TbCategory />
@@ -40,8 +40,8 @@ export default function Nav() {
           ))}
         </div>
       </div>
-      {/* trailing menu items */}
 
+      {/* trailing menu items */}
       <div className="flex items-center gap-1">
         {locations.map((location) => {
           if (pathname === location.href) return null;

@@ -2,11 +2,13 @@
 
 import { isToday } from "date-fns/isToday";
 import { el } from "date-fns/locale";
+import { Scroll } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useContext, useEffect, useState } from "react";
 import { GiStoneStack } from "react-icons/gi";
 
 import MeasureableCard from "~/components/measurableCard";
+import ScrollableContainer from "~/components/my-ui/scrollableContainer";
 import { Button } from "~/components/ui/button";
 import {
   Empty,
@@ -67,41 +69,40 @@ export default function Home() {
   }, [measurables, selectedFilter]);
 
   return (
-    <div className="flex grow flex-col gap-2 overflow-hidden">
-      {/* <h3>Measurables</h3> */}
-      <div className="flex grow flex-col gap-2 overflow-y-auto pb-24">
-        {isLoading && <Spinner className="mx-auto h-24 w-24" />}
+    <>
+      {isLoading && <Spinner className="mx-auto h-24 w-24" />}
 
-        {/* TODO: maybe: https://theodorusclarence.com/blog/list-animation */}
-        {!isLoading && (
-          <div className="flex flex-col">
-            <div className="mx-2 my-4 flex gap-2">
-              <Button
-                variant={selectedFilter === "Today" ? "default" : "outline"}
-                onClick={() => setSelectedFilter("Today")}
-              >
-                Today
-              </Button>
-              <Button
-                variant={selectedFilter === "Tomorrow" ? "default" : "outline"}
-                onClick={() => setSelectedFilter("Tomorrow")}
-              >
-                Tomorrow
-              </Button>
-              <Button
-                variant={selectedFilter === "This week" ? "default" : "outline"}
-                onClick={() => setSelectedFilter("This week")}
-              >
-                This week
-              </Button>
-              <Button
-                variant={selectedFilter === "All" ? "default" : "outline"}
-                onClick={() => setSelectedFilter("All")}
-              >
-                All
-              </Button>
-            </div>
-            <div className="mx-auto mt-4 flex grow flex-col gap-2">
+      {/* TODO: maybe: https://theodorusclarence.com/blog/list-animation */}
+      {!isLoading && (
+        <>
+          <div className="mx-2 my-4 flex gap-2">
+            <Button
+              variant={selectedFilter === "Today" ? "default" : "outline"}
+              onClick={() => setSelectedFilter("Today")}
+            >
+              Today
+            </Button>
+            <Button
+              variant={selectedFilter === "Tomorrow" ? "default" : "outline"}
+              onClick={() => setSelectedFilter("Tomorrow")}
+            >
+              Tomorrow
+            </Button>
+            <Button
+              variant={selectedFilter === "This week" ? "default" : "outline"}
+              onClick={() => setSelectedFilter("This week")}
+            >
+              This week
+            </Button>
+            <Button
+              variant={selectedFilter === "All" ? "default" : "outline"}
+              onClick={() => setSelectedFilter("All")}
+            >
+              All
+            </Button>
+          </div>
+          <ScrollableContainer>
+            <div className="flex flex-col gap-2">
               <AnimatePresence>
                 {filteredMeasurables?.map((measurable, i) => (
                   <motion.div
@@ -118,11 +119,11 @@ export default function Home() {
                 ))}
               </AnimatePresence>
             </div>
-          </div>
-        )}
-        {!isLoading && measurables && measurables.length === 0 && <EmptyView />}
-      </div>
-    </div>
+          </ScrollableContainer>
+        </>
+      )}
+      {!isLoading && measurables && measurables.length === 0 && <EmptyView />}
+    </>
   );
 }
 
