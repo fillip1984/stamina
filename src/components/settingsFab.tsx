@@ -18,6 +18,7 @@ import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useRef, type ChangeEvent } from "react";
 import { AppContext } from "~/contexts/AppContext";
+import type { AreaType, MeasurableType } from "~/trpc/types";
 
 export default function SettingsFab() {
   const router = useRouter();
@@ -34,7 +35,7 @@ export default function SettingsFab() {
 
   // export/import data stuff
   const utils = api.useUtils();
-  const { mutate: exportMeasurables } = api.measurable.exportData.useMutation({
+  const { mutate: exportData } = api.admin.exportData.useMutation({
     onSuccess: (data) => {
       // Create blob link to download
       const url = window.URL.createObjectURL(new Blob([JSON.stringify(data)]));
@@ -55,23 +56,18 @@ export default function SettingsFab() {
       link.parentNode?.removeChild(link);
     },
   });
-  const { mutate: importMeasurables } = api.measurable.importData.useMutation({
+  const { mutate: importData } = api.admin.importData.useMutation({
     onSuccess: () => {
       // toast.success("Vendor file uploaded", {
       //   duration: 4000,
       //   position: "top-center",
       // });
       void utils.measurable.invalidate();
+      void utils.area.invalidate();
       void router.push("/");
     },
   });
 
-  // const { showImportFileBrowser } = useContext(AppContext);
-  // useEffect(() => {
-  //   if (showImportFileBrowser) {
-  //     triggerFileBrowse();
-  //   }
-  // }, [showImportFileBrowser]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const triggerFileBrowse = () => {
     fileInputRef.current?.click();
@@ -86,17 +82,36 @@ export default function SettingsFab() {
   };
 
   const processFile = (file: File) => {
-    const fr = new FileReader();
-    fr.onload = convertFileToDataUrl;
-    fr.readAsDataURL(file);
+    try {
+      const fr = new FileReader();
+      fr.onload = convertFileToDataUrl;
+      fr.readAsDataURL(file);
+    } finally {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
   };
 
   const convertFileToDataUrl = (e: ProgressEvent<FileReader>) => {
     const dataUrlString = e.target?.result;
-    if (dataUrlString) {
-      importMeasurables({
-        dataUrl: dataUrlString as string,
-      });
+    const dataUrl = dataUrlString as string;
+    const data = dataUrl.split(",")[1]!;
+    const buffer = Buffer.from(data, "base64");
+    const string = buffer.toString();
+    const json = JSON.parse(string) as {
+      areas: AreaType[];
+      measurables: MeasurableType[];
+    };
+    const areas = json.areas;
+    const measurables = json.measurables.map((measurable) => ({
+      ...measurable,
+      setDate: new Date(measurable.setDate),
+      dueDate: measurable.dueDate ? new Date(measurable.dueDate) : null,
+      interval: measurable.interval ?? undefined,
+    }));
+    if (areas && measurables) {
+      importData({ areas, measurables });
     }
   };
 
@@ -111,7 +126,7 @@ export default function SettingsFab() {
       <DropdownMenuContent className="w-36" align="start">
         <DropdownMenuGroup>
           <DropdownMenuItem
-            onClick={() => exportMeasurables()}
+            onClick={() => exportData()}
             className="justify-between"
           >
             Export <FiDownloadCloud />

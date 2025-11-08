@@ -2,6 +2,7 @@ import { resultRouter } from "~/server/api/routers/result";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { areaRouter } from "./routers/area";
 import { measurableRouter } from "./routers/measurable";
+import { adminRouter } from "./routers/admin";
 
 /**
  * This is the primary router for your server.
@@ -9,6 +10,7 @@ import { measurableRouter } from "./routers/measurable";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
+  admin: adminRouter,
   area: areaRouter,
   measurable: measurableRouter,
   result: resultRouter,
