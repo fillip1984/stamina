@@ -4,8 +4,13 @@ Another productivity tool attempt
 
 ## TODOs
 
-- [ ] - create outcomes popups (steal them from fortuna)
 - [ ] - build out results page to track progress
+- [ ] - create outcomes popups (steal them from fortuna)
+  - [ ] - add in weight goal flow, compare weigh ins to goals showing progress
+  - [ ] - add spinners for pending mutation
+  - [ ] - add popup toast
+  - [ ] - add optional tags to things
+  - [ ] - decide on pulse vs heart rate for blood pressure
 - [ ] - test out functionality, to see if dates are being calculated properly
 - [ ] - redo modal for creating measurables (to match how we did the areas dialog)
   - [ ] - make sure modal doesn't overflow and has scrolling

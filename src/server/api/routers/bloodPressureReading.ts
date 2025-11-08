@@ -7,26 +7,40 @@ export const BloodPressureReadingRouter = createTRPCRouter({
   create: publicProcedure
     .input(
       z.object({
+        measurableId: z.string(),
         date: z.date(),
         systolic: z.number(),
         diastolic: z.number(),
-        pulse: z.string().optional(),
+        pulse: z.number().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const category = determineCategory(input);
-
-      const result = await ctx.db.bloodPressureReading.create({
-        data: {
-          // userId: ctx.session.user.id,
-          date: input.date,
-          systolic: input.systolic,
-          diastolic: input.diastolic,
-          pulse: input.pulse ? parseInt(input.pulse) : null,
-          category: category as BloodPressureCategoryEnum,
-        },
+      const txResult = await ctx.db.$transaction(async (db) => {
+        const result = await db.result.create({
+          data: {
+            // userId: ctx.session.user.id,
+            measurableId: input.measurableId,
+            date: input.date,
+            notes: `Blood Pressure Reading recorded: ${input.systolic} over ${input.diastolic}${
+              input.pulse ? `, Pulse: ${input.pulse}` : ""
+            }, Category: ${category.replaceAll("_", " ")}`,
+          },
+        });
+        const bpr = await db.bloodPressureReading.create({
+          data: {
+            // userId: ctx.session.user.id,
+            date: input.date,
+            systolic: input.systolic,
+            diastolic: input.diastolic,
+            pulse: input.pulse,
+            category: category as BloodPressureCategoryEnum,
+            resultId: result.id,
+          },
+        });
+        return { bpr, result };
       });
-      return result;
+      return txResult;
     }),
   readAll: publicProcedure
     .input(z.object({ filter: z.string() }))

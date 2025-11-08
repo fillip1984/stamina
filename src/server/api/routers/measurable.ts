@@ -123,26 +123,33 @@ export const measurableRouter = createTRPCRouter({
       // if type was Countdown or Tally, leave alone
       const newType =
         measurable.type === "Seeking" ? "Countdown" : measurable.type;
-      const txResult = await ctx.db.$transaction([
-        ctx.db.measurable.update({
-          where: { id: input },
-          data: {
-            type: newType,
-            setDate: measurable.setDate,
-            dueDate: measurable.dueDate,
-            interval: newType === "Countdown" ? effectiveInterval : undefined,
-          },
-        }),
-        ctx.db.result.create({
-          data: {
-            measurableId: input,
-            date: new Date(),
-            notes: `Completed measurable: ${measurable.name}`,
-          },
-        }),
-      ]);
 
-      return txResult;
+      if (
+        measurable.onComplete !== "Blood_pressure_reading" &&
+        measurable.onComplete !== "Weigh_in"
+      ) {
+        // result already accounted for these types
+      } else {
+        const txResult = await ctx.db.$transaction([
+          ctx.db.measurable.update({
+            where: { id: input },
+            data: {
+              type: newType,
+              setDate: measurable.setDate,
+              dueDate: measurable.dueDate,
+              interval: newType === "Countdown" ? effectiveInterval : undefined,
+            },
+          }),
+          ctx.db.result.create({
+            data: {
+              measurableId: input,
+              date: new Date(),
+              notes: `Completed measurable: ${measurable.name}`,
+            },
+          }),
+        ]);
+        return txResult;
+      }
     }),
   delete: publicProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
     return ctx.db.measurable.delete({

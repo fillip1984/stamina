@@ -1,28 +1,44 @@
 import { endOfWeek, startOfWeek } from "date-fns";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { m } from "motion/react";
 
 export const WeighInRouter = createTRPCRouter({
   create: publicProcedure
     .input(
       z.object({
+        measurableId: z.string(),
         date: z.date(),
         weight: z.number(),
-        bodyFatPercentage: z.string().optional(),
+        bodyFatPercentage: z.number().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const result = await ctx.db.weighIn.create({
-        data: {
-          // userId: ctx.session.user.id,
-          date: input.date,
-          weight: input.weight,
-          bodyFatPercentage: input.bodyFatPercentage
-            ? parseFloat(input.bodyFatPercentage)
-            : null,
-        },
+      const txResult = await ctx.db.$transaction(async (db) => {
+        const result = await db.result.create({
+          data: {
+            // userId: ctx.session.user.id,
+            measurableId: input.measurableId,
+            date: input.date,
+            notes: `Weigh-in recorded: ${input.weight} lbs${
+              input.bodyFatPercentage
+                ? `, Body Fat: ${input.bodyFatPercentage}%`
+                : ""
+            }`,
+          },
+        });
+        const weighIn = await db.weighIn.create({
+          data: {
+            // userId: ctx.session.user.id,
+            date: input.date,
+            weight: input.weight,
+            bodyFatPercentage: input.bodyFatPercentage,
+            resultId: result.id,
+          },
+        });
+        return { weighIn, result };
       });
-      return result;
+      return txResult;
     }),
   readAll: publicProcedure
     .input(z.object({ filter: z.string() }))

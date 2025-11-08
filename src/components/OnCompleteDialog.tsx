@@ -29,18 +29,34 @@ import {
 } from "~/components/ui/popover";
 import { api } from "~/trpc/react";
 import type { MeasurableType } from "~/trpc/types";
+import { Label } from "./ui/label";
+import { on } from "events";
 
 export default function OnCompleteModal({
   measurable,
   dismiss,
+  onComplete,
 }: {
   measurable: MeasurableType;
   dismiss: () => void;
+  onComplete: () => void;
 }) {
   if (measurable.onComplete === "Weigh_in") {
-    return <WeighIn measurable={measurable} dismiss={dismiss} />;
+    return (
+      <WeighIn
+        measurable={measurable}
+        dismiss={dismiss}
+        onComplete={onComplete}
+      />
+    );
   } else if (measurable.onComplete === "Blood_pressure_reading") {
-    return <BloodPressureReading measurable={measurable} dismiss={dismiss} />;
+    return (
+      <BloodPressureReading
+        measurable={measurable}
+        dismiss={dismiss}
+        onComplete={onComplete}
+      />
+    );
   } else {
     return null;
   }
@@ -49,9 +65,11 @@ export default function OnCompleteModal({
 const WeighIn = ({
   measurable,
   dismiss,
+  onComplete,
 }: {
   measurable: MeasurableType;
   dismiss: () => void;
+  onComplete: () => void;
 }) => {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [date, setDate] = useState(new Date());
@@ -63,18 +81,20 @@ const WeighIn = ({
     api.weighIn.create.useMutation({
       onSuccess: () => {
         void utils.weighIn.invalidate();
-        // completeAct({ id: event.id });
+        onComplete();
+        dismiss();
       },
     });
 
   const handleSaveWeighIn = () => {
-    // createWeighIn({
-    //   date,
-    //   weight: parseFloat(weight),
-    //   bodyFatPercentage: bodyFatPercentage
-    //     ? parseFloat(bodyFatPercentage)
-    //     : undefined,
-    // });
+    createWeighIn({
+      measurableId: measurable.id,
+      date,
+      weight: parseFloat(weight),
+      bodyFatPercentage: bodyFatPercentage
+        ? parseFloat(bodyFatPercentage)
+        : undefined,
+    });
   };
 
   return (
@@ -150,9 +170,11 @@ const WeighIn = ({
 const BloodPressureReading = ({
   measurable,
   dismiss,
+  onComplete,
 }: {
   measurable: MeasurableType;
   dismiss: () => void;
+  onComplete: () => void;
 }) => {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [date, setDate] = useState(new Date());
@@ -160,98 +182,111 @@ const BloodPressureReading = ({
   const [diastolic, setDiastolic] = useState("");
   const [heartRate, setHeartRate] = useState("");
 
-  // const utils = api.useUtils();
-  // const { mutate: createWeighIn, isLoading: isCreatingWeighIn } =
-  //   api.weighIns.create.useMutation({
-  //     onSuccess: () => {
-  //       void utils.weighIns.invalidate();
-  //       completeAct({ id: event.id });
-  //     },
-  //   });
+  const utils = api.useUtils();
+  const {
+    mutateAsync: createBloodPressure,
+    isPending: isCreatingBloodPressure,
+  } = api.bloodPressureReading.create.useMutation({
+    onSuccess: () => {
+      void utils.bloodPressureReading.invalidate();
+      onComplete();
+      dismiss();
+    },
+  });
 
   const handleSaveBloodPressure = () => {
-    // createWeighIn({
-    //   date,
-    //   weight: parseFloat(weight),
-    //   bodyFatPercentage: bodyFatPercentage
-    //     ? parseFloat(bodyFatPercentage)
-    //     : undefined,
-    // });
+    createBloodPressure({
+      measurableId: measurable.id,
+      date,
+      systolic: parseInt(systolic),
+      diastolic: parseInt(diastolic),
+      pulse: heartRate ? parseInt(heartRate) : undefined,
+    });
   };
 
   return (
     <Dialog open={true} onOpenChange={dismiss}>
-      <DialogContent className="flex w-fit flex-col gap-2">
+      <DialogContent className="grid w-72 gap-4">
         <DialogHeader>
           <DialogTitle>Blood Pressure Reading</DialogTitle>
         </DialogHeader>
-        <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
-          <PopoverTrigger asChild>
-            <InputGroup className="w-fit">
+        <div className="grid justify-center gap-3">
+          <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+            <PopoverTrigger asChild>
+              <InputGroup>
+                <InputGroupAddon>
+                  <FaCalendarDay />
+                </InputGroupAddon>
+                <Button variant="ghost">
+                  {date ? date.toLocaleDateString() : "Select date"}
+                  <ChevronDownIcon />
+                </Button>
+              </InputGroup>
+            </PopoverTrigger>
+            <PopoverContent>
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={(date) => {
+                  setDate(date ?? new Date());
+                  setDatePickerOpen(false);
+                }}
+              />
+            </PopoverContent>
+          </Popover>
+
+          <div className="grid gap-2">
+            <Label htmlFor="systolic">Systolic</Label>
+            <InputGroup>
               <InputGroupAddon>
-                <FaCalendarDay />
+                <AiFillHeart />
               </InputGroupAddon>
-              <Button variant="ghost">
-                {date ? date.toLocaleDateString() : "Select date"}
-                <ChevronDownIcon />
-              </Button>
+              <InputGroupInput
+                id="systolic"
+                value={systolic}
+                onChange={(e) => setSystolic(e.target.value)}
+                placeholder="120"
+              />
+              <InputGroupAddon align="inline-end">mmHg</InputGroupAddon>
             </InputGroup>
-          </PopoverTrigger>
-          <PopoverContent>
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={(date) => {
-                setDate(date ?? new Date());
-                setDatePickerOpen(false);
-              }}
-            />
-          </PopoverContent>
-        </Popover>
+          </div>
 
-        <div>
-          <InputGroup className="w-32">
-            <InputGroupAddon>
-              <AiFillHeart />
-            </InputGroupAddon>
-            <InputGroupInput
-              value={systolic}
-              onChange={(e) => setSystolic(e.target.value)}
-              placeholder="120"
-            />
-            <InputGroupAddon align="inline-end">mmHg</InputGroupAddon>
-          </InputGroup>
-          <span className="text-muted-foreground text-sm">Systolic</span>
+          <div className="grid gap-2">
+            <Label htmlFor="diastolic">Diastolic</Label>
+            <InputGroup>
+              <InputGroupAddon>
+                <AiOutlineHeart />
+              </InputGroupAddon>
+              <InputGroupInput
+                id="diastolic"
+                value={diastolic}
+                onChange={(e) => setDiastolic(e.target.value)}
+                placeholder="80"
+              />
+              <InputGroupAddon align="inline-end">mmHg</InputGroupAddon>
+            </InputGroup>
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="heartRate">Heart Rate</Label>
+            <InputGroup>
+              <InputGroupAddon>
+                <BsHeartPulseFill />
+              </InputGroupAddon>
+              <InputGroupInput
+                id="heartRate"
+                value={heartRate}
+                onChange={(e) => setHeartRate(e.target.value)}
+                placeholder="70"
+              />
+              <InputGroupAddon align="inline-end">bpm</InputGroupAddon>
+            </InputGroup>
+          </div>
         </div>
-
-        <div>
-          <InputGroup className="w-32">
-            <InputGroupAddon>
-              <AiOutlineHeart />
-            </InputGroupAddon>
-            <InputGroupInput
-              value={diastolic}
-              onChange={(e) => setDiastolic(e.target.value)}
-              placeholder="80"
-            />
-            <InputGroupAddon align="inline-end">mmHg</InputGroupAddon>
-          </InputGroup>
-          <span className="text-muted-foreground text-sm">Diastolic</span>
-        </div>
-
-        <InputGroup className="w-28">
-          <InputGroupAddon>
-            <BsHeartPulseFill />
-          </InputGroupAddon>
-          <InputGroupInput
-            value={heartRate}
-            onChange={(e) => setHeartRate(e.target.value)}
-            placeholder="70"
-          />
-          <InputGroupAddon align="inline-end">bpm</InputGroupAddon>
-        </InputGroup>
         <DialogFooter className="mt-8 flex flex-row">
-          <Button variant={"secondary"}>Cancel</Button>
+          <DialogClose asChild>
+            <Button variant={"secondary"}>Cancel</Button>
+          </DialogClose>
           <Button
             onClick={handleSaveBloodPressure}
             disabled={!date || !systolic || !diastolic}

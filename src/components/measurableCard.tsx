@@ -219,7 +219,13 @@ export default function MeasureableCard({
         </ItemActions>
       </Item>
 
-      {isOpen && <OnCompleteModal measurable={measurable} dismiss={hide} />}
+      {isOpen && (
+        <OnCompleteModal
+          measurable={measurable}
+          dismiss={hide}
+          onComplete={() => completeMeasurable(measurable.id)}
+        />
+      )}
     </>
   );
 }

@@ -15,6 +15,8 @@ export const resultRouter = createTRPCRouter({
       });
     }),
   findAll: publicProcedure.query(async ({ ctx }) => {
-    return ctx.db.result.findMany();
+    return ctx.db.result.findMany({
+      orderBy: { date: "desc" },
+    });
   }),
 });
