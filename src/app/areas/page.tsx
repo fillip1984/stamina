@@ -11,6 +11,7 @@ import {
   FaTrash,
 } from "react-icons/fa6";
 import { GiStoneStack } from "react-icons/gi";
+import { set } from "zod";
 import Header, { HeaderActions } from "~/components/my-ui/header";
 import LoadingAndRetry from "~/components/my-ui/loadingAndRetry";
 import ScrollableContainer from "~/components/my-ui/scrollableContainer";
@@ -19,6 +20,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -117,10 +119,6 @@ export default function AreaPage() {
 }
 
 const AreaCard = ({ area, edit }: { area: AreaType; edit: () => void }) => {
-  const deleteMeasurable = (id: string) => {
-    console.log("delete area", id);
-  };
-
   const utils = api.useUtils();
   const { mutateAsync: deleteArea } = api.area.delete.useMutation({
     onSuccess: async () => {
@@ -139,7 +137,7 @@ const AreaCard = ({ area, edit }: { area: AreaType; edit: () => void }) => {
           Action
         </Button> */}
         <DropdownMenu>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm">
               <FaEllipsisVertical />
             </Button>
@@ -201,13 +199,14 @@ const AreaModal = ({
 
   // UX: form validation
   const [isValid, setIsValid] = useState(false);
+  const validateForm = () => {
+    if (name.trim() === "") return false;
+    if (description.trim() === "") return false;
+    return true;
+  };
   useEffect(() => {
-    if (name.trim() === "") {
-      setIsValid(false);
-    } else {
-      setIsValid(true);
-    }
-  }, [name]);
+    setIsValid(validateForm());
+  }, [name, description]);
 
   // MX: create/update area
   const utils = api.useUtils();
@@ -246,6 +245,9 @@ const AreaModal = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{mode} area</DialogTitle>
+          <DialogDescription>
+            {mode} area, areas are used to categorize your items.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-3">
           <div className="grid gap-2">

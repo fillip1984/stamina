@@ -4,8 +4,8 @@ import { createContext, useEffect, useState } from "react";
 import type { AreaType } from "~/trpc/types";
 
 type AppContextType = {
-  area: AreaType | null;
-  setArea: (area: AreaType | null) => void;
+  areaFilter: AreaType | null;
+  setAreaFilter: (area: AreaType | null) => void;
   isCreateMeasurableModalOpen: boolean;
   openCreateMeasurableModal: () => void;
   closeCreateMeasurableModal: () => void;
@@ -14,14 +14,20 @@ type AppContextType = {
   // isShowImportFileBrowser: boolean;
   // showImportFileBrowser?: () => void;
 };
+
+export const AllAreas: AreaType = {
+  id: "All",
+  name: "All",
+  description: "All areas",
+};
 // export const UncategorizedArea: AreaType = {
 //   id: "",
 //   name: "Uncategorized",
 //   description: "Uncategorized area",
 // };
 export const AppContext = createContext<AppContextType>({
-  area: null,
-  setArea: (area: AreaType | null) => {},
+  areaFilter: null,
+  setAreaFilter: (area: AreaType | null) => {},
   isCreateMeasurableModalOpen: false,
   openCreateMeasurableModal: () => {},
   closeCreateMeasurableModal: () => {},
@@ -36,7 +42,7 @@ export function AppContextProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [area, setArea] = useState<AreaType | null>(null);
+  const [areaFilter, setAreaFilter] = useState<AreaType | null>(AllAreas);
   const [isCreateMeasurableModalOpen, setIsCreateMeasurableModalOpen] =
     useState(false);
   const [measurableIdToEdit, setMeasurableIdToEdit] = useState<string>("");
@@ -50,8 +56,8 @@ export function AppContextProvider({
   return (
     <AppContext.Provider
       value={{
-        area: area,
-        setArea,
+        areaFilter,
+        setAreaFilter,
         isCreateMeasurableModalOpen,
         openCreateMeasurableModal: () => setIsCreateMeasurableModalOpen(true),
         closeCreateMeasurableModal: () => {

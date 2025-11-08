@@ -21,7 +21,7 @@ export const areaRouter = createTRPCRouter({
   findAll: publicProcedure.query(async ({ ctx }) => {
     return await ctx.db.area.findMany({
       select: { id: true, name: true, description: true },
-      orderBy: { name: "desc" },
+      orderBy: { name: "asc" },
     });
   }),
   findById: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {

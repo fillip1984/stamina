@@ -11,7 +11,10 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -29,6 +32,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { api } from "~/trpc/react";
 import type { AreaType, MeasurableType } from "~/trpc/types";
 import Combobox from "./my-ui/combobox";
+import { set } from "zod";
 
 export default function MeasurableDialog() {
   const {
@@ -51,14 +55,14 @@ export default function MeasurableDialog() {
       onSuccess: async () => {
         await utils.measurable.findAll.invalidate();
         closeCreateMeasurableModal();
-        setName("");
-        setDescription("");
-        setAreaId(null);
-        setType("Countdown");
-        setSuggestedDay(null);
-        setSuggestedDayTime(null);
-        setDueDate(null);
-        setInterval(undefined);
+        // setName("");
+        // setDescription("");
+        // setArea(null);
+        // setType("Countdown");
+        // setSuggestedDay(null);
+        // setSuggestedDayTime(null);
+        // setDueDate(null);
+        // setInterval(undefined);
       },
     });
 
@@ -67,18 +71,20 @@ export default function MeasurableDialog() {
       onSuccess: async () => {
         await utils.measurable.findAll.invalidate();
         closeCreateMeasurableModal();
-        setName("");
-        setDescription("");
-        setType("Countdown");
-        setDueDate(null);
+        // setName("");
+        // setDescription("");
+        // setType("Countdown");
+        // setDueDate(null);
       },
     });
 
+  const [mode, setMode] = useState<"Create" | "Update">("Create");
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [id, setId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [areaId, setAreaId] = useState<string | null>(null);
+  const [area, setArea] = useState<AreaType | null>(null);
+  // const [effectiveArea, setEffectiveArea] = useState<AreaType | null>();
   const [type, setType] = useState<MeasurableType["type"]>("Countdown");
   const [suggestedDayTime, setSuggestedDayTime] = useState<DaytimeEnum | null>(
     null,
@@ -86,15 +92,14 @@ export default function MeasurableDialog() {
   const [suggestedDay, setSuggestedDay] = useState<DayOfWeekEnum | null>(null);
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [interval, setInterval] = useState<number>();
-  const [effectiveArea, setEffectiveArea] = useState<AreaType | null>();
 
   const handleCreateOrUpdate = () => {
-    if (id) {
+    if (mode === "Update" && id) {
       updateMeasurable({
         id,
         name,
         description,
-        areaId: effectiveArea?.id ?? null,
+        areaId: area?.id ?? null,
         type,
         suggestedDay: suggestedDay,
         suggestedDayTime: suggestedDayTime,
@@ -105,7 +110,7 @@ export default function MeasurableDialog() {
       createMeasurable({
         name,
         description,
-        areaId: effectiveArea?.id ?? null,
+        areaId: area?.id ?? null,
         type,
         suggestedDay,
         suggestedDayTime,
@@ -118,13 +123,14 @@ export default function MeasurableDialog() {
   const [validToCreate, setValidToCreate] = useState(false);
   const validateForm = () => {
     if (name.trim().length === 0) return false;
+    if (description.trim().length === 0) return false;
     if (type === "Countdown" && !dueDate) return false;
 
     return true;
   };
   useEffect(() => {
     setValidToCreate(validateForm());
-  }, [name, type, dueDate, areaId]);
+  }, [name, description, type, dueDate]);
 
   // UX: when editing, populate fields or set defaults when creating new
   useEffect(() => {
@@ -132,29 +138,31 @@ export default function MeasurableDialog() {
       setId(measurableToEdit.id);
       setName(measurableToEdit.name);
       setDescription(measurableToEdit.description);
-      setAreaId(measurableToEdit.areaId ?? "");
+      setArea(areas?.find((a) => a.id === measurableToEdit.areaId) ?? null);
       setType(measurableToEdit.type);
       setSuggestedDay(measurableToEdit.suggestedDay);
       setSuggestedDayTime(measurableToEdit.suggestedDayTime);
       setDueDate(measurableToEdit.dueDate);
       setInterval(measurableToEdit.interval ?? undefined);
+      setMode("Update");
     } else {
       setId(null);
       setName("");
       setDescription("");
-      setAreaId(null);
+      setArea(null);
       setType("Countdown");
       setSuggestedDayTime(null);
       setSuggestedDay(null);
       setDueDate(null);
       setInterval(undefined);
+      setMode("Create");
     }
-  }, [measurableToEdit]);
+  }, [measurableToEdit, areas]);
 
   // UX: set effective area when areaId or areas change
-  useEffect(() => {
-    setEffectiveArea(areas?.find((a) => a.id === areaId));
-  }, [areaId, areas]);
+  // useEffect(() => {
+  //   setEffectiveArea(areas?.find((a) => a.id === areaId));
+  // }, [areaId, areas]);
 
   // UX: set dueDate to next instance of suggestedDay when it is selected
   useEffect(() => {
@@ -224,10 +232,13 @@ export default function MeasurableDialog() {
       }}
     >
       <DialogContent>
-        {/* <DialogHeader>
-          <DialogTitle>Create Measurable</DialogTitle>
-          <DialogDescription>Create a new measurable item.</DialogDescription>
-        </DialogHeader> */}
+        <DialogHeader>
+          <DialogTitle>{mode} Measurable</DialogTitle>
+          <DialogDescription>
+            {mode} measurable item, measurable items are used to track progress
+            towards a goal.
+          </DialogDescription>
+        </DialogHeader>
         <div className="grid gap-3">
           <div className="grid gap-2">
             <Label htmlFor="name">Name</Label>
@@ -253,8 +264,10 @@ export default function MeasurableDialog() {
             <div className="grid gap-2">
               <Label htmlFor="area">Area</Label>
               <Combobox
-                value={effectiveArea?.name ?? "Uncategorized"}
-                setValue={setAreaId}
+                value={area?.name ?? "Uncategorized"}
+                setValue={(value) =>
+                  setArea(areas?.find((a) => a.id === value) ?? null)
+                }
                 options={[
                   { id: "Uncategorized", label: "Uncategorized" },
                 ].concat(
@@ -267,7 +280,7 @@ export default function MeasurableDialog() {
             <div className="grid gap-2">
               <Label>Area Description</Label>
               <span className="text-muted-foreground text-sm">
-                {effectiveArea?.description ?? "Uncategorized"}
+                {area?.description ?? "Uncategorized"}
               </span>
             </div>
           </div>
@@ -276,6 +289,7 @@ export default function MeasurableDialog() {
             <div className="flex justify-center gap-2">
               {measurableTypes.map((t) => (
                 <div
+                  key={t.label}
                   onClick={() => setType(t.label as MeasurableType["type"])}
                   className={`flex h-24 w-32 flex-col items-center justify-center gap-2 rounded-md select-none ${type === t.label ? "border-accent bg-accent/40 border-2" : "border"} p-4`}
                 >

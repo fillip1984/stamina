@@ -32,11 +32,12 @@ import { AppContext } from "~/contexts/AppContext";
 import { api } from "~/trpc/react";
 import type { MeasurableType } from "~/trpc/types";
 import { calculateProgress } from "~/utils/progressUtil";
+import { Badge } from "./ui/badge";
 
 export default function MeasureableCard({
   measurable,
 }: {
-  measurable: MeasurableType;
+  measurable: MeasurableType & { areaName: string };
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { daysRemaining, progress, overdue, interval, elapsedDays } =
@@ -65,15 +66,15 @@ export default function MeasureableCard({
   };
 
   return (
-    <Item
-      variant="outline"
-      className="bg-card relative w-[600px] items-start overflow-hidden p-2"
-    >
+    <Item variant="outline" className="bg-card relative w-full items-start p-2">
       <ItemContent
         onClick={() => setIsExpanded((prev) => !prev)}
         className="cursor-pointer gap-0"
       >
-        <ItemTitle>{measurable.name}</ItemTitle>
+        <ItemTitle>
+          {measurable.name}
+          <Badge variant={"secondary"}>{measurable.areaName}</Badge>
+        </ItemTitle>
         <span className="text-muted-foreground flex items-center gap-1 text-xs">
           {measurable.description}
         </span>
@@ -174,7 +175,7 @@ export default function MeasureableCard({
           </div>
         </Button>
         <DropdownMenu>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm">
               <FaEllipsisVertical />
             </Button>

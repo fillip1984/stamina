@@ -23,25 +23,50 @@ import { api } from "~/trpc/react";
 import type { MeasurableType } from "~/trpc/types";
 
 export default function Home() {
+  const { areaFilter } = useContext(AppContext);
+  const { data: areas, isLoading: isLoadingAreas } =
+    api.area.findAll.useQuery();
   const {
     data: measurables,
-    isLoading,
+    isLoading: isLoadingMeasurables,
     isError,
     refetch,
-  } = api.measurable.findAll.useQuery();
+  } = api.measurable.findAll.useQuery(undefined, {
+    enabled: !isLoadingAreas,
+    select: (data) =>
+      data?.map((measurable) => ({
+        ...measurable,
+        areaName:
+          areas?.find((area) => area.id === measurable.areaId)?.name ??
+          "Uncategorized",
+      })),
+  });
+
   const [filteredMeasurables, setFilteredMeasurables] = useState<
-    MeasurableType[]
+    (MeasurableType & { areaName: string })[]
   >([]);
   const [selectedFilter, setSelectedFilter] = useState("Today");
 
   useEffect(() => {
     if (!measurables) return;
+    const measurablesFilteredByArea = measurables.filter((measurable) => {
+      // All -> return all
+      // Uncategorized -> areaId is null
+      // Specific area -> areaId matches
+      if (areaFilter === null) {
+        return !measurable.areaId;
+      } else if (areaFilter.id === "All") {
+        return true;
+      } else {
+        return measurable.areaId === areaFilter.id;
+      }
+    });
     if (selectedFilter === "All") {
-      setFilteredMeasurables(measurables);
+      setFilteredMeasurables(measurablesFilteredByArea);
       return;
     } else if (selectedFilter === "Today") {
       setFilteredMeasurables(
-        measurables.filter(
+        measurablesFilteredByArea.filter(
           (measurable) => !measurable.dueDate || isToday(measurable.dueDate),
         ),
       );
@@ -49,7 +74,7 @@ export default function Home() {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       setFilteredMeasurables(
-        measurables.filter(
+        measurablesFilteredByArea.filter(
           (measurable) =>
             !measurable.dueDate ||
             (measurable.dueDate.getDate() === tomorrow.getDate() &&
@@ -62,19 +87,19 @@ export default function Home() {
       const endOfWeek = new Date();
       endOfWeek.setDate(now.getDate() + (7 - now.getDay()));
       setFilteredMeasurables(
-        measurables.filter(
+        measurablesFilteredByArea.filter(
           (measurable) =>
             !measurable.dueDate ||
             (measurable.dueDate >= now && measurable.dueDate <= endOfWeek),
         ),
       );
     }
-  }, [measurables, selectedFilter]);
+  }, [measurables, selectedFilter, areaFilter]);
 
-  if (isLoading || isError) {
+  if (isLoadingMeasurables || isLoadingAreas || isError) {
     return (
       <LoadingAndRetry
-        isLoading={isLoading}
+        isLoading={isLoadingMeasurables || isLoadingAreas}
         isError={isError}
         retry={() => void refetch()}
       />
@@ -113,9 +138,9 @@ export default function Home() {
             </Button>
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex w-full flex-col gap-2">
             <AnimatePresence>
-              {filteredMeasurables?.map((measurable, i) => (
+              {filteredMeasurables?.map((measurable) => (
                 <motion.div
                   key={measurable.id}
                   initial={{ height: 0, opacity: 0 }}
@@ -132,7 +157,9 @@ export default function Home() {
           </div>
         </>
       }
-      {!isLoading && measurables && measurables.length === 0 && <EmptyView />}
+      {!isLoadingMeasurables && measurables && measurables.length === 0 && (
+        <EmptyView />
+      )}
     </ScrollableContainer>
   );
 }

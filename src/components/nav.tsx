@@ -7,8 +7,9 @@ import { useContext } from "react";
 import { SiGoogletasks } from "react-icons/si";
 import { TbCategory } from "react-icons/tb";
 import { Button } from "~/components/ui/button";
-import { AppContext } from "~/contexts/AppContext";
+import { AllAreas, AppContext } from "~/contexts/AppContext";
 import { api } from "~/trpc/react";
+import { Badge } from "./ui/badge";
 
 export default function Nav() {
   const pathname = usePathname();
@@ -17,9 +18,9 @@ export default function Nav() {
     { name: "Results", href: "/results" },
   ];
 
-  const { data: areas } = api.area.findAll.useQuery();
+  const { data: areas, isLoading } = api.area.findAll.useQuery();
 
-  const { area, setArea } = useContext(AppContext);
+  const { areaFilter, setAreaFilter } = useContext(AppContext);
 
   return (
     <div className="flex shrink-0 gap-1 overflow-hidden p-2">
@@ -30,15 +31,34 @@ export default function Nav() {
             <TbCategory />
           </Button>
         </Link>
-
-        <div className="flex grow gap-2 overflow-y-auto">
-          <Button onClick={() => setArea(null)}>Uncategorized</Button>
-          {areas?.map((area) => (
-            <Link key={area.name} href={`/${area.name}`}>
-              <Button variant="outline">{area.name}</Button>
-            </Link>
-          ))}
-        </div>
+        {!isLoading && (
+          <div className="flex grow items-center gap-2 overflow-y-auto py-2">
+            <Badge
+              variant={areaFilter?.id === "All" ? "default" : "outline"}
+              onClick={() => setAreaFilter(AllAreas)}
+              className="cursor-pointer"
+            >
+              All
+            </Badge>
+            {areas?.map((area) => (
+              <Badge
+                key={area.id}
+                variant={areaFilter?.id === area.id ? "default" : "outline"}
+                onClick={() => setAreaFilter(area)}
+                className="cursor-pointer"
+              >
+                {area.name}
+              </Badge>
+            ))}
+            <Badge
+              variant={areaFilter === null ? "default" : "outline"}
+              onClick={() => setAreaFilter(null)}
+              className="cursor-pointer"
+            >
+              Uncategorized
+            </Badge>
+          </div>
+        )}
       </div>
 
       {/* trailing menu items */}
