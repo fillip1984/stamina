@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useEffect, useState } from "react";
-import { Button } from "~/components/ui/button";
 import type { AreaType } from "~/trpc/types";
 
 type AppContextType = {

@@ -56,10 +56,10 @@ export default function ScrollableContainer({
        *    flex-col --- scrolling up and down
        *    items-center --- center children horizontally //TODO: this might be a mistake, if you keep finding yourself overriding this then remove it
        *    w-full --- full width on smaller screens
-       *    md:mx-auto md:w-[800px] --- centered and constrained width on md+ screens
+       *    sm:mx-auto sm:w-[600px] md:w-[800px] --- centered and constrained width on screens
        *    px-4 --- padding on sides, especially the side with the scrollbar so it doesn't overlap content
        */}
-      <div className="flex w-full flex-col items-center px-4 md:mx-auto md:w-[800px]">
+      <div className="flex w-full flex-col items-center px-4 sm:mx-auto sm:w-[600px] lg:w-[800px]">
         {children}
         {isScrollToTopVisible && <ScrollToTopButton onClick={scrollToTop} />}
       </div>

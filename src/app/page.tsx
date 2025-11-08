@@ -1,8 +1,6 @@
 "use client";
 
 import { isToday } from "date-fns/isToday";
-import { el } from "date-fns/locale";
-import { Scroll } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useContext, useEffect, useState } from "react";
 import { GiStoneStack } from "react-icons/gi";
@@ -19,7 +17,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "~/components/ui/empty";
-import { Spinner } from "~/components/ui/spinner";
 import { AppContext } from "~/contexts/AppContext";
 
 import { api } from "~/trpc/react";
