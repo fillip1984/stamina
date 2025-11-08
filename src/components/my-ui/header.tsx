@@ -1,3 +1,4 @@
+import { cva, type VariantProps } from "class-variance-authority";
 import React from "react";
 import { cn } from "~/lib/utils";
 
@@ -7,11 +8,11 @@ export default function Header({
   ...props
 }: React.ComponentProps<"div">) {
   return (
-    <div className={cn("my-4 flex w-full gap-2", className)} {...props}>
-      {/* TODO: leading icons */}
+    <div
+      className={cn("my-4 flex w-full items-center gap-2", className)}
+      {...props}
+    >
       {children}
-      {/* TODO: icons directly after label */}
-      {/* TODO: trailing icons */}
 
       {/* TODO: Standardize on header size? */}
       {/* TODO: add sticky option */}
@@ -19,3 +20,31 @@ export default function Header({
     </div>
   );
 }
+
+const headerActionsVariants = cva("flex gap-2", {
+  variants: {
+    variant: {
+      default: "pl-1",
+      leading: "pr-1",
+      trailing: "ml-auto",
+    },
+  },
+  defaultVariants: { variant: "default" },
+});
+
+export const HeaderActions = ({
+  className,
+  variant,
+  children,
+  ...props
+}: React.ComponentProps<"div"> &
+  VariantProps<typeof headerActionsVariants>) => {
+  return (
+    <div
+      className={cn(headerActionsVariants({ variant, className }))}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+};

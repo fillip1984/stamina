@@ -8,6 +8,7 @@ import { useContext, useEffect, useState } from "react";
 import { GiStoneStack } from "react-icons/gi";
 
 import MeasureableCard from "~/components/measurableCard";
+import LoadingAndRetry from "~/components/my-ui/loadingAndRetry";
 import ScrollableContainer from "~/components/my-ui/scrollableContainer";
 import { Button } from "~/components/ui/button";
 import {
@@ -25,7 +26,12 @@ import { api } from "~/trpc/react";
 import type { MeasurableType } from "~/trpc/types";
 
 export default function Home() {
-  const { data: measurables, isLoading } = api.measurable.findAll.useQuery();
+  const {
+    data: measurables,
+    isLoading,
+    isError,
+    refetch,
+  } = api.measurable.findAll.useQuery();
   const [filteredMeasurables, setFilteredMeasurables] = useState<
     MeasurableType[]
   >([]);
@@ -68,12 +74,20 @@ export default function Home() {
     }
   }, [measurables, selectedFilter]);
 
+  if (isLoading || isError) {
+    return (
+      <LoadingAndRetry
+        isLoading={isLoading}
+        isError={isError}
+        retry={() => void refetch()}
+      />
+    );
+  }
+
   return (
     <ScrollableContainer scrollToTopButton={true}>
-      {isLoading && <Spinner className="mx-auto h-24 w-24" />}
-
       {/* TODO: maybe: https://theodorusclarence.com/blog/list-animation */}
-      {!isLoading && (
+      {
         <>
           <div className="mx-2 my-4 flex gap-2">
             <Button
@@ -120,7 +134,7 @@ export default function Home() {
             </AnimatePresence>
           </div>
         </>
-      )}
+      }
       {!isLoading && measurables && measurables.length === 0 && <EmptyView />}
     </ScrollableContainer>
   );

@@ -6,12 +6,29 @@ import { GiCheckeredDiamond, GiCheckeredFlag } from "react-icons/gi";
 import { IoMdCalendar } from "react-icons/io";
 import { TbShieldCheckered, TbShieldCheckeredFilled } from "react-icons/tb";
 import Header from "~/components/my-ui/header";
+import LoadingAndRetry from "~/components/my-ui/loadingAndRetry";
 import ScrollableContainer from "~/components/my-ui/scrollableContainer";
 import { Item, ItemContent, ItemMedia } from "~/components/ui/item";
 import { api } from "~/trpc/react";
 
 export default function ResultsPage() {
-  const { data: results } = api.result.findAll.useQuery();
+  const {
+    data: results,
+    isLoading,
+    isError,
+    refetch,
+  } = api.result.findAll.useQuery();
+
+  if (isLoading || isError) {
+    return (
+      <LoadingAndRetry
+        isLoading={isLoading}
+        isError={isError}
+        retry={() => void refetch()}
+      />
+    );
+  }
+
   return (
     <ScrollableContainer scrollToTopButton={true}>
       <Header>
