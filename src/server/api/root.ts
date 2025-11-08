@@ -3,6 +3,8 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { areaRouter } from "./routers/area";
 import { measurableRouter } from "./routers/measurable";
 import { adminRouter } from "./routers/admin";
+import { WeighInRouter } from "./routers/weighIn";
+import { BloodPressureReadingRouter } from "./routers/bloodPressureReading";
 
 /**
  * This is the primary router for your server.
@@ -14,6 +16,8 @@ export const appRouter = createTRPCRouter({
   area: areaRouter,
   measurable: measurableRouter,
   result: resultRouter,
+  bloodPressureReading: BloodPressureReadingRouter,
+  weighIn: WeighInRouter,
 });
 
 // export type definition of API

@@ -1,4 +1,9 @@
-import { DayOfWeekEnum, DaytimeEnum, MeasurableTypeEnum } from "@prisma/client";
+import {
+  DayOfWeekEnum,
+  DaytimeEnum,
+  MeasurableTypeEnum,
+  OnCompleteEnum,
+} from "@prisma/client";
 import { addDays, startOfDay } from "date-fns";
 import { z } from "zod";
 
@@ -17,6 +22,7 @@ export const measurableRouter = createTRPCRouter({
         suggestedDayTime: z.enum(DaytimeEnum).nullable(),
         dueDate: z.date().nullable(),
         interval: z.number().min(1).optional(),
+        onComplete: z.enum(OnCompleteEnum).nullable(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -31,6 +37,7 @@ export const measurableRouter = createTRPCRouter({
           suggestedDayTime: input.suggestedDayTime,
           dueDate: input.dueDate,
           interval: input.interval,
+          onComplete: input.onComplete,
         },
       });
     }),
@@ -65,6 +72,7 @@ export const measurableRouter = createTRPCRouter({
         suggestedDayTime: z.enum(DaytimeEnum).nullable(),
         dueDate: z.date().nullable(),
         interval: z.number().min(1).optional(),
+        onComplete: z.enum(OnCompleteEnum).nullable(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -79,6 +87,7 @@ export const measurableRouter = createTRPCRouter({
           suggestedDayTime: input.suggestedDayTime,
           dueDate: input.dueDate,
           interval: input.interval,
+          onComplete: input.onComplete,
         },
       });
     }),

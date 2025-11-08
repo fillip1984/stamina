@@ -1,6 +1,10 @@
 "use client";
 
-import type { DayOfWeekEnum, DaytimeEnum } from "@prisma/client";
+import type {
+  DayOfWeekEnum,
+  DaytimeEnum,
+  OnCompleteEnum,
+} from "@prisma/client";
 import { ChevronDownIcon } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { ImHourGlass } from "react-icons/im";
@@ -92,6 +96,7 @@ export default function MeasurableDialog() {
   const [suggestedDay, setSuggestedDay] = useState<DayOfWeekEnum | null>(null);
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [interval, setInterval] = useState<number>();
+  const [onComplete, setOnComplete] = useState<OnCompleteEnum | null>(null);
 
   const handleCreateOrUpdate = () => {
     if (mode === "Update" && id) {
@@ -105,6 +110,7 @@ export default function MeasurableDialog() {
         suggestedDayTime: suggestedDayTime,
         dueDate: dueDate,
         interval,
+        onComplete,
       });
     } else {
       createMeasurable({
@@ -116,6 +122,7 @@ export default function MeasurableDialog() {
         suggestedDayTime,
         dueDate,
         interval,
+        onComplete,
       });
     }
   };
@@ -144,6 +151,7 @@ export default function MeasurableDialog() {
       setSuggestedDayTime(measurableToEdit.suggestedDayTime);
       setDueDate(measurableToEdit.dueDate);
       setInterval(measurableToEdit.interval ?? undefined);
+      setOnComplete(measurableToEdit.onComplete ?? null);
       setMode("Update");
     } else {
       setId(null);
@@ -155,14 +163,10 @@ export default function MeasurableDialog() {
       setSuggestedDay(null);
       setDueDate(null);
       setInterval(undefined);
+      setOnComplete(null);
       setMode("Create");
     }
   }, [measurableToEdit, areas]);
-
-  // UX: set effective area when areaId or areas change
-  // useEffect(() => {
-  //   setEffectiveArea(areas?.find((a) => a.id === areaId));
-  // }, [areaId, areas]);
 
   // UX: set dueDate to next instance of suggestedDay when it is selected
   useEffect(() => {
@@ -283,6 +287,28 @@ export default function MeasurableDialog() {
                 {area?.description ?? "Uncategorized"}
               </span>
             </div>
+          </div>
+          <div className="grid gap-3">
+            <Label htmlFor="onComplete">On Complete Action</Label>
+            <Combobox
+              value={onComplete ?? "None"}
+              setValue={(value) =>
+                setOnComplete(
+                  value === "None" ? null : (value as OnCompleteEnum),
+                )
+              }
+              options={[
+                { id: "None", label: "None" },
+                // { id: "Note", label: "Note" },
+                { id: "Weigh_in", label: "Weigh in" },
+                {
+                  id: "Blood_pressure_reading",
+                  label: "Blood pressure reading",
+                },
+                // { id: "Runners_log", label: "Runners log" },
+              ]}
+              placeholder="Select an action"
+            />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="type">Type</Label>
