@@ -16,6 +16,10 @@ export const resultRouter = createTRPCRouter({
     }),
   findAll: publicProcedure.query(async ({ ctx }) => {
     return ctx.db.result.findMany({
+      include: {
+        bloodPressureReading: true,
+        weighIn: true,
+      },
       orderBy: { date: "desc" },
     });
   }),

@@ -125,8 +125,8 @@ export const measurableRouter = createTRPCRouter({
         measurable.type === "Seeking" ? "Countdown" : measurable.type;
 
       if (
-        measurable.onComplete !== "Blood_pressure_reading" &&
-        measurable.onComplete !== "Weigh_in"
+        measurable.onComplete === "Blood_pressure_reading" ||
+        measurable.onComplete === "Weigh_in"
       ) {
         // result already accounted for these types
       } else {
