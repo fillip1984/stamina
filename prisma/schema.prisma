@@ -52,8 +52,8 @@ model Result {
     notes        String
     measurableId String
 
-    weighIns              WeighIn?
-    bloodPressureReadings BloodPressureReading?
+    weighIn              WeighIn?
+    bloodPressureReading BloodPressureReading?
 
     @@index([date])
     @@index([measurableId])
