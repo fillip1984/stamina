@@ -268,7 +268,8 @@ export default function MeasurableDialog() {
             <div className="grid gap-2">
               <Label htmlFor="area">Area</Label>
               <Combobox
-                value={area?.name ?? "Uncategorized"}
+                id="area"
+                value={area?.id ?? "Uncategorized"}
                 setValue={(value) =>
                   setArea(areas?.find((a) => a.id === value) ?? null)
                 }
@@ -279,6 +280,7 @@ export default function MeasurableDialog() {
                     [],
                 )}
                 placeholder="Select an area"
+                className="w-52"
               />
             </div>
             <div className="grid gap-2">
@@ -291,6 +293,7 @@ export default function MeasurableDialog() {
           <div className="grid gap-3">
             <Label htmlFor="onComplete">On Complete Action</Label>
             <Combobox
+              id="onComplete"
               value={onComplete ?? "None"}
               setValue={(value) =>
                 setOnComplete(
@@ -300,14 +303,15 @@ export default function MeasurableDialog() {
               options={[
                 { id: "None", label: "None" },
                 // { id: "Note", label: "Note" },
-                { id: "Weigh_in", label: "Weigh in" },
                 {
                   id: "Blood_pressure_reading",
                   label: "Blood pressure reading",
                 },
+                { id: "Weigh_in", label: "Weigh in" },
                 // { id: "Runners_log", label: "Runners log" },
               ]}
               placeholder="Select an action"
+              className="w-52"
             />
           </div>
           <div className="grid gap-2">
@@ -346,7 +350,8 @@ export default function MeasurableDialog() {
                       </span>
                     </Label>
                     <Combobox
-                      value={suggestedDay}
+                      id="suggestedDay"
+                      value={suggestedDay as string}
                       setValue={(value) =>
                         setSuggestedDay(value as DayOfWeekEnum | null)
                       }
@@ -355,14 +360,15 @@ export default function MeasurableDialog() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="suggestDayTime">
+                    <Label htmlFor="suggestedDayTime">
                       Suggest Day Time
                       <span className="text-muted-foreground text-xs">
                         (optional)
                       </span>
                     </Label>
                     <Combobox
-                      value={suggestedDayTime}
+                      id="suggestedDayTime"
+                      value={suggestedDayTime as string}
                       setValue={(value) =>
                         setSuggestedDayTime(value as DaytimeEnum | null)
                       }

@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { Button } from "../ui/button";
-import { FaArrowUp } from "react-icons/fa6";
 import { cva } from "class-variance-authority";
+import React, { useEffect } from "react";
+import { FaArrowUp } from "react-icons/fa6";
 import { cn } from "~/lib/utils";
-import { is } from "date-fns/locale";
+import { Button } from "../ui/button";
 
 export const scrollableContainerVariants = cva("flex grow overflow-y-auto");
 

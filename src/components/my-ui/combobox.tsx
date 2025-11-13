@@ -17,6 +17,9 @@ import {
 } from "~/components/ui/command";
 import { cn } from "~/lib/utils";
 import { useState } from "react";
+import { cva } from "class-variance-authority";
+
+const comboboxVariants = cva("justify-between font-normal");
 
 export default function Combobox({
   value,
@@ -24,7 +27,9 @@ export default function Combobox({
   options,
   searchable,
   placeholder,
-}: {
+  className,
+  ...props
+}: React.ComponentProps<"button"> & {
   value: string | null;
   setValue: (value: string | null) => void;
   options: Array<{ id: string | null; label: string }>;
@@ -38,10 +43,12 @@ export default function Combobox({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          id="area"
-          className="w-48 justify-between font-normal"
+          className={cn(comboboxVariants({ className }))}
+          {...props}
         >
-          {value ?? placeholder ?? "Select an option"}
+          {options.find((o) => o.id === value)?.label ??
+            placeholder ??
+            "Select an option"}
           <ChevronDownIcon />
         </Button>
       </PopoverTrigger>
