@@ -234,7 +234,7 @@ export default function MeasurableDialog() {
         }
       }}
     >
-      <DialogContent>
+      <DialogContent className="h-full w-full">
         <DialogHeader>
           <DialogTitle>{mode} Measurable</DialogTitle>
           <DialogDescription>
@@ -242,7 +242,7 @@ export default function MeasurableDialog() {
             towards a goal.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-3">
+        <div className="grid gap-3 overflow-y-auto">
           <div className="grid gap-2">
             <Label htmlFor="name">Name</Label>
             <Input
