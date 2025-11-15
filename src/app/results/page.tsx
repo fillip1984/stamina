@@ -109,10 +109,6 @@ const WeighInResult = ({ weighIn }: { weighIn: WeighInType }) => {
     }
   }, [lastWeighIn, weighIn]);
 
-  useEffect(() => {
-    console.log({ weightTrendValue, bodyFatTrendValue });
-  }, [weightTrendValue, bodyFatTrendValue]);
-
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-flow-col">
       <StatCard
@@ -201,6 +197,46 @@ const BloodPressureResult = ({
 }: {
   bloodPressureReading: BloodPressureReadingType;
 }) => {
+  const { data: lastBloodPressureReading } =
+    api.bloodPressureReading.readById.useQuery(
+      {
+        id: bloodPressureReading.previousBloodPressureReadingId!,
+      },
+      {
+        enabled: !!bloodPressureReading.previousBloodPressureReadingId,
+      },
+    );
+  const [systolicTrendValue, setSystolicTrendValue] = useState<number | null>(
+    null,
+  );
+  const [diastolicTrendValue, setDiastolicTrendValue] = useState<number | null>(
+    null,
+  );
+  const [pulseTrendValue, setPulseTrendValue] = useState<number | null>(null);
+  useEffect(() => {
+    if (lastBloodPressureReading) {
+      const systolicDiff = (
+        bloodPressureReading.systolic - lastBloodPressureReading.systolic
+      ).toFixed(2);
+      setSystolicTrendValue(Number(systolicDiff));
+
+      const diastolicDiff = (
+        bloodPressureReading.diastolic - lastBloodPressureReading.diastolic
+      ).toFixed(2);
+      setDiastolicTrendValue(Number(diastolicDiff));
+
+      if (
+        bloodPressureReading.pulse !== null &&
+        lastBloodPressureReading.pulse !== null
+      ) {
+        const pulseDiff = (
+          bloodPressureReading.pulse - lastBloodPressureReading.pulse
+        ).toFixed(2);
+        setPulseTrendValue(Number(pulseDiff));
+      }
+    }
+  }, [bloodPressureReading, lastBloodPressureReading]);
+
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-flow-col">
       <StatCard
@@ -212,9 +248,25 @@ const BloodPressureResult = ({
         }
         primaryValue={bloodPressureReading.systolic}
         primaryFooter="mmHg"
-        trendValue={10}
-        trendFooter={<FaArrowDown className="text-xl" />}
-        trendDirection="down"
+        trendValue={systolicTrendValue ?? undefined}
+        trendFooter={
+          systolicTrendValue === null ? undefined : systolicTrendValue === 0 ? (
+            <FaArrowRight />
+          ) : systolicTrendValue > 0 ? (
+            <FaArrowUp />
+          ) : (
+            <FaArrowDown />
+          )
+        }
+        trendDirection={
+          systolicTrendValue === null
+            ? undefined
+            : systolicTrendValue === 0
+              ? "neutral"
+              : systolicTrendValue > 0
+                ? "up"
+                : "down"
+        }
       />
       <StatCard
         title={
@@ -225,8 +277,8 @@ const BloodPressureResult = ({
         }
         primaryValue={bloodPressureReading.diastolic}
         primaryFooter="mmHg"
-        trendValue={5}
-        trendFooter={<FaArrowDown className="text-xl" />}
+        trendValue={diastolicTrendValue ?? undefined}
+        trendFooter={<FaArrowDown />}
         trendDirection="down"
       />
       <StatCard
@@ -238,8 +290,8 @@ const BloodPressureResult = ({
         }
         primaryValue={bloodPressureReading.pulse ?? "N/A"}
         primaryFooter="bpm"
-        trendValue={10}
-        trendFooter={<FaArrowDown className="text-xl" />}
+        trendValue={pulseTrendValue ?? undefined}
+        trendFooter={<FaArrowDown />}
         trendDirection="down"
       />
 

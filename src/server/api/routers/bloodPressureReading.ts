@@ -2,6 +2,7 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { z } from "zod";
 import { endOfWeek, startOfWeek } from "date-fns";
 import type { BloodPressureCategoryEnum } from "@prisma/client";
+import { read } from "fs";
 
 export const BloodPressureReadingRouter = createTRPCRouter({
   create: publicProcedure
@@ -15,6 +16,18 @@ export const BloodPressureReadingRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const previousBloodPressureReading =
+        await ctx.db.bloodPressureReading.findFirst({
+          where: {
+            // userId: ctx.session.user.id,
+            date: {
+              lt: input.date,
+            },
+          },
+          orderBy: {
+            date: "desc",
+          },
+        });
       const category = determineCategory(input);
       const txResult = await ctx.db.$transaction(async (db) => {
         const result = await db.result.create({
@@ -35,6 +48,9 @@ export const BloodPressureReadingRouter = createTRPCRouter({
             diastolic: input.diastolic,
             pulse: input.pulse,
             category: category as BloodPressureCategoryEnum,
+            previousBloodPressureReadingId:
+              previousBloodPressureReading?.id || null,
+
             resultId: result.id,
           },
         });
@@ -89,11 +105,20 @@ export const BloodPressureReadingRouter = createTRPCRouter({
       });
       return result;
     }),
+  readById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return await ctx.db.bloodPressureReading.findUnique({
+        where: {
+          id: input.id,
+        },
+      });
+    }),
 });
 
 const determineCategory = (bpr: { systolic: number; diastolic: number }) => {
   if (bpr.systolic > 180 || bpr.diastolic > 120) {
-    return "Hypertensive_crisis";
+    return "Hypertension_crisis";
   } else if (bpr.systolic >= 140 || bpr.diastolic >= 90) {
     return "Hypertension_2";
   } else if (bpr.systolic >= 130) {
