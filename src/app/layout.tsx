@@ -6,7 +6,7 @@ import Nav from "~/components/nav/nav";
 import { TRPCReactProvider } from "~/trpc/react";
 import CreateMeasurableDialog from "~/components/measurable/measurableDialog";
 import { AppContextProvider } from "~/contexts/AppContext";
-import Fabs from "~/components/nav/fabs";
+import Fab from "~/components/nav/fab";
 
 export const metadata: Metadata = {
   title: "stamina",
@@ -33,7 +33,7 @@ export default function RootLayout({
                 {children}
               </div>
               <CreateMeasurableDialog />
-              <Fabs />
+              <Fab />
             </ThemeProvider>
           </AppContextProvider>
         </TRPCReactProvider>

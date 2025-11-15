@@ -2,6 +2,7 @@ import { endOfWeek, startOfWeek } from "date-fns";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { m } from "motion/react";
+import type { get } from "http";
 
 export const WeighInRouter = createTRPCRouter({
   create: publicProcedure
@@ -86,5 +87,39 @@ export const WeighInRouter = createTRPCRouter({
         },
       });
       return result;
+    }),
+  getWeightGoal: publicProcedure.query(async ({ ctx }) => {
+    const weightGoal = await ctx.db.weightGoal.findFirst({
+      // where: { userId: ctx.session.user.id },
+    });
+    return weightGoal;
+  }),
+  setWeightGoal: publicProcedure
+    .input(
+      z.object({
+        weightGoal: z.number().nullable(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const currentGoal = await ctx.db.weightGoal.findFirst({
+        // where: { userId: ctx.session.user.id },
+      });
+      if (currentGoal) {
+        const updatedGoal = await ctx.db.weightGoal.update({
+          where: { id: currentGoal.id },
+          data: {
+            weight: input.weightGoal,
+          },
+        });
+        return updatedGoal;
+      } else {
+        const newGoal = await ctx.db.weightGoal.create({
+          data: {
+            // userId: ctx.session.user.id,
+            weight: input.weightGoal,
+          },
+        });
+        return newGoal;
+      }
     }),
 });
