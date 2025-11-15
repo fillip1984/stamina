@@ -1,8 +1,6 @@
 import { endOfWeek, startOfWeek } from "date-fns";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { m } from "motion/react";
-import type { get } from "http";
 
 export const WeighInRouter = createTRPCRouter({
   create: publicProcedure
@@ -15,6 +13,14 @@ export const WeighInRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const previousWeighIn = await ctx.db.weighIn.findFirst({
+        where: {
+          // userId: ctx.session.user.id,
+        },
+        orderBy: {
+          date: "desc",
+        },
+      });
       const txResult = await ctx.db.$transaction(async (db) => {
         const result = await db.result.create({
           data: {
@@ -34,6 +40,7 @@ export const WeighInRouter = createTRPCRouter({
             date: input.date,
             weight: input.weight,
             bodyFatPercentage: input.bodyFatPercentage,
+            previousWeighInId: previousWeighIn ? previousWeighIn.id : null,
             resultId: result.id,
           },
         });
@@ -87,6 +94,17 @@ export const WeighInRouter = createTRPCRouter({
         },
       });
       return result;
+    }),
+  readById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const weighIn = await ctx.db.weighIn.findUnique({
+        where: {
+          id: input.id,
+          // userId: ctx.session.user.id
+        },
+      });
+      return weighIn;
     }),
   getWeightGoal: publicProcedure.query(async ({ ctx }) => {
     const weightGoal = await ctx.db.weightGoal.findFirst({

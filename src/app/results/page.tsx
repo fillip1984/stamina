@@ -1,13 +1,14 @@
 "use client";
 
 import { Trophy } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { BsHeartPulseFill, BsJournalMedical } from "react-icons/bs";
-import { FaArrowDown } from "react-icons/fa6";
+import { FaArrowDown, FaArrowRight, FaArrowUp } from "react-icons/fa6";
 import { IoMdCalendar } from "react-icons/io";
 import { IoScaleOutline } from "react-icons/io5";
 import { LuHeartPulse } from "react-icons/lu";
+import { PiPersonBold } from "react-icons/pi";
 import { TbTargetArrow } from "react-icons/tb";
 import { Item, ItemContent, ItemMedia } from "~/components/ui/item";
 import Header from "~/components/ui/my-ui/header";
@@ -80,21 +81,40 @@ export default function ResultsPage() {
 }
 
 const WeighInResult = ({ weighIn }: { weighIn: WeighInType }) => {
+  const { data: weightGoal } = api.weighIn.getWeightGoal.useQuery();
+  const { data: lastWeighIn } = api.weighIn.readById.useQuery(
+    {
+      id: weighIn.previousWeighInId!,
+    },
+    {
+      enabled: !!weighIn.previousWeighInId,
+    },
+  );
+  const [weightTrendValue, setWeightTrendValue] = useState<number | null>(null);
+  const [bodyFatTrendValue, setBodyFatTrendValue] = useState<number | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (lastWeighIn) {
+      const weightDiff = (weighIn.weight - lastWeighIn.weight).toFixed(2);
+      setWeightTrendValue(Number(weightDiff));
+
+      if (weighIn.bodyFatPercentage && lastWeighIn.bodyFatPercentage) {
+        const bodyFatDiff = (
+          weighIn.bodyFatPercentage - lastWeighIn.bodyFatPercentage
+        ).toFixed(2);
+        setBodyFatTrendValue(Number(bodyFatDiff));
+      }
+    }
+  }, [lastWeighIn, weighIn]);
+
+  useEffect(() => {
+    console.log({ weightTrendValue, bodyFatTrendValue });
+  }, [weightTrendValue, bodyFatTrendValue]);
+
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-flow-col">
-      <StatCard
-        title={
-          <>
-            <TbTargetArrow className="text-yellow-300" />
-            Goal
-          </>
-        }
-        primaryValue="32"
-        primaryFooter="lbs to go"
-        trendValue={""}
-        trendFooter={""}
-        trendDirection="neutral"
-      />
       <StatCard
         title={
           <>
@@ -104,23 +124,74 @@ const WeighInResult = ({ weighIn }: { weighIn: WeighInType }) => {
         }
         primaryValue={weighIn.weight}
         primaryFooter="lbs"
-        trendValue={3.4}
-        trendFooter={<FaArrowDown />}
-        trendDirection="down"
+        trendValue={weightTrendValue ?? undefined}
+        trendFooter={
+          weightTrendValue === null ? undefined : weightTrendValue === 0 ? (
+            <FaArrowRight />
+          ) : weightTrendValue > 0 ? (
+            <FaArrowUp />
+          ) : (
+            <FaArrowDown />
+          )
+        }
+        trendDirection={
+          weightTrendValue === null
+            ? undefined
+            : weightTrendValue === 0
+              ? "neutral"
+              : weightTrendValue > 0
+                ? "up"
+                : "down"
+        }
       />
       <StatCard
         title={
           <>
-            <IoScaleOutline />
+            <PiPersonBold />
             body fat
           </>
         }
-        primaryValue={weighIn.bodyFatPercentage ?? "N/A"}
+        primaryValue={weighIn.bodyFatPercentage ?? ""}
         primaryFooter="%"
-        trendValue={0.8}
-        trendFooter={<FaArrowDown className="text-xl" />}
-        trendDirection="down"
+        trendValue={bodyFatTrendValue ?? undefined}
+        trendFooter={
+          bodyFatTrendValue === null ? undefined : bodyFatTrendValue === 0 ? (
+            <FaArrowRight />
+          ) : bodyFatTrendValue > 0 ? (
+            <FaArrowUp />
+          ) : (
+            <FaArrowDown />
+          )
+        }
+        trendDirection={
+          bodyFatTrendValue === null
+            ? undefined
+            : bodyFatTrendValue === 0
+              ? "neutral"
+              : bodyFatTrendValue > 0
+                ? "up"
+                : "down"
+        }
       />
+      {weightGoal?.weight && (
+        <StatCard
+          title={
+            <>
+              <TbTargetArrow className="text-yellow-300" />
+              Goal
+              <span className="text-sm lowercase">
+                {weightGoal?.weight} lbs
+              </span>
+            </>
+          }
+          primaryValue={
+            weightGoal?.weight
+              ? (weighIn.weight - weightGoal.weight).toFixed(2)
+              : "N/A"
+          }
+          primaryFooter="lbs to go"
+        />
+      )}
     </div>
   );
 };
@@ -233,14 +304,14 @@ const StatCard = ({
             </span>
           )}
         </div>
-        {trendValue && (
+        {trendValue !== undefined && (
           <>
             <Separator orientation="vertical" />
             <div
-              className={`flex w-8 flex-col items-center gap-1 p-1 ${trendDirection === "neutral" ? "text-muted-foreground" : trendDirection === "down" ? "text-green-400" : "text-red-400"}`}
+              className={`flex w-8 flex-col items-center gap-1 p-1 ${trendDirection === "neutral" ? "text-muted-foreground" : trendDirection === "down" ? "text-green-400" : "text-destructive"}`}
             >
               <span>{trendValue}</span>
-              <span>{trendFooter}</span>
+              {trendFooter}
             </div>
           </>
         )}

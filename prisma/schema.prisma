@@ -68,12 +68,7 @@ model WeighIn {
     weight            Float
     bodyFatPercentage Float?
 
-    // weightProgress     Float
-    // weightTotalChange  Float
-    // weightToGoal       Float
-    // bodyFatProgress    Float?
-    // bodyFatTotalChange Float?
-    // previousWeighInId  String?
+    previousWeighInId String?
 
     // user   User   @relation(fields: [userId], references: [id])
     // userId String
