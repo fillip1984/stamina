@@ -24,7 +24,7 @@ export default function SignInView() {
               onClick={() =>
                 authClient.signIn.social({
                   provider: provider.label,
-                  requestSignUp: true, // toggles on or off whether people can sign up/in
+                  requestSignUp: false, // toggles on or off whether people can sign up/in
                 })
               }
             >
