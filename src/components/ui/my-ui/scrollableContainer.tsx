@@ -4,7 +4,7 @@ import { cva } from "class-variance-authority";
 import React, { useEffect } from "react";
 import { FaArrowUp } from "react-icons/fa6";
 import { cn } from "~/lib/utils";
-import { Button } from "../ui/button";
+import { Button } from "../button";
 
 export const scrollableContainerVariants = cva("flex grow overflow-y-auto");
 

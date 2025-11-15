@@ -9,10 +9,10 @@ import { IoMdCalendar } from "react-icons/io";
 import { IoScaleOutline } from "react-icons/io5";
 import { LuHeartPulse } from "react-icons/lu";
 import { TbTargetArrow } from "react-icons/tb";
-import Header from "~/components/my-ui/header";
-import LoadingAndRetry from "~/components/my-ui/loadingAndRetry";
-import ScrollableContainer from "~/components/my-ui/scrollableContainer";
 import { Item, ItemContent, ItemMedia } from "~/components/ui/item";
+import Header from "~/components/ui/my-ui/header";
+import LoadingAndRetry from "~/components/ui/my-ui/loadingAndRetry";
+import ScrollableContainer from "~/components/ui/my-ui/scrollableContainer";
 import { Separator } from "~/components/ui/separator";
 import { api } from "~/trpc/react";
 import type {

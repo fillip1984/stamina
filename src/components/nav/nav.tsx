@@ -9,7 +9,7 @@ import { TbCategory } from "react-icons/tb";
 import { Button } from "~/components/ui/button";
 import { AllAreas, AppContext } from "~/contexts/AppContext";
 import { api } from "~/trpc/react";
-import { Badge } from "./ui/badge";
+import { Badge } from "../ui/badge";
 
 export default function Nav() {
   const pathname = usePathname();

@@ -1,6 +1,6 @@
 import { FaExclamationTriangle } from "react-icons/fa";
-import { Button } from "../ui/button";
-import { Spinner } from "../ui/spinner";
+import { Button } from "../button";
+import { Spinner } from "../spinner";
 
 export default function LoadingAndRetry({
   isLoading,

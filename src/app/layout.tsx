@@ -2,11 +2,11 @@ import "~/styles/globals.css";
 
 import { type Metadata } from "next";
 import { ThemeProvider } from "next-themes";
-import Nav from "~/components/nav";
+import Nav from "~/components/nav/nav";
 import { TRPCReactProvider } from "~/trpc/react";
-import CreateMeasurableDialog from "~/components/measurableDialog";
+import CreateMeasurableDialog from "~/components/measurable/measurableDialog";
 import { AppContextProvider } from "~/contexts/AppContext";
-import Fabs from "~/components/fabs";
+import Fabs from "~/components/nav/fabs";
 
 export const metadata: Metadata = {
   title: "stamina",

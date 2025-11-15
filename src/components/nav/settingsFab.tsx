@@ -2,10 +2,13 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
+import { useRef, type ChangeEvent } from "react";
+import { FiDownloadCloud, FiSettings, FiUploadCloud } from "react-icons/fi";
 import { GrSystem } from "react-icons/gr";
-import { FaFileExport } from "react-icons/fa6";
-import { FiDownloadCloud, FiUploadCloud } from "react-icons/fi";
-import { Button } from "./ui/button";
+import { api } from "~/trpc/react";
+import type { AreaType, MeasurableType } from "~/trpc/types";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,12 +16,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { api } from "~/trpc/react";
-import { useRouter } from "next/navigation";
-import { useContext, useEffect, useRef, type ChangeEvent } from "react";
-import { AppContext } from "~/contexts/AppContext";
-import type { AreaType, MeasurableType } from "~/trpc/types";
+} from "../ui/dropdown-menu";
+import Link from "next/link";
 
 export default function SettingsFab() {
   const router = useRouter();
@@ -124,6 +123,17 @@ export default function SettingsFab() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-36" align="start">
+        <DropdownMenuGroup>
+          <Link href="/settings">
+            <DropdownMenuItem
+              // onClick={() => exportData()}
+              className="justify-between"
+            >
+              Settings <FiSettings />
+            </DropdownMenuItem>
+          </Link>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem
             onClick={() => exportData()}

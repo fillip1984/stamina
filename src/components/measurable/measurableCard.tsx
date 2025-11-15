@@ -29,12 +29,12 @@ import {
   ItemTitle,
 } from "~/components/ui/item";
 import { AppContext } from "~/contexts/AppContext";
+import { useModal } from "~/hooks/useModal";
 import { api } from "~/trpc/react";
 import type { MeasurableType } from "~/trpc/types";
 import { calculateProgress } from "~/utils/progressUtil";
-import { Badge } from "./ui/badge";
-import { useModal } from "~/hooks/useModal";
-import OnCompleteModal from "./OnCompleteDialog";
+import { Badge } from "../ui/badge";
+import OnCompleteModal from "./onCompleteDialog";
 
 export default function MeasureableCard({
   measurable,

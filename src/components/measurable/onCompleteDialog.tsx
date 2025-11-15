@@ -29,8 +29,7 @@ import {
 } from "~/components/ui/popover";
 import { api } from "~/trpc/react";
 import type { MeasurableType } from "~/trpc/types";
-import { Label } from "./ui/label";
-import { on } from "events";
+import { Label } from "../ui/label";
 
 export default function OnCompleteModal({
   measurable,
