@@ -1,42 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { FaCircleNotch, FaGoogle } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa";
 import { authClient } from "~/server/auth/client";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 
 export default function SignInView() {
   const socialProviders = [
     { label: "google", icon: <FaGoogle /> },
     // { label: "github", icon: <FaGithub /> },
   ];
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [emailLoginLoading, setEmailLoginLoading] = useState(false);
-  const handleEmailSignIn = async () => {
-    setEmailLoginLoading(true);
-    // await authClient.signUp.email({
-    //   email,
-    //   password,
-    //   name: "fillip1984",
-    // });
-    await authClient.signIn.email({
-      email,
-      password,
-      rememberMe: true,
-      fetchOptions: {
-        onError: (error) => {
-          setEmailError(error.error.message);
-        },
-        onResponse: () => {
-          setEmailLoginLoading(false);
-        },
-      },
-    });
-  };
 
   return (
     <div className="flex h-screen w-screen flex-col items-center pt-40">
@@ -50,7 +22,10 @@ export default function SignInView() {
             <Button
               key={provider.label}
               onClick={() =>
-                authClient.signIn.social({ provider: provider.label })
+                authClient.signIn.social({
+                  provider: provider.label,
+                  requestSignUp: true, // toggles on or off whether people can sign up/in
+                })
               }
             >
               {provider.icon}
@@ -58,32 +33,6 @@ export default function SignInView() {
             </Button>
           ))}
         </div>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            void handleEmailSignIn();
-          }}
-          className="flex flex-col gap-2"
-        >
-          {emailError && <p className="text-destructive">{emailError}</p>}
-
-          <Input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email address"
-          />
-          <Input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-          />
-          <Button type="submit" className="w-full">
-            {emailLoginLoading && <FaCircleNotch className="animate-spin" />}
-            Sign in with Email
-          </Button>
-        </form>
       </div>
     </div>
   );

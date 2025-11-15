@@ -22,6 +22,8 @@ import { authClient } from "~/server/auth/client";
 import { se } from "date-fns/locale";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import type { Session } from "~/server/auth";
+import { FaSignOutAlt } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 export default function Fab() {
   const { data: session } = authClient.useSession();
@@ -64,6 +66,12 @@ const FabMenuItems = ({ session }: { session: Session }) => {
       .join("");
   };
 
+  const router = useRouter();
+  const handleSignOut = async () => {
+    await authClient.signOut();
+    router.push("/");
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -82,12 +90,9 @@ const FabMenuItems = ({ session }: { session: Session }) => {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          {/* <DropdownMenuItem
-            onClick={() => void authClient.signOut()}
-            className="justify-between"
-          >
+          <DropdownMenuItem onClick={handleSignOut} className="justify-between">
             Sign out <FaSignOutAlt />
-          </DropdownMenuItem> */}
+          </DropdownMenuItem>
           <DropdownMenuItem
             onClick={handleThemeToggle}
             className="justify-between"
