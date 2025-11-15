@@ -58,14 +58,6 @@ export default function MeasurableDialog() {
       onSuccess: async () => {
         await utils.measurable.findAll.invalidate();
         closeCreateMeasurableModal();
-        // setName("");
-        // setDescription("");
-        // setArea(null);
-        // setType("Countdown");
-        // setSuggestedDay(null);
-        // setSuggestedDayTime(null);
-        // setDueDate(null);
-        // setInterval(undefined);
       },
     });
 
@@ -74,10 +66,6 @@ export default function MeasurableDialog() {
       onSuccess: async () => {
         await utils.measurable.findAll.invalidate();
         closeCreateMeasurableModal();
-        // setName("");
-        // setDescription("");
-        // setType("Countdown");
-        // setDueDate(null);
       },
     });
 
@@ -87,7 +75,6 @@ export default function MeasurableDialog() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [area, setArea] = useState<AreaType | null>(null);
-  // const [effectiveArea, setEffectiveArea] = useState<AreaType | null>();
   const [type, setType] = useState<MeasurableType["type"]>("Countdown");
   const [suggestedDayTime, setSuggestedDayTime] = useState<DaytimeEnum | null>(
     null,
@@ -165,7 +152,7 @@ export default function MeasurableDialog() {
       setOnComplete(null);
       setMode("Create");
     }
-  }, [measurableToEdit, areas]);
+  }, [measurableToEdit, areas, isCreateMeasurableModalOpen]);
 
   // UX: set dueDate to next instance of suggestedDay when it is selected
   useEffect(() => {

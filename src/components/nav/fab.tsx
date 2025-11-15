@@ -18,14 +18,21 @@ import {
 
 import { FaPlus } from "react-icons/fa6";
 import { AppContext } from "~/contexts/AppContext";
+import { authClient } from "~/server/auth/client";
+import { se } from "date-fns/locale";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import type { Session } from "~/server/auth";
 
 export default function Fab() {
+  const { data: session } = authClient.useSession();
   const { openCreateMeasurableModal } = useContext(AppContext);
+
+  if (!session) return null;
 
   return (
     <div className="absolute right-4 bottom-6 flex flex-col gap-2">
       {/* FAB contents */}
-      <FabMenuItems />
+      <FabMenuItems session={session} />
 
       {/* trigger */}
       <Button
@@ -39,7 +46,7 @@ export default function Fab() {
   );
 }
 
-const FabMenuItems = () => {
+const FabMenuItems = ({ session }: { session: Session }) => {
   // theme stuff
   const { theme, setTheme } = useTheme();
   const handleThemeToggle = () => {
@@ -50,13 +57,20 @@ const FabMenuItems = () => {
     });
   };
 
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("");
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon-lg" className="rounded-full">
-          <span>PMW</span>
-          <span className="sr-only">Toggle theme and access settings</span>
-        </Button>
+        <Avatar className="size-10 select-none">
+          <AvatarImage src={session.user.image ?? undefined} />
+          <AvatarFallback>{getInitials(session.user.name)}</AvatarFallback>
+        </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-36" align="start">
         <DropdownMenuGroup>

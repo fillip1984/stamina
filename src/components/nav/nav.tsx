@@ -8,19 +8,26 @@ import { SiGoogletasks } from "react-icons/si";
 import { TbCategory } from "react-icons/tb";
 import { Button } from "~/components/ui/button";
 import { AllAreas, AppContext } from "~/contexts/AppContext";
+import { authClient } from "~/server/auth/client";
 import { api } from "~/trpc/react";
 import { Badge } from "../ui/badge";
 
 export default function Nav() {
+  const { data: session } = authClient.useSession();
+
   const pathname = usePathname();
   const locations = [
     { name: "Home", href: "/" },
     { name: "Results", href: "/results" },
   ];
 
-  const { data: areas, isLoading } = api.area.findAll.useQuery();
+  const { data: areas, isLoading } = api.area.findAll.useQuery(undefined, {
+    enabled: !!session,
+  });
 
   const { areaFilter, setAreaFilter } = useContext(AppContext);
+
+  if (!session?.user) return null;
 
   return (
     <div className="flex shrink-0 gap-1 overflow-hidden p-2">

@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
@@ -19,7 +20,10 @@ model Area {
     description String
     measurables Measurable[]
 
-    @@index([name])
+    user   User   @relation(fields: [userId], references: [id])
+    userId String
+
+    @@index([name, userId])
 }
 
 model Measurable {
@@ -40,7 +44,10 @@ model Measurable {
     area   Area?   @relation(fields: [areaId], references: [id], onDelete: SetNull)
     areaId String?
 
-    @@index([name])
+    user   User   @relation(fields: [userId], references: [id])
+    userId String
+
+    @@index([name, userId])
 }
 
 model Result {
@@ -55,7 +62,10 @@ model Result {
     weighIn              WeighIn?
     bloodPressureReading BloodPressureReading?
 
-    @@index([date])
+    user   User   @relation(fields: [userId], references: [id])
+    userId String
+
+    @@index([date, userId])
     @@index([measurableId])
 }
 
@@ -70,11 +80,11 @@ model WeighIn {
 
     previousWeighInId String?
 
-    // user   User   @relation(fields: [userId], references: [id])
-    // userId String
-
     result   Result @relation(fields: [resultId], references: [id])
     resultId String @unique
+
+    user   User   @relation(fields: [userId], references: [id])
+    userId String
 }
 
 model WeightGoal {
@@ -84,8 +94,8 @@ model WeightGoal {
 
     weight Float?
 
-    // user   User   @relation(fields: [userId], references: [id])
-    // userId String @unique
+    user   User   @relation(fields: [userId], references: [id])
+    userId String @unique
 }
 
 model BloodPressureReading {
@@ -102,11 +112,11 @@ model BloodPressureReading {
 
     previousBloodPressureReadingId String?
 
-    // user   User   @relation(fields: [userId], references: [id])
-    // userId String
-
     result   Result @relation(fields: [resultId], references: [id])
     resultId String @unique
+
+    user   User   @relation(fields: [userId], references: [id])
+    userId String
 }
 
 enum MeasurableTypeEnum {
@@ -146,4 +156,66 @@ enum BloodPressureCategoryEnum {
     Hypertension_1
     Hypertension_2
     Hypertension_crisis
+}
+
+// Necessary for Beter auth
+model User {
+    id            String    @id
+    name          String
+    email         String
+    emailVerified Boolean   @default(false)
+    image         String?
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @default(now()) @updatedAt
+    sessions      Session[]
+    accounts      Account[]
+
+    areas       Area[]
+    measurables Measurable[]
+    results     Result[]
+
+    weightGoal WeightGoal?
+
+    weighIns              WeighIn[]
+    bloodPressureReadings BloodPressureReading[]
+}
+
+model Session {
+    id        String   @id
+    expiresAt DateTime
+    token     String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    ipAddress String?
+    userAgent String?
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([token])
+}
+
+model Account {
+    id                    String    @id
+    accountId             String
+    providerId            String
+    userId                String
+    user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    accessToken           String?
+    refreshToken          String?
+    idToken               String?
+    accessTokenExpiresAt  DateTime?
+    refreshTokenExpiresAt DateTime?
+    scope                 String?
+    password              String?
+    createdAt             DateTime  @default(now())
+    updatedAt             DateTime  @updatedAt
+}
+
+model Verification {
+    id         String   @id
+    identifier String
+    value      String
+    expiresAt  DateTime
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @default(now()) @updatedAt
 }

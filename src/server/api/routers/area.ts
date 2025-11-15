@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const areaRouter = createTRPCRouter({
-  create: publicProcedure
+  create: protectedProcedure
     .input(
       z.object({
         name: z.string(),
@@ -15,21 +15,25 @@ export const areaRouter = createTRPCRouter({
         data: {
           name: input.name,
           description: input.description,
+          userId: ctx.session.user.id,
         },
       });
     }),
-  findAll: publicProcedure.query(async ({ ctx }) => {
+  findAll: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.db.area.findMany({
+      where: { userId: ctx.session.user.id },
       select: { id: true, name: true, description: true },
       orderBy: { name: "asc" },
     });
   }),
-  findById: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    return ctx.db.area.findUnique({
-      where: { id: input },
-    });
-  }),
-  update: publicProcedure
+  findById: protectedProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      return ctx.db.area.findUnique({
+        where: { id: input, userId: ctx.session.user.id },
+      });
+    }),
+  update: protectedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -39,16 +43,18 @@ export const areaRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       return ctx.db.area.update({
-        where: { id: input.id },
+        where: { id: input.id, userId: ctx.session.user.id },
         data: {
           name: input.name,
           description: input.description,
         },
       });
     }),
-  delete: publicProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
-    return ctx.db.area.delete({
-      where: { id: input },
-    });
-  }),
+  delete: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.area.delete({
+        where: { id: input, userId: ctx.session.user.id },
+      });
+    }),
 });

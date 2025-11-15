@@ -2,11 +2,11 @@ import "~/styles/globals.css";
 
 import { type Metadata } from "next";
 import { ThemeProvider } from "next-themes";
-import Nav from "~/components/nav/nav";
-import { TRPCReactProvider } from "~/trpc/react";
-import CreateMeasurableDialog from "~/components/measurable/measurableDialog";
-import { AppContextProvider } from "~/contexts/AppContext";
+import MeasurableDialog from "~/components/measurable/measurableDialog";
 import Fab from "~/components/nav/fab";
+import Nav from "~/components/nav/nav";
+import { AppContextProvider } from "~/contexts/AppContext";
+import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
   title: "stamina",
@@ -32,7 +32,7 @@ export default function RootLayout({
                 <Nav />
                 {children}
               </div>
-              <CreateMeasurableDialog />
+              <MeasurableDialog />
               <Fab />
             </ThemeProvider>
           </AppContextProvider>

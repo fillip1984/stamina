@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const resultRouter = createTRPCRouter({
-  create: publicProcedure
+  create: protectedProcedure
     .input(z.object({ measurableId: z.string(), notes: z.string() }))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.result.create({
@@ -11,11 +11,13 @@ export const resultRouter = createTRPCRouter({
           measurableId: input.measurableId,
           notes: input.notes,
           date: new Date(),
+          userId: ctx.session.user.id,
         },
       });
     }),
-  findAll: publicProcedure.query(async ({ ctx }) => {
+  findAll: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.result.findMany({
+      where: { userId: ctx.session.user.id },
       include: {
         bloodPressureReading: true,
         weighIn: true,

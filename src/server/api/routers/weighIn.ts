@@ -1,9 +1,9 @@
 import { endOfWeek, startOfWeek } from "date-fns";
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const WeighInRouter = createTRPCRouter({
-  create: publicProcedure
+  create: protectedProcedure
     .input(
       z.object({
         measurableId: z.string(),
@@ -15,7 +15,7 @@ export const WeighInRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const previousWeighIn = await ctx.db.weighIn.findFirst({
         where: {
-          // userId: ctx.session.user.id,
+          userId: ctx.session.user.id,
         },
         orderBy: {
           date: "desc",
@@ -24,7 +24,7 @@ export const WeighInRouter = createTRPCRouter({
       const txResult = await ctx.db.$transaction(async (db) => {
         const result = await db.result.create({
           data: {
-            // userId: ctx.session.user.id,
+            userId: ctx.session.user.id,
             measurableId: input.measurableId,
             date: input.date,
             notes: `Weigh-in recorded: ${input.weight} lbs${
@@ -36,7 +36,7 @@ export const WeighInRouter = createTRPCRouter({
         });
         const weighIn = await db.weighIn.create({
           data: {
-            // userId: ctx.session.user.id,
+            userId: ctx.session.user.id,
             date: input.date,
             weight: input.weight,
             bodyFatPercentage: input.bodyFatPercentage,
@@ -48,7 +48,7 @@ export const WeighInRouter = createTRPCRouter({
       });
       return txResult;
     }),
-  readAll: publicProcedure
+  readAll: protectedProcedure
     .input(z.object({ filter: z.string() }))
     .query(async ({ ctx, input }) => {
       if (input.filter === "This week") {
@@ -59,7 +59,7 @@ export const WeighInRouter = createTRPCRouter({
 
         const result = await ctx.db.weighIn.findMany({
           where: {
-            // userId: ctx.session.user.id,
+            userId: ctx.session.user.id,
             date: {
               gte: start,
               lte: end,
@@ -75,7 +75,7 @@ export const WeighInRouter = createTRPCRouter({
       if (input.filter === "Last 10") {
         const result = await ctx.db.weighIn.findMany({
           where: {
-            // userId: ctx.session.user.id,
+            userId: ctx.session.user.id,
           },
           take: 10,
           orderBy: {
@@ -87,7 +87,7 @@ export const WeighInRouter = createTRPCRouter({
 
       const result = await ctx.db.weighIn.findMany({
         where: {
-          // userId: ctx.session.user.id,
+          userId: ctx.session.user.id,
         },
         orderBy: {
           date: "asc",
@@ -95,24 +95,24 @@ export const WeighInRouter = createTRPCRouter({
       });
       return result;
     }),
-  readById: publicProcedure
+  readById: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       const weighIn = await ctx.db.weighIn.findUnique({
         where: {
           id: input.id,
-          // userId: ctx.session.user.id
+          userId: ctx.session.user.id,
         },
       });
       return weighIn;
     }),
-  getWeightGoal: publicProcedure.query(async ({ ctx }) => {
+  getWeightGoal: protectedProcedure.query(async ({ ctx }) => {
     const weightGoal = await ctx.db.weightGoal.findFirst({
-      // where: { userId: ctx.session.user.id },
+      where: { userId: ctx.session.user.id },
     });
     return weightGoal;
   }),
-  setWeightGoal: publicProcedure
+  setWeightGoal: protectedProcedure
     .input(
       z.object({
         weightGoal: z.number().nullable(),
@@ -120,7 +120,7 @@ export const WeighInRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const currentGoal = await ctx.db.weightGoal.findFirst({
-        // where: { userId: ctx.session.user.id },
+        where: { userId: ctx.session.user.id },
       });
       if (currentGoal) {
         const updatedGoal = await ctx.db.weightGoal.update({
@@ -133,7 +133,7 @@ export const WeighInRouter = createTRPCRouter({
       } else {
         const newGoal = await ctx.db.weightGoal.create({
           data: {
-            // userId: ctx.session.user.id,
+            userId: ctx.session.user.id,
             weight: input.weightGoal,
           },
         });

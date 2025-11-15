@@ -1,18 +1,22 @@
 import { DayOfWeekEnum, DaytimeEnum, MeasurableTypeEnum } from "@prisma/client";
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const adminRouter = createTRPCRouter({
-  exportData: publicProcedure.mutation(async ({ ctx }) => {
-    const areas = await ctx.db.area.findMany();
-    const measurables = await ctx.db.measurable.findMany();
+  exportData: protectedProcedure.mutation(async ({ ctx }) => {
+    const areas = await ctx.db.area.findMany({
+      where: { userId: ctx.session.user.id },
+    });
+    const measurables = await ctx.db.measurable.findMany({
+      where: { userId: ctx.session.user.id },
+    });
 
     return {
       areas,
       measurables,
     };
   }),
-  importData: publicProcedure
+  importData: protectedProcedure
     .input(
       z.object({
         areas: z.array(
@@ -41,7 +45,7 @@ export const adminRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       for (const area of input.areas) {
         const existingArea = await ctx.db.area.findUnique({
-          where: { id: area.id },
+          where: { id: area.id, userId: ctx.session.user.id },
         });
         if (!existingArea) {
           await ctx.db.area.create({
@@ -49,6 +53,7 @@ export const adminRouter = createTRPCRouter({
               id: area.id,
               name: area.name,
               description: area.description,
+              userId: ctx.session.user.id,
             },
           });
         }
@@ -56,7 +61,7 @@ export const adminRouter = createTRPCRouter({
 
       for (const measurable of input.measurables) {
         const existingMeasurable = await ctx.db.measurable.findUnique({
-          where: { id: measurable.id },
+          where: { id: measurable.id, userId: ctx.session.user.id },
         });
         if (existingMeasurable) continue;
 
@@ -71,6 +76,7 @@ export const adminRouter = createTRPCRouter({
             type: measurable.type,
             dueDate: measurable.dueDate,
             interval: measurable.interval,
+            userId: ctx.session.user.id,
           },
         });
       }

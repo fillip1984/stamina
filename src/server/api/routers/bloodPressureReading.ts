@@ -1,11 +1,10 @@
-import { createTRPCRouter, publicProcedure } from "../trpc";
-import { z } from "zod";
-import { endOfWeek, startOfWeek } from "date-fns";
 import type { BloodPressureCategoryEnum } from "@prisma/client";
-import { read } from "fs";
+import { endOfWeek, startOfWeek } from "date-fns";
+import { z } from "zod";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const BloodPressureReadingRouter = createTRPCRouter({
-  create: publicProcedure
+  create: protectedProcedure
     .input(
       z.object({
         measurableId: z.string(),
@@ -19,7 +18,7 @@ export const BloodPressureReadingRouter = createTRPCRouter({
       const previousBloodPressureReading =
         await ctx.db.bloodPressureReading.findFirst({
           where: {
-            // userId: ctx.session.user.id,
+            userId: ctx.session.user.id,
             date: {
               lt: input.date,
             },
@@ -32,7 +31,7 @@ export const BloodPressureReadingRouter = createTRPCRouter({
       const txResult = await ctx.db.$transaction(async (db) => {
         const result = await db.result.create({
           data: {
-            // userId: ctx.session.user.id,
+            userId: ctx.session.user.id,
             measurableId: input.measurableId,
             date: input.date,
             notes: `Blood Pressure Reading recorded: ${input.systolic} over ${input.diastolic}${
@@ -42,7 +41,7 @@ export const BloodPressureReadingRouter = createTRPCRouter({
         });
         const bpr = await db.bloodPressureReading.create({
           data: {
-            // userId: ctx.session.user.id,
+            userId: ctx.session.user.id,
             date: input.date,
             systolic: input.systolic,
             diastolic: input.diastolic,
@@ -58,7 +57,7 @@ export const BloodPressureReadingRouter = createTRPCRouter({
       });
       return txResult;
     }),
-  readAll: publicProcedure
+  readAll: protectedProcedure
     .input(z.object({ filter: z.string() }))
     .query(async ({ ctx, input }) => {
       if (input.filter === "This week") {
@@ -69,7 +68,7 @@ export const BloodPressureReadingRouter = createTRPCRouter({
 
         const result = await ctx.db.bloodPressureReading.findMany({
           where: {
-            // userId: ctx.session.user.id,
+            userId: ctx.session.user.id,
             date: {
               gte: start,
               lte: end,
@@ -85,7 +84,7 @@ export const BloodPressureReadingRouter = createTRPCRouter({
       if (input.filter === "Last 10") {
         const result = await ctx.db.bloodPressureReading.findMany({
           where: {
-            // userId: ctx.session.user.id,
+            userId: ctx.session.user.id,
           },
           take: 10,
           orderBy: {
@@ -97,7 +96,7 @@ export const BloodPressureReadingRouter = createTRPCRouter({
 
       const result = await ctx.db.bloodPressureReading.findMany({
         where: {
-          // userId: ctx.session.user.id,
+          userId: ctx.session.user.id,
         },
         orderBy: {
           date: "asc",
@@ -105,12 +104,13 @@ export const BloodPressureReadingRouter = createTRPCRouter({
       });
       return result;
     }),
-  readById: publicProcedure
+  readById: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       return await ctx.db.bloodPressureReading.findUnique({
         where: {
           id: input.id,
+          userId: ctx.session.user.id,
         },
       });
     }),
