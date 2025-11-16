@@ -49,7 +49,7 @@ export const BloodPressureReadingRouter = createTRPCRouter({
             pulse: input.pulse,
             category: category as BloodPressureCategoryEnum,
             previousBloodPressureReadingId:
-              previousBloodPressureReading?.id || null,
+              previousBloodPressureReading?.id ?? null,
 
             resultId: result.id,
           },

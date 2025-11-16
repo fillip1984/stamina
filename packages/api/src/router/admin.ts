@@ -66,7 +66,7 @@ export const adminRouter = createTRPCRouter({
         });
         if (existingMeasurable) continue;
 
-        const result = await ctx.db.measurable.create({
+        await ctx.db.measurable.create({
           data: {
             setDate: measurable.setDate,
             name: measurable.name,

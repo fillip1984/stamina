@@ -4,11 +4,11 @@ import {
   MeasurableTypeEnum,
   OnCompleteEnum,
 } from "@prisma/client";
-import { calculateProgress } from "apps/stamina-web/src/utils/progressUtil";
 import { addDays, startOfDay } from "date-fns";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { calculateProgress } from "../utils/progressUtil";
 
 export const measurableRouter = createTRPCRouter({
   create: protectedProcedure
@@ -114,7 +114,7 @@ export const measurableRouter = createTRPCRouter({
       );
       const effectiveInterval = measurable.interval ?? interval;
       const newSetDate = startOfDay(measurable.dueDate ?? new Date());
-      let newDueDate =
+      const newDueDate =
         measurable.type === "Countdown"
           ? startOfDay(addDays(newSetDate, effectiveInterval))
           : measurable.type === "Seeking"

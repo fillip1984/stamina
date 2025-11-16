@@ -12,9 +12,7 @@ export const calculateProgress = (setDate: Date, dueDate?: Date) => {
   const currentDate = new Date();
   const elapsedDays = differenceInCalendarDays(currentDate, setDate);
 
-  if (!dueDate) {
-    dueDate = endOfYear(currentDate);
-  }
+  dueDate ??= endOfYear(currentDate);
 
   // include both start and end dates in interval and daysRemaining calculations
   const interval = differenceInCalendarDays(dueDate, setDate) + 1;
