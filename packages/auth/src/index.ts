@@ -42,6 +42,7 @@ export function initAuth(options: {
         clientId: options.googleClientId,
         clientSecret: options.googleClientSecret,
         redirectURI: `${options.baseUrl}/api/auth/callback/google`,
+        disableImplicitSignUp: true,
       },
     },
     emailAndPassword: {
