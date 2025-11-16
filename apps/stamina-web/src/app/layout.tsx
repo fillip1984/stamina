@@ -2,10 +2,10 @@ import "~/styles/globals.css";
 
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
-import { Nav } from "react-day-picker";
 
 import MeasurableDialog from "~/components/measurable/measurableDialog";
 import Fab from "~/components/nav/fab";
+import Nav from "~/components/nav/nav";
 import { AppContextProvider } from "~/contexts/AppContext";
 import { TRPCReactProvider } from "~/trpc/react";
 
