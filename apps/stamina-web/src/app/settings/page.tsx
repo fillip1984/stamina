@@ -1,20 +1,22 @@
 "use client";
 
+import type { ChangeEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { FiDownloadCloud, FiUploadCloud } from "react-icons/fi";
 import { IoScaleOutline } from "react-icons/io5";
-import { Button } from "apps/stamina-web/src/components/ui/button";
-import { Input } from "apps/stamina-web/src/components/ui/input";
+
+import type { AreaType, MeasurableType } from "@stamina/api";
+
+import { Button } from "~/components/ui/button";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-} from "apps/stamina-web/src/components/ui/input-group";
-import Header from "apps/stamina-web/src/components/ui/my-ui/header";
-import ScrollableContainer from "apps/stamina-web/src/components/ui/my-ui/scrollableContainer";
-import { api } from "apps/stamina-web/src/trpc/react";
-import type { AreaType, MeasurableType } from "apps/stamina-web/src/trpc/types";
+} from "~/components/ui/input-group";
+import Header from "~/components/ui/my-ui/header";
+import ScrollableContainer from "~/components/ui/my-ui/scrollableContainer";
+import { api } from "~/trpc/react";
 
 export default function PreferencesPage() {
   return (
@@ -97,6 +99,7 @@ const ImportExportSection = () => {
   const convertFileToDataUrl = (e: ProgressEvent<FileReader>) => {
     const dataUrlString = e.target?.result;
     const dataUrl = dataUrlString as string;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const data = dataUrl.split(",")[1]!;
     const buffer = Buffer.from(data, "base64");
     const string = buffer.toString();
@@ -111,9 +114,8 @@ const ImportExportSection = () => {
       dueDate: measurable.dueDate ? new Date(measurable.dueDate) : null,
       interval: measurable.interval ?? undefined,
     }));
-    if (areas && measurables) {
-      importData({ areas, measurables });
-    }
+
+    importData({ areas, measurables });
   };
 
   return (
@@ -146,6 +148,7 @@ const WeightGoalsSection = () => {
   const { data: existingWeightGoal } = api.weighIn.getWeightGoal.useQuery();
   useEffect(() => {
     if (existingWeightGoal?.weight) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWeightGoal(existingWeightGoal.weight.toString());
     }
   }, [existingWeightGoal]);

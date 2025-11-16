@@ -1,11 +1,18 @@
 "use client";
 
+import { useContext } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import Link from "next/link";
-import { useContext } from "react";
+import { FaSignOutAlt } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa6";
 import { FiSettings } from "react-icons/fi";
 import { GrSystem } from "react-icons/gr";
+
+import { authClient } from "~/auth/client";
+import { AppContext } from "~/contexts/AppContext";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -15,15 +22,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-
-import { FaPlus } from "react-icons/fa6";
-import { AppContext } from "apps/stamina-web/src/contexts/AppContext";
-import { authClient } from "apps/stamina-web/src/server/auth/client";
-import { se } from "date-fns/locale";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import type { Session } from "apps/stamina-web/src/server/auth";
-import { FaSignOutAlt } from "react-icons/fa";
-import { useRouter } from "next/navigation";
 
 export default function Fab() {
   const { data: session } = authClient.useSession();
@@ -48,7 +46,11 @@ export default function Fab() {
   );
 }
 
-const FabMenuItems = ({ session }: { session: Session }) => {
+const FabMenuItems = ({
+  session,
+}: {
+  session: { user: { name: string; image?: string | null } };
+}) => {
   // theme stuff
   const { theme, setTheme } = useTheme();
   const handleThemeToggle = () => {

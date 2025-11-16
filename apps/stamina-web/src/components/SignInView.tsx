@@ -1,7 +1,8 @@
 "use client";
 
 import { FaGoogle } from "react-icons/fa";
-import { authClient } from "apps/stamina-web/src/server/auth/client";
+
+import { authClient } from "~/auth/client";
 import { Button } from "./ui/button";
 
 export default function SignInView() {

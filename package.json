@@ -1,6 +1,7 @@
 {
   "name": "stamina",
   "private": true,
+  "type": "module",
   "engines": {
     "node": ">=22.14.0",
     "pnpm": ">=10.11.1"
@@ -28,9 +29,12 @@
     "sst": "^3.17.14"
   },
   "devDependencies": {
+    "@eslint/compat": "^1.2.9",
+    "@stamina/eslint-config": "workspace:*",
     "@stamina/prettier-config": "workspace:*",
     "@types/aws-lambda": "8.10.152",
     "dotenv-cli": "catalog:",
+    "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"
   },

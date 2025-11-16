@@ -1,9 +1,10 @@
 "use client";
 
-import { cva } from "class-variance-authority";
 import React, { useEffect } from "react";
+import { cva } from "class-variance-authority";
 import { FaArrowUp } from "react-icons/fa6";
-import { cn } from "apps/stamina-web/src/lib/utils";
+
+import { cn } from "~/lib/utils";
 import { Button } from "../button";
 
 export const scrollableContainerVariants = cva("flex grow overflow-y-auto");
@@ -38,7 +39,7 @@ export default function ScrollableContainer({
         currentRef.removeEventListener("scroll", handleScroll);
       }
     };
-  }, []);
+  }, [scrollToTopButton]);
 
   const scrollToTop = () => {
     divRef.current?.scrollTo({ top: 0, behavior: "smooth" });

@@ -1,10 +1,10 @@
+import type { NextRequest } from "next/server";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { type NextRequest } from "next/server";
 
-import { env } from "apps/stamina-web/src/env";
-import { appRouter } from "apps/stamina-web/src/server/api/root";
-import { createTRPCContext } from "apps/stamina-web/src/server/api/trpc";
-import { auth } from "apps/stamina-web/src/server/auth/server";
+import { appRouter, createTRPCContext } from "@stamina/api";
+
+import { auth } from "~/auth/server";
+import { env } from "~/env";
 
 /**
  * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when

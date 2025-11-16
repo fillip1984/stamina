@@ -19,6 +19,7 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
+    "@stamina/api": "workspace:*",
     "@stamina/auth": "workspace:*",
     "@stamina/db": "workspace:*",
     "@trpc/server": "catalog:",
@@ -27,7 +28,6 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@stamina/eslint-config": "workspace:*",
     "@stamina/prettier-config": "workspace:*",
     "@stamina/tsconfig": "workspace:*",
     "@types/node": "catalog:",

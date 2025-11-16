@@ -36,7 +36,6 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@stamina/eslint-config": "workspace:*",
     "@stamina/prettier-config": "workspace:*",
     "@stamina/tsconfig": "workspace:*",
     "dotenv-cli": "catalog:",

@@ -1,7 +1,8 @@
 "use client";
 
+import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { Trophy } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { BsHeartPulseFill, BsJournalMedical } from "react-icons/bs";
 import { FaArrowDown, FaArrowRight, FaArrowUp } from "react-icons/fa6";
@@ -10,21 +11,19 @@ import { IoScaleOutline } from "react-icons/io5";
 import { LuHeartPulse } from "react-icons/lu";
 import { PiPersonBold } from "react-icons/pi";
 import { TbTargetArrow } from "react-icons/tb";
-import {
-  Item,
-  ItemContent,
-  ItemMedia,
-} from "apps/stamina-web/src/components/ui/item";
-import Header from "apps/stamina-web/src/components/ui/my-ui/header";
-import LoadingAndRetry from "apps/stamina-web/src/components/ui/my-ui/loadingAndRetry";
-import ScrollableContainer from "apps/stamina-web/src/components/ui/my-ui/scrollableContainer";
-import { Separator } from "apps/stamina-web/src/components/ui/separator";
-import { api } from "apps/stamina-web/src/trpc/react";
+
 import type {
   BloodPressureReadingType,
   ResultType,
   WeighInType,
-} from "apps/stamina-web/src/trpc/types";
+} from "@stamina/api";
+
+import { Item, ItemContent, ItemMedia } from "~/components/ui/item";
+import Header from "~/components/ui/my-ui/header";
+import LoadingAndRetry from "~/components/ui/my-ui/loadingAndRetry";
+import ScrollableContainer from "~/components/ui/my-ui/scrollableContainer";
+import { Separator } from "~/components/ui/separator";
+import { api } from "~/trpc/react";
 
 export default function ResultsPage() {
   const {
@@ -88,6 +87,7 @@ const WeighInResult = ({ weighIn }: { weighIn: WeighInType }) => {
   const { data: weightGoal } = api.weighIn.getWeightGoal.useQuery();
   const { data: lastWeighIn } = api.weighIn.readById.useQuery(
     {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       id: weighIn.previousWeighInId!,
     },
     {
@@ -102,6 +102,7 @@ const WeighInResult = ({ weighIn }: { weighIn: WeighInType }) => {
   useEffect(() => {
     if (lastWeighIn) {
       const weightDiff = (weighIn.weight - lastWeighIn.weight).toFixed(2);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWeightTrendValue(Number(weightDiff));
 
       if (weighIn.bodyFatPercentage && lastWeighIn.bodyFatPercentage) {
@@ -179,13 +180,11 @@ const WeighInResult = ({ weighIn }: { weighIn: WeighInType }) => {
             <>
               <TbTargetArrow className="text-yellow-300" />
               Goal
-              <span className="text-sm lowercase">
-                {weightGoal?.weight} lbs
-              </span>
+              <span className="text-sm lowercase">{weightGoal.weight} lbs</span>
             </>
           }
           primaryValue={
-            weightGoal?.weight
+            weightGoal.weight
               ? (weighIn.weight - weightGoal.weight).toFixed(2)
               : "N/A"
           }
@@ -204,6 +203,7 @@ const BloodPressureResult = ({
   const { data: lastBloodPressureReading } =
     api.bloodPressureReading.readById.useQuery(
       {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         id: bloodPressureReading.previousBloodPressureReadingId!,
       },
       {
@@ -222,6 +222,7 @@ const BloodPressureResult = ({
       const systolicDiff = (
         bloodPressureReading.systolic - lastBloodPressureReading.systolic
       ).toFixed(2);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSystolicTrendValue(Number(systolicDiff));
 
       const diastolicDiff = (

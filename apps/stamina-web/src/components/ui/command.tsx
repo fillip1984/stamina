@@ -1,17 +1,16 @@
 "use client";
 
-import * as React from "react";
 import { Command as CommandPrimitive } from "cmdk";
 import { SearchIcon } from "lucide-react";
 
-import { cn } from "apps/stamina-web/src/lib/utils";
+import { cn } from "~/lib/utils";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "apps/stamina-web/src/components/ui/dialog";
+} from "./dialog";
 
 function Command({
   className,

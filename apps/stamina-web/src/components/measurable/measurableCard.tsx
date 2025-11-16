@@ -1,8 +1,8 @@
 "use client";
 
+import { useContext, useState } from "react";
 import { format } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
-import { useContext, useState } from "react";
 import {
   FaCalendarWeek,
   FaCheck,
@@ -13,7 +13,15 @@ import {
 } from "react-icons/fa6";
 import { GiDuration } from "react-icons/gi";
 import { TbTargetArrow } from "react-icons/tb";
-import { Button } from "apps/stamina-web/src/components/ui/button";
+
+import type { MeasurableType } from "@stamina/api";
+import { calculateProgress } from "@stamina/api";
+
+import { AppContext } from "~/contexts/AppContext";
+import { useModal } from "~/hooks/useModal";
+import { api } from "~/trpc/react";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,19 +29,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "apps/stamina-web/src/components/ui/dropdown-menu";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemTitle,
-} from "apps/stamina-web/src/components/ui/item";
-import { AppContext } from "apps/stamina-web/src/contexts/AppContext";
-import { useModal } from "apps/stamina-web/src/hooks/useModal";
-import { api } from "apps/stamina-web/src/trpc/react";
-import type { MeasurableType } from "apps/stamina-web/src/trpc/types";
-import { calculateProgress } from "apps/stamina-web/src/utils/progressUtil";
-import { Badge } from "../ui/badge";
+} from "../ui/dropdown-menu";
+import { Item, ItemActions, ItemContent, ItemTitle } from "../ui/item";
 import OnCompleteModal from "./onCompleteDialog";
 
 export default function MeasureableCard({
@@ -50,21 +47,21 @@ export default function MeasureableCard({
   const utils = api.useUtils();
   const { mutateAsync: completeMeasurable } =
     api.measurable.complete.useMutation({
-      onSuccess: () => {
-        utils.measurable.findAll.invalidate();
+      onSuccess: async () => {
+        await utils.measurable.findAll.invalidate();
       },
     });
   const { mutateAsync: deleteMeasurable } = api.measurable.delete.useMutation({
-    onSuccess: () => {
-      utils.measurable.findAll.invalidate();
+    onSuccess: async () => {
+      await utils.measurable.findAll.invalidate();
     },
   });
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     if (measurable.onComplete) {
       show();
     } else {
-      completeMeasurable(measurable.id);
+      await completeMeasurable(measurable.id);
     }
   };
 

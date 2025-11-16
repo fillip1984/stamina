@@ -1,18 +1,15 @@
 "use client";
 
-import { Label } from "@radix-ui/react-label";
+import type { FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState, type FormEvent } from "react";
-import {
-  FaEllipsisVertical,
-  FaEye,
-  FaPencil,
-  FaPlus,
-  FaTrash,
-} from "react-icons/fa6";
+import { FaEye, FaPlus, FaTrash } from "react-icons/fa";
+import { FaEllipsisVertical, FaPencil } from "react-icons/fa6";
 import { GiStoneStack } from "react-icons/gi";
 
-import { Button } from "apps/stamina-web/src/components/ui/button";
+import type { AreaType } from "@stamina/api";
+
+import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -21,7 +18,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "apps/stamina-web/src/components/ui/dialog";
+} from "~/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,7 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "apps/stamina-web/src/components/ui/dropdown-menu";
+} from "~/components/ui/dropdown-menu";
 import {
   Empty,
   EmptyContent,
@@ -37,31 +34,28 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "apps/stamina-web/src/components/ui/empty";
-import { Input } from "apps/stamina-web/src/components/ui/input";
+} from "~/components/ui/empty";
+import { Input } from "~/components/ui/input";
 import {
   Item,
   ItemActions,
   ItemContent,
   ItemDescription,
   ItemTitle,
-} from "apps/stamina-web/src/components/ui/item";
-import Header, {
-  HeaderActions,
-} from "apps/stamina-web/src/components/ui/my-ui/header";
-import LoadingAndRetry from "apps/stamina-web/src/components/ui/my-ui/loadingAndRetry";
-import ScrollableContainer from "apps/stamina-web/src/components/ui/my-ui/scrollableContainer";
-import { Spinner } from "apps/stamina-web/src/components/ui/spinner";
-import { Textarea } from "apps/stamina-web/src/components/ui/textarea";
-import { useModal } from "apps/stamina-web/src/hooks/useModal";
-import { api } from "apps/stamina-web/src/trpc/react";
-import type { AreaType } from "apps/stamina-web/src/trpc/types";
+} from "~/components/ui/item";
+import { Label } from "~/components/ui/label";
+import Header, { HeaderActions } from "~/components/ui/my-ui/header";
+import LoadingAndRetry from "~/components/ui/my-ui/loadingAndRetry";
+import ScrollableContainer from "~/components/ui/my-ui/scrollableContainer";
+import { Spinner } from "~/components/ui/spinner";
+import { Textarea } from "~/components/ui/textarea";
+import { useModal } from "~/hooks/useModal";
+import { api } from "~/trpc/react";
 
 export default function AreaPage() {
   const { isOpen, show, hide, showWithItem, editableItem } =
     useModal<AreaType>();
 
-  const utils = api.useUtils();
   const {
     data: areas,
     isLoading,
@@ -93,7 +87,7 @@ export default function AreaPage() {
 
         <div className="flex w-full flex-col gap-2">
           <AnimatePresence>
-            {areas?.map((area, i) => (
+            {areas?.map((area) => (
               <motion.div
                 key={area.id}
                 initial={{ height: 0, opacity: 0 }}
@@ -108,9 +102,7 @@ export default function AreaPage() {
             ))}
           </AnimatePresence>
         </div>
-        {!isLoading && areas && areas.length === 0 && (
-          <EmptyView createNewAction={show} />
-        )}
+        {areas?.length === 0 && <EmptyView createNewAction={show} />}
       </ScrollableContainer>
 
       {isOpen && (
@@ -208,6 +200,7 @@ const AreaModal = ({
   };
   useEffect(() => {
     setIsValid(validateForm());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, description]);
 
   // MX: create/update area

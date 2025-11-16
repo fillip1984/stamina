@@ -1,23 +1,19 @@
 "use client";
 
+import { useState } from "react";
+import { cva } from "class-variance-authority";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "apps/stamina-web/src/components/ui/popover";
-import { Button } from "apps/stamina-web/src/components/ui/button";
-import { Check, ChevronDownIcon } from "lucide-react";
-import {
-  Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
-} from "apps/stamina-web/src/components/ui/command";
-import { cn } from "apps/stamina-web/src/lib/utils";
-import { useState } from "react";
-import { cva } from "class-variance-authority";
+} from "cmdk";
+import { Check, ChevronDownIcon, Command } from "lucide-react";
+
+import { cn } from "~/lib/utils";
+import { Button } from "../button";
+import { Popover, PopoverContent, PopoverTrigger } from "../popover";
 
 const comboboxVariants = cva("justify-between font-normal");
 
@@ -32,7 +28,7 @@ export default function Combobox({
 }: React.ComponentProps<"button"> & {
   value: string | null;
   setValue: (value: string | null) => void;
-  options: Array<{ id: string | null; label: string }>;
+  options: { id: string | null; label: string }[];
   searchable?: boolean;
   placeholder?: string;
 }) {

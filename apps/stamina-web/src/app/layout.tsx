@@ -1,12 +1,13 @@
 import "~/styles/globals.css";
 
-import { type Metadata } from "next";
+import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
-import MeasurableDialog from "apps/stamina-web/src/components/measurable/measurableDialog";
-import Fab from "apps/stamina-web/src/components/nav/fab";
-import Nav from "apps/stamina-web/src/components/nav/nav";
-import { AppContextProvider } from "apps/stamina-web/src/contexts/AppContext";
-import { TRPCReactProvider } from "apps/stamina-web/src/trpc/react";
+import { Nav } from "react-day-picker";
+
+import MeasurableDialog from "~/components/measurable/measurableDialog";
+import Fab from "~/components/nav/fab";
+import { AppContextProvider } from "~/contexts/AppContext";
+import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
   title: "stamina",

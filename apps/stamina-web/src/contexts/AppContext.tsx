@@ -1,9 +1,10 @@
 "use client";
 
 import { createContext, useEffect, useState } from "react";
-import type { AreaType } from "apps/stamina-web/src/trpc/types";
 
-type AppContextType = {
+import type { AreaType } from "@stamina/api";
+
+interface AppContextType {
   areaFilter: AreaType | null;
   setAreaFilter: (area: AreaType | null) => void;
   isCreateMeasurableModalOpen: boolean;
@@ -13,7 +14,7 @@ type AppContextType = {
   setMeasurableIdToEdit: (id: string) => void;
   // isShowImportFileBrowser: boolean;
   // showImportFileBrowser?: () => void;
-};
+}
 
 export const AllAreas: AreaType = {
   id: "All",
@@ -27,12 +28,20 @@ export const AllAreas: AreaType = {
 // };
 export const AppContext = createContext<AppContextType>({
   areaFilter: null,
-  setAreaFilter: (area: AreaType | null) => {},
+  setAreaFilter: () => {
+    /* empty */
+  },
   isCreateMeasurableModalOpen: false,
-  openCreateMeasurableModal: () => {},
-  closeCreateMeasurableModal: () => {},
+  openCreateMeasurableModal: () => {
+    /* empty */
+  },
+  closeCreateMeasurableModal: () => {
+    /* empty */
+  },
   measurableIdToEdit: "",
-  setMeasurableIdToEdit: () => {},
+  setMeasurableIdToEdit: () => {
+    /* empty */
+  },
   // isShowImportFileBrowser: false,
   // showImportFileBrowser: () => {},
 });
@@ -48,6 +57,7 @@ export function AppContextProvider({
   const [measurableIdToEdit, setMeasurableIdToEdit] = useState<string>("");
   useEffect(() => {
     if (measurableIdToEdit !== "") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsCreateMeasurableModalOpen(true);
     }
   }, [measurableIdToEdit]);

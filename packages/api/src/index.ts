@@ -31,4 +31,5 @@ type RouterOutputs = inferRouterOutputs<AppRouter>;
 
 export { createTRPCContext, appRouter, createCaller };
 export type { AppRouter, RouterInputs, RouterOutputs };
-export * from "./types";
+export type * from "./types";
+export { calculateProgress } from "./utils/progressUtil";

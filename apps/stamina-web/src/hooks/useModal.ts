@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useCallback, useState } from "react";
 
 interface UseModalReturn<T = any> {
   isOpen: boolean;

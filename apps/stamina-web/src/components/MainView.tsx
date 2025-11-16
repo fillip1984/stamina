@@ -1,13 +1,16 @@
 "use client";
 
+import { useContext, useEffect, useState } from "react";
 import { isToday } from "date-fns/isToday";
 import { AnimatePresence, motion } from "motion/react";
-import { useContext, useEffect, useState } from "react";
 import { GiStoneStack } from "react-icons/gi";
 
-import MeasureableCard from "apps/stamina-web/src/components/measurable/measurableCard";
+import type { MeasurableType } from "@stamina/api";
 
-import { Button } from "apps/stamina-web/src/components/ui/button";
+import { AppContext } from "~/contexts/AppContext";
+import { api } from "~/trpc/react";
+import MeasureableCard from "./measurable/measurableCard";
+import { Button } from "./ui/button";
 import {
   Empty,
   EmptyContent,
@@ -15,13 +18,9 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "apps/stamina-web/src/components/ui/empty";
-import LoadingAndRetry from "apps/stamina-web/src/components/ui/my-ui/loadingAndRetry";
-import ScrollableContainer from "apps/stamina-web/src/components/ui/my-ui/scrollableContainer";
-import { AppContext } from "apps/stamina-web/src/contexts/AppContext";
-
-import { api } from "apps/stamina-web/src/trpc/react";
-import type { MeasurableType } from "apps/stamina-web/src/trpc/types";
+} from "./ui/empty";
+import LoadingAndRetry from "./ui/my-ui/loadingAndRetry";
+import ScrollableContainer from "./ui/my-ui/scrollableContainer";
 
 export default function Home() {
   const { areaFilter } = useContext(AppContext);
@@ -35,7 +34,7 @@ export default function Home() {
   } = api.measurable.findAll.useQuery(undefined, {
     enabled: !isLoadingAreas,
     select: (data) =>
-      data?.map((measurable) => ({
+      data.map((measurable) => ({
         ...measurable,
         areaName:
           areas?.find((area) => area.id === measurable.areaId)?.name ??
@@ -63,6 +62,7 @@ export default function Home() {
       }
     });
     if (selectedFilter === "All") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFilteredMeasurables(measurablesFilteredByArea);
       return;
     } else if (selectedFilter === "Today") {
@@ -141,7 +141,7 @@ export default function Home() {
 
           <div className="flex w-full flex-col gap-2">
             <AnimatePresence>
-              {filteredMeasurables?.map((measurable) => (
+              {filteredMeasurables.map((measurable) => (
                 <motion.div
                   key={measurable.id}
                   initial={{ height: 0, opacity: 0 }}
@@ -158,9 +158,7 @@ export default function Home() {
           </div>
         </>
       }
-      {!isLoadingMeasurables && measurables && measurables.length === 0 && (
-        <EmptyView />
-      )}
+      {measurables?.length === 0 && <EmptyView />}
     </ScrollableContainer>
   );
 }

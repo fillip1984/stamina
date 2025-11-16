@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-   "build": "pnpm with-env next build",
+    "build": "pnpm with-env next build",
     "dev": "pnpm with-env next dev",
     "start": "pnpm with-env next start",
     "format": "prettier --write . --ignore-path ../../.gitignore",
@@ -48,10 +48,10 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@eslint/compat": "^1.2.9",
     "@stamina/eslint-config": "workspace:*",
     "@stamina/prettier-config": "workspace:*",
     "@stamina/tsconfig": "workspace:*",
-    "@eslint/eslintrc": "^3.3.1",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/node": "^24.10.1",
     "@types/react": "catalog:react19",
@@ -68,5 +68,5 @@
     "typescript": "catalog:",
     "typescript-eslint": "^8.46.4"
   },
-  "prettier": "@acme/prettier-config"
+  "prettier": "@stamina/prettier-config"
 }

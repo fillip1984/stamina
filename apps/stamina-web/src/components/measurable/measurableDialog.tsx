@@ -5,37 +5,38 @@ import type {
   DaytimeEnum,
   OnCompleteEnum,
 } from "@prisma/client";
-import { ChevronDownIcon } from "lucide-react";
+import type { Day } from "date-fns";
 import { useContext, useEffect, useState } from "react";
+import { nextDay } from "date-fns";
+import { ChevronDownIcon } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { ImHourGlass } from "react-icons/im";
 import { LuTally4, LuTelescope } from "react-icons/lu";
-import { Button } from "apps/stamina-web/src/components/ui/button";
-import { Calendar } from "apps/stamina-web/src/components/ui/calendar";
+
+import type { AreaType, MeasurableType } from "@stamina/api";
+
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
-  DialogHeader,
   DialogTitle,
-} from "apps/stamina-web/src/components/ui/dialog";
-import { Input } from "apps/stamina-web/src/components/ui/input";
-import { Label } from "apps/stamina-web/src/components/ui/label";
+} from "~/components/ui/dialog";
+import { Label } from "~/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "apps/stamina-web/src/components/ui/popover";
-import { Spinner } from "apps/stamina-web/src/components/ui/spinner";
-import { Textarea } from "apps/stamina-web/src/components/ui/textarea";
-import { AppContext } from "apps/stamina-web/src/contexts/AppContext";
-
-import { nextDay, type Day } from "date-fns";
-import { AnimatePresence, motion } from "motion/react";
-import { api } from "apps/stamina-web/src/trpc/react";
-import type { AreaType, MeasurableType } from "apps/stamina-web/src/trpc/types";
+} from "~/components/ui/popover";
+import { AppContext } from "~/contexts/AppContext";
+import { api } from "~/trpc/react";
+import { Button } from "../ui/button";
+import { Calendar } from "../ui/calendar";
+import { DialogFooter, DialogHeader } from "../ui/dialog";
+import { Input } from "../ui/input";
 import Combobox from "../ui/my-ui/combobox";
+import { Spinner } from "../ui/spinner";
+import { Textarea } from "../ui/textarea";
 
 export default function MeasurableDialog() {
   const {
@@ -48,7 +49,7 @@ export default function MeasurableDialog() {
   const utils = api.useUtils();
   const { data: areas } = api.area.findAll.useQuery();
   const { data: measurableToEdit } = api.measurable.findById.useQuery(
-    measurableIdToEdit!,
+    measurableIdToEdit,
     {
       enabled: !!measurableIdToEdit,
     },
@@ -84,9 +85,9 @@ export default function MeasurableDialog() {
   const [interval, setInterval] = useState<number>();
   const [onComplete, setOnComplete] = useState<OnCompleteEnum | null>(null);
 
-  const handleCreateOrUpdate = () => {
+  const handleCreateOrUpdate = async () => {
     if (mode === "Update" && id) {
-      updateMeasurable({
+      await updateMeasurable({
         id,
         name,
         description,
@@ -99,7 +100,7 @@ export default function MeasurableDialog() {
         onComplete,
       });
     } else {
-      createMeasurable({
+      await createMeasurable({
         name,
         description,
         areaId: area?.id ?? null,
@@ -123,6 +124,7 @@ export default function MeasurableDialog() {
   };
   useEffect(() => {
     setValidToCreate(validateForm());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, description, type, dueDate]);
 
   // UX: when editing, populate fields or set defaults when creating new
@@ -154,6 +156,16 @@ export default function MeasurableDialog() {
     }
   }, [measurableToEdit, areas, isCreateMeasurableModalOpen]);
 
+  const daysOfWeek = [
+    { id: "Sunday", label: "Sunday" },
+    { id: "Monday", label: "Monday" },
+    { id: "Tuesday", label: "Tuesday" },
+    { id: "Wednesday", label: "Wednesday" },
+    { id: "Thursday", label: "Thursday" },
+    { id: "Friday", label: "Friday" },
+    { id: "Saturday", label: "Saturday" },
+  ];
+
   // UX: set dueDate to next instance of suggestedDay when it is selected
   useEffect(() => {
     if (type !== "Countdown") return;
@@ -179,6 +191,7 @@ export default function MeasurableDialog() {
     if (!interval) {
       setInterval(7);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [suggestedDay, type]);
 
   const measurableTypes = [
@@ -198,16 +211,6 @@ export default function MeasurableDialog() {
       icon: <LuTally4 />,
       description: "A measurable that tallies up days since being set.",
     },
-  ];
-
-  const daysOfWeek = [
-    { id: "Sunday", label: "Sunday" },
-    { id: "Monday", label: "Monday" },
-    { id: "Tuesday", label: "Tuesday" },
-    { id: "Wednesday", label: "Wednesday" },
-    { id: "Thursday", label: "Thursday" },
-    { id: "Friday", label: "Friday" },
-    { id: "Saturday", label: "Saturday" },
   ];
 
   return (
@@ -262,7 +265,7 @@ export default function MeasurableDialog() {
                 options={[
                   { id: "Uncategorized", label: "Uncategorized" },
                 ].concat(
-                  areas?.map((area) => ({ id: area.id, label: area.name })) ||
+                  areas?.map((area) => ({ id: area.id, label: area.name })) ??
                     [],
                 )}
                 placeholder="Select an area"

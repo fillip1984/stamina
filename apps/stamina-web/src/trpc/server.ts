@@ -1,16 +1,14 @@
 import "server-only";
 
-import { createHydrationHelpers } from "@trpc/react-query/rsc";
-import { headers } from "next/headers";
 import { cache } from "react";
+import { headers } from "next/headers";
+import { createHydrationHelpers } from "@trpc/react-query/rsc";
 
-import {
-  createCaller,
-  type AppRouter,
-} from "apps/stamina-web/src/server/api/root";
-import { createTRPCContext } from "apps/stamina-web/src/server/api/trpc";
+import type { AppRouter } from "@stamina/api";
+import { createCaller, createTRPCContext } from "@stamina/api";
+
+import { auth } from "~/auth/server";
 import { createQueryClient } from "./query-client";
-import { auth } from "apps/stamina-web/src/server/auth/server";
 
 /**
  * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when

@@ -1,16 +1,17 @@
 "use client";
 
-import { TrophyIcon } from "lucide-react";
+import { useContext } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useContext } from "react";
+import { TrophyIcon } from "lucide-react";
 import { SiGoogletasks } from "react-icons/si";
 import { TbCategory } from "react-icons/tb";
-import { Button } from "apps/stamina-web/src/components/ui/button";
-import { AllAreas, AppContext } from "apps/stamina-web/src/contexts/AppContext";
-import { authClient } from "apps/stamina-web/src/server/auth/client";
-import { api } from "apps/stamina-web/src/trpc/react";
+
+import { authClient } from "~/auth/client";
+import { AllAreas, AppContext } from "~/contexts/AppContext";
+import { api } from "~/trpc/react";
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 
 export default function Nav() {
   const { data: session } = authClient.useSession();

@@ -1,34 +1,35 @@
 "use client";
 
-import { ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
+import { ChevronDownIcon } from "lucide-react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { BsHeartPulseFill } from "react-icons/bs";
 import { FaCalendarDay } from "react-icons/fa";
 import { IoScaleOutline } from "react-icons/io5";
 import { PiPersonBold } from "react-icons/pi";
-import { Button } from "apps/stamina-web/src/components/ui/button";
-import { Calendar } from "apps/stamina-web/src/components/ui/calendar";
+
+import type { MeasurableType } from "@stamina/api";
+
 import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogFooter,
-  DialogHeader,
   DialogTitle,
-} from "apps/stamina-web/src/components/ui/dialog";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "apps/stamina-web/src/components/ui/input-group";
+} from "~/components/ui/dialog";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "apps/stamina-web/src/components/ui/popover";
-import { api } from "apps/stamina-web/src/trpc/react";
-import type { MeasurableType } from "apps/stamina-web/src/trpc/types";
+} from "~/components/ui/popover";
+import { api } from "~/trpc/react";
+import { Button } from "../ui/button";
+import { Calendar } from "../ui/calendar";
+import { DialogFooter, DialogHeader } from "../ui/dialog";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "../ui/input-group";
 import { Label } from "../ui/label";
 
 export default function OnCompleteModal({
@@ -76,14 +77,13 @@ const WeighIn = ({
   const [bodyFatPercentage, setBodyFatPercentage] = useState("");
 
   const utils = api.useUtils();
-  const { mutate: createWeighIn, isPending: isCreatingWeighIn } =
-    api.weighIn.create.useMutation({
-      onSuccess: () => {
-        void utils.weighIn.invalidate();
-        onComplete();
-        dismiss();
-      },
-    });
+  const { mutate: createWeighIn } = api.weighIn.create.useMutation({
+    onSuccess: () => {
+      void utils.weighIn.invalidate();
+      onComplete();
+      dismiss();
+    },
+  });
 
   const handleSaveWeighIn = () => {
     createWeighIn({
@@ -110,7 +110,10 @@ const WeighIn = ({
                   <FaCalendarDay />
                 </InputGroupAddon>
                 <Button variant="ghost">
-                  {date ? date.toLocaleDateString() : "Select date"}
+                  {
+                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                    date ? date.toLocaleDateString() : "Select date"
+                  }
                   <ChevronDownIcon />
                 </Button>
               </InputGroup>
@@ -157,7 +160,7 @@ const WeighIn = ({
               Cancel
             </Button>
           </DialogClose>
-          <Button onClick={handleSaveWeighIn} disabled={!date || !weight}>
+          <Button onClick={handleSaveWeighIn} disabled={!weight}>
             Save
           </Button>
         </DialogFooter>
@@ -182,19 +185,17 @@ const BloodPressureReading = ({
   const [heartRate, setHeartRate] = useState("");
 
   const utils = api.useUtils();
-  const {
-    mutateAsync: createBloodPressure,
-    isPending: isCreatingBloodPressure,
-  } = api.bloodPressureReading.create.useMutation({
-    onSuccess: () => {
-      void utils.bloodPressureReading.invalidate();
-      onComplete();
-      dismiss();
-    },
-  });
+  const { mutateAsync: createBloodPressure } =
+    api.bloodPressureReading.create.useMutation({
+      onSuccess: () => {
+        void utils.bloodPressureReading.invalidate();
+        onComplete();
+        dismiss();
+      },
+    });
 
-  const handleSaveBloodPressure = () => {
-    createBloodPressure({
+  const handleSaveBloodPressure = async () => {
+    await createBloodPressure({
       measurableId: measurable.id,
       date,
       systolic: parseInt(systolic),
@@ -217,7 +218,10 @@ const BloodPressureReading = ({
                   <FaCalendarDay />
                 </InputGroupAddon>
                 <Button variant="ghost">
-                  {date ? date.toLocaleDateString() : "Select date"}
+                  {
+                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                    date ? date.toLocaleDateString() : "Select date"
+                  }
                   <ChevronDownIcon />
                 </Button>
               </InputGroup>
@@ -288,7 +292,7 @@ const BloodPressureReading = ({
           </DialogClose>
           <Button
             onClick={handleSaveBloodPressure}
-            disabled={!date || !systolic || !diastolic}
+            disabled={!systolic || !diastolic}
           >
             Save
           </Button>
