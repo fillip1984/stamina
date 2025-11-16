@@ -1,5 +1,5 @@
 {
-  "name": "@paratus/api",
+  "name": "@stamina/api",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -19,21 +19,21 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@paratus/auth": "workspace:*",
-    "@paratus/db": "workspace:*",
+    "@stamina/auth": "workspace:*",
+    "@stamina/db": "workspace:*",
     "@trpc/server": "catalog:",
     "date-fns": "catalog:",
     "superjson": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@paratus/eslint-config": "workspace:*",
-    "@paratus/prettier-config": "workspace:*",
-    "@paratus/tsconfig": "workspace:*",
+    "@stamina/eslint-config": "workspace:*",
+    "@stamina/prettier-config": "workspace:*",
+    "@stamina/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"
   },
-  "prettier": "@paratus/prettier-config"
+  "prettier": "@stamina/prettier-config"
 }

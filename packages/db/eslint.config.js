@@ -1,9 +1,10 @@
-import baseConfig from "@paratus/eslint-config/base";
+import { defineConfig } from "eslint/config";
 
-/** @type {import('typescript-eslint').Config} */
-export default [
-    {
-        ignores: ["dist/**"],
-    },
-    ...baseConfig,
-];
+import { baseConfig } from "@stamina/eslint-config/base";
+
+export default defineConfig(
+  {
+    ignores: ["dist/**"],
+  },
+  baseConfig,
+);

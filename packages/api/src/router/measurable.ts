@@ -4,14 +4,11 @@ import {
   MeasurableTypeEnum,
   OnCompleteEnum,
 } from "@prisma/client";
+import { calculateProgress } from "apps/stamina-web/src/utils/progressUtil";
 import { addDays, startOfDay } from "date-fns";
 import { z } from "zod";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-} from "apps/stamina-web/src/server/api/trpc";
-import { calculateProgress } from "apps/stamina-web/src/utils/progressUtil";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const measurableRouter = createTRPCRouter({
   create: protectedProcedure

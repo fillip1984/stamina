@@ -1,5 +1,5 @@
 {
-  "name": "@paratus/db",
+  "name": "@stamina/db",
   "version": "1.0.0",
   "private": true,
   "description": "",
@@ -36,14 +36,14 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@paratus/eslint-config": "workspace:*",
-    "@paratus/prettier-config": "workspace:*",
-    "@paratus/tsconfig": "workspace:*",
+    "@stamina/eslint-config": "workspace:*",
+    "@stamina/prettier-config": "workspace:*",
+    "@stamina/tsconfig": "workspace:*",
     "dotenv-cli": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "prisma": "catalog:",
     "typescript": "catalog:"
   },
-  "prettier": "@paratus/prettier-config"
+  "prettier": "@stamina/prettier-config"
 }

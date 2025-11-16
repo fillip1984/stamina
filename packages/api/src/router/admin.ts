@@ -1,9 +1,7 @@
 import { DayOfWeekEnum, DaytimeEnum, MeasurableTypeEnum } from "@prisma/client";
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  protectedProcedure,
-} from "apps/stamina-web/src/server/api/trpc";
+
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const adminRouter = createTRPCRouter({
   exportData: protectedProcedure.mutation(async ({ ctx }) => {

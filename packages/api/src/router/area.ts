@@ -1,9 +1,6 @@
 import { z } from "zod";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-} from "apps/stamina-web/src/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const areaRouter = createTRPCRouter({
   create: protectedProcedure

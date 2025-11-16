@@ -1,5 +1,6 @@
 import { endOfWeek, startOfWeek } from "date-fns";
 import { z } from "zod";
+
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const WeighInRouter = createTRPCRouter({

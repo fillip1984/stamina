@@ -8,10 +8,10 @@
  */
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
-import { ZodError } from "zod/v4";
+import z, { ZodError } from "zod/v4";
 
-import type { Auth } from "@paratus/auth";
-import { db } from "@paratus/db";
+import type { Auth } from "@stamina/auth";
+import { db } from "@stamina/db";
 
 /**
  * 1. CONTEXT
@@ -53,7 +53,10 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
     ...shape,
     data: {
       ...shape.data,
-      zodError: error.cause instanceof ZodError ? error.cause.flatten() : null,
+      zodError:
+        error.cause instanceof ZodError
+          ? z.flattenError(error.cause as ZodError<Record<string, unknown>>)
+          : null,
     },
   }),
 });

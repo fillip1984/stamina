@@ -1,9 +1,5 @@
 {
-  "extends": "@paratus/tsconfig/base.json",
-  "include": [
-    "."
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "extends": "@stamina/tsconfig/base.json",
+  "include": ["."],
+  "exclude": ["node_modules"]
 }

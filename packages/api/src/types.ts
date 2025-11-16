@@ -1,15 +1,9 @@
 import type { RouterOutputs } from ".";
 
-// sumary types
-export type CollectionSummaryType = NonNullable<
-  RouterOutputs["collection"]["readAll"]
->[number];
-export type SectionSummaryType = CollectionSummaryType["sections"][number];
-
-// detail types
-export type CollectionDetailType = NonNullable<
-  RouterOutputs["collection"]["readOne"]
+export type AreaType = RouterOutputs["area"]["findAll"][number];
+export type MeasurableType = RouterOutputs["measurable"]["findAll"][number];
+export type ResultType = RouterOutputs["result"]["findAll"][number];
+export type BloodPressureReadingType = NonNullable<
+  ResultType["bloodPressureReading"]
 >;
-export type SectionDetailType = CollectionDetailType["sections"][number];
-export type TaskDetailType = SectionDetailType["tasks"][number];
-export type CommentType = TaskDetailType["comments"][number];
+export type WeighInType = NonNullable<ResultType["weighIn"]>;

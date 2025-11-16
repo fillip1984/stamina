@@ -4,7 +4,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { oAuthProxy } from "better-auth/plugins";
 
-import { db } from "@paratus/db";
+import { db } from "@stamina/db";
 
 export function initAuth(options: {
   baseUrl: string;
@@ -48,7 +48,7 @@ export function initAuth(options: {
       enabled: true,
       disableSignUp: true,
     },
-    trustedOrigins: ["paratus://", "expo://"],
+    trustedOrigins: ["stamina://", "expo://"],
   } satisfies BetterAuthOptions;
 
   return betterAuth(config);
