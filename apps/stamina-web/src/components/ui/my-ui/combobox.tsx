@@ -1,18 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { cva } from "class-variance-authority";
-import {
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "cmdk";
-import { Check, ChevronDownIcon, Command } from "lucide-react";
+import { useState } from "react";
+
+import { Check, ChevronDownIcon } from "lucide-react";
 
 import { cn } from "~/lib/utils";
 import { Button } from "../button";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../command";
 import { Popover, PopoverContent, PopoverTrigger } from "../popover";
 
 const comboboxVariants = cva("justify-between font-normal");

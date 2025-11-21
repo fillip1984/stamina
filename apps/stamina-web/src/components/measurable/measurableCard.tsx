@@ -1,8 +1,8 @@
 "use client";
 
-import { useContext, useState } from "react";
 import { differenceInCalendarDays, endOfYear, format } from "date-fns";
 import { AnimatePresence, motion } from "motion/react";
+import { useContext, useState } from "react";
 import {
   FaCalendarWeek,
   FaCheck,
@@ -132,12 +132,12 @@ export default function MeasureableCard({
             )}
 
             {(measurable.type === "Tally" || measurable.type === "Seeking") && (
-              <div className="flex items-center gap-1">
+              <div className="absolute inset-0 flex items-center gap-1">
                 <span className="text-xl font-bold">
                   {elapsedDays > 0 ? elapsedDays : 0}
                 </span>
                 {measurable.type === "Tally" ? (
-                  <span className="text-xs">days and counting</span>
+                    <span className="text-xs">days and counting</span>
                 ) : (
                   <span className="text-xs">days since</span>
                 )}
@@ -151,7 +151,7 @@ export default function MeasureableCard({
                 type: "spring",
                 bounce: progress > 100 && progress < 0 ? 0 : 0.3,
               }}
-              className="absolute inset-0 -z-20 bg-blue-600/80"
+              className="absolute inset-0 bg-blue-600/30"
             ></motion.div>
             {overdue && (
               <motion.div
@@ -163,7 +163,7 @@ export default function MeasureableCard({
                   type: "spring",
                   bounce: progress > 100 ? 0 : 0.3,
                 }}
-                className="absolute inset-0 -z-10 bg-red-600/80"
+                className="absolute inset-0 bg-red-600/30"
                 style={{
                   width: `
           ${progress - 100}%

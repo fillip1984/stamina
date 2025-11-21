@@ -134,7 +134,7 @@ export const measurableRouter = createTRPCRouter({
       ) {
         // result already accounted for these types
 
-        ctx.db.result.create({
+        return ctx.db.result.create({
             data: {
               measurableId: input,
               date: new Date(),
