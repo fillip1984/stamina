@@ -13,6 +13,7 @@ export default $config({
   async run() {
     new sst.aws.Nextjs("stamina", {
       domain: "stamina.illizen.com",
+      path: "./apps/stamina-web",
       server: {
         runtime: "nodejs22.x",
       },
