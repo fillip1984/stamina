@@ -26,10 +26,10 @@
     "start:web": "pnpm --filter stamina-web run start"
   },
   "dependencies": {
-    "sst": "^3.17.14"
+    "sst": "^3.17.23"
   },
   "devDependencies": {
-    "@eslint/compat": "^1.2.9",
+    "@eslint/compat": "^1.4.1",
     "@stamina/eslint-config": "workspace:*",
     "@stamina/prettier-config": "workspace:*",
     "@types/aws-lambda": "8.10.152",
