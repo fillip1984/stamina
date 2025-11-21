@@ -224,15 +224,15 @@ export default function MeasurableDialog() {
         }
       }}
     >
-      <DialogContent className="h-3/4 md:h-1/2">
-        <DialogHeader>
+      <DialogContent className="h-3/4 lg:h-1/2 px-0">
+        <DialogHeader className="px-2">
           <DialogTitle>{mode} Measurable</DialogTitle>
           <DialogDescription>
             {mode} measurable item, measurable items are used to track progress
             towards a goal.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-3 overflow-y-auto">
+        <div className="flex flex-col gap-3 overflow-y-auto py-2 px-4 bg-destructive">
           <div className="grid gap-2">
             <Label htmlFor="name">Name</Label>
             <Input
@@ -253,7 +253,7 @@ export default function MeasurableDialog() {
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div className="grid gap-2">
               <Label htmlFor="area">Area</Label>
               <Combobox
@@ -305,7 +305,7 @@ export default function MeasurableDialog() {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="type">Type</Label>
-            <div className="flex justify-center gap-2">
+            <div className="flex justify-center flex-wrap gap-2">
               {measurableTypes.map((t) => (
                 <div
                   key={t.label}
@@ -330,7 +330,7 @@ export default function MeasurableDialog() {
                 transition={{ duration: 0.2 }}
                 className="grid gap-3"
               >
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="grid gap-2">
                     <Label htmlFor="suggestedDay">
                       Suggested Day
@@ -371,7 +371,7 @@ export default function MeasurableDialog() {
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="grid gap-2">
                     <Label htmlFor="date">Due Date</Label>
                     <Popover
