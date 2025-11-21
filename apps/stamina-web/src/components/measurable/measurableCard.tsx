@@ -117,7 +117,7 @@ export default function MeasureableCard({
           </span>
           <div className="relative my-2 flex h-8 w-full items-center justify-center overflow-hidden rounded-2xl border">
             {measurable.dueDate && (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 z-30">
                 <span className="text-xl font-bold">
                   {daysRemaining > 0 ? daysRemaining : daysRemaining * -1}
                 </span>
@@ -132,7 +132,7 @@ export default function MeasureableCard({
             )}
 
             {(measurable.type === "Tally" || measurable.type === "Seeking") && (
-              <div className="absolute inset-0 flex items-center gap-1">
+              <div className="absolute inset-0 flex items-center gap-1 z-30">
                 <span className="text-xl font-bold">
                   {elapsedDays > 0 ? elapsedDays : 0}
                 </span>
@@ -151,7 +151,7 @@ export default function MeasureableCard({
                 type: "spring",
                 bounce: progress > 100 && progress < 0 ? 0 : 0.3,
               }}
-              className="absolute inset-0 bg-blue-600/30"
+              className="absolute inset-0 bg-blue-600/80 z-10"
             ></motion.div>
             {overdue && (
               <motion.div
@@ -163,7 +163,7 @@ export default function MeasureableCard({
                   type: "spring",
                   bounce: progress > 100 ? 0 : 0.3,
                 }}
-                className="absolute inset-0 bg-red-600/30"
+                className="absolute inset-0 bg-red-600/80 z-20"
                 style={{
                   width: `
           ${progress - 100}%
