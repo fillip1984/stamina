@@ -224,7 +224,7 @@ export default function MeasurableDialog() {
         }
       }}
     >
-      <DialogContent className="h-full w-full">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{mode} Measurable</DialogTitle>
           <DialogDescription>
