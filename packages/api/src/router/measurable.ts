@@ -133,6 +133,15 @@ export const measurableRouter = createTRPCRouter({
         measurable.onComplete === "Weigh_in"
       ) {
         // result already accounted for these types
+
+        ctx.db.result.create({
+            data: {
+              measurableId: input,
+              date: new Date(),
+              notes: `Completed measurable: ${measurable.name}`,
+              userId: ctx.session.user.id,
+            },
+          })
       } else {
         const txResult = await ctx.db.$transaction([
           ctx.db.measurable.update({
