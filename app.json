@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "e0d276b6-3409-49e4-a7d4-381f6b952aad"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.fillip1984.stamina",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    }
+  }
+}

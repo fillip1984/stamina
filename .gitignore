@@ -44,6 +44,29 @@ yarn-error.log*
 dist/
 .cache
 
+# expo
+.ipa
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# generated native folders
+/ios
+/android
+
 # idea files
 .idea
 
