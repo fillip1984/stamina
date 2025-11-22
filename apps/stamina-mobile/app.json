@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "stamina-mobile",
-    "slug": "stamina-mobile",
+    "name": "stamina",
+    "slug": "stamina",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/images/icon.png",
-    "scheme": "staminamobile",
+    "scheme": "stamina",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.illizen.stamina-mobile",
+      "bundleIdentifier": "com.fillip1984.stamina",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }

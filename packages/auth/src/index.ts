@@ -45,10 +45,6 @@ export function initAuth(options: {
         disableImplicitSignUp: true,
       },
     },
-    emailAndPassword: {
-      enabled: true,
-      disableSignUp: true,
-    },
     trustedOrigins: ["stamina://", "expo://"],
   } satisfies BetterAuthOptions;
 

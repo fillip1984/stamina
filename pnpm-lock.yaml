@@ -110,8 +110,8 @@ importers:
   apps/stamina-mobile:
     dependencies:
       '@better-auth/expo':
-        specifier: ^1.4.0
-        version: 1.4.0(@better-auth/core@1.4.0(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.0)(jose@6.1.2)(kysely@0.28.8)(nanostores@1.1.0))(expo-constants@18.0.10)(expo-linking@8.0.9)(expo-network@8.0.7(expo@54.0.25)(react@19.1.0))(expo-web-browser@15.0.9(expo@54.0.25)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.10)(react@19.1.0)))
+        specifier: 1.3.8
+        version: 1.3.8(better-auth@1.3.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
       '@expo/vector-icons':
         specifier: ^15.0.3
         version: 15.0.3(expo-font@14.0.9(expo@54.0.25)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.10)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.10)(react@19.1.0))(react@19.1.0)
@@ -140,8 +140,8 @@ importers:
         specifier: 'catalog:'
         version: 11.7.1(@tanstack/react-query@5.90.10(react@19.1.0))(@trpc/client@11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3))(@trpc/server@11.7.1(typescript@5.9.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.3)
       better-auth:
-        specifier: 1.4.0
-        version: 1.4.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: 1.3.8
+        version: 1.3.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       date-fns:
         specifier: 'catalog:'
         version: 4.1.0
@@ -401,7 +401,7 @@ importers:
         version: 9.39.1(jiti@2.6.1)
       eslint-config-next:
         specifier: ^16.0.3
-        version: 16.0.3(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
+        version: 16.0.3(@typescript-eslint/parser@8.47.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       postcss:
         specifier: ^8.5.6
         version: 8.5.6
@@ -560,7 +560,7 @@ importers:
         version: 16.0.3
       eslint-plugin-import:
         specifier: ^2.32.0
-        version: 2.32.0(@typescript-eslint/parser@8.47.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.1(jiti@2.6.1))
+        version: 2.32.0(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-jsx-a11y:
         specifier: ^6.10.2
         version: 6.10.2(eslint@9.39.1(jiti@2.6.1))
@@ -1151,46 +1151,13 @@ packages:
       kysely: ^0.28.5
       nanostores: ^1.0.1
 
-  '@better-auth/core@1.4.0':
-    resolution: {integrity: sha512-HaHJ9jlxg4+clgspfrmRPrbkG2G2NFisgo2G+qFxfcRBpTAg+/VNLP4vfGMq7Pmj9CjZLLyk9sas/+zEE5ejuQ==}
-    peerDependencies:
-      '@better-auth/utils': 0.3.0
-      '@better-fetch/fetch': 1.1.18
-      better-call: 1.1.0
-      jose: ^6.1.0
-      kysely: ^0.28.5
-      nanostores: ^1.0.1
-
   '@better-auth/expo@1.3.8':
     resolution: {integrity: sha512-ODU0oD+xJqg3fWv2Ibbty5ZJVU4ldkBpiSVKL4j/b7TVR6mozWNHldJlB8wjqCOEnzOLqBgG9snYNjXQr4FJ7A==}
     peerDependencies:
       better-auth: 1.3.8
 
-  '@better-auth/expo@1.4.0':
-    resolution: {integrity: sha512-vk3idkuuqZraZoDr55OglaV6QgBnA4M56hIpStpcwSrrh0nq/Uw1FenJJPf+Pz3B5g5BpOyricrxQKLoicpWQQ==}
-    peerDependencies:
-      '@better-auth/core': 1.4.0
-      expo-constants: '>=17.0.0'
-      expo-linking: '>=7.0.0'
-      expo-network: ^8.0.7
-      expo-web-browser: '>=14.0.0'
-    peerDependenciesMeta:
-      expo-constants:
-        optional: true
-      expo-linking:
-        optional: true
-      expo-network:
-        optional: true
-      expo-web-browser:
-        optional: true
-
   '@better-auth/telemetry@1.3.34':
     resolution: {integrity: sha512-aQZ3wN90YMqV49diWxAMe1k7s2qb55KCsedCZne5PlgCjU4s3YtnqyjC5FEpzw2KY8l8rvR7DMAsDl13NjObKA==}
-
-  '@better-auth/telemetry@1.4.0':
-    resolution: {integrity: sha512-nNTx9GP4o+5aZhP/ii1RzvkvYu+wnIZj55CoZPms/7+JHfS8qz3zhgy+/nVHGQhUpE52VekFPNTIURzkhAeeUg==}
-    peerDependencies:
-      '@better-auth/core': 1.4.0
 
   '@better-auth/utils@0.2.6':
     resolution: {integrity: sha512-3y/vaL5Ox33dBwgJ6ub3OPkVqr6B5xL2kgxNHG8eHZuryLyG/4JSPGqjbdRSgjuy9kALUZYDFl+ORIAxlWMSuA==}
@@ -3056,43 +3023,11 @@ packages:
       react-dom:
         optional: true
 
-  better-auth@1.4.0:
-    resolution: {integrity: sha512-W49RtERlaosdaLqwXhDxgOmxE0EC/8dVllIsnGpHqFgz4jO3CtW81ABNclXD1nJdy33xkebwX0NSPGn6/UFW/w==}
-    peerDependencies:
-      '@lynx-js/react': '*'
-      '@sveltejs/kit': '*'
-      next: '*'
-      react: '*'
-      react-dom: '*'
-      solid-js: '*'
-      svelte: '*'
-      vue: '*'
-    peerDependenciesMeta:
-      '@lynx-js/react':
-        optional: true
-      '@sveltejs/kit':
-        optional: true
-      next:
-        optional: true
-      react:
-        optional: true
-      react-dom:
-        optional: true
-      solid-js:
-        optional: true
-      svelte:
-        optional: true
-      vue:
-        optional: true
-
   better-call@1.0.16:
     resolution: {integrity: sha512-42dgJ1rOtc0anOoxjXPOWuel/Z/4aeO7EJ2SiXNwvlkySSgjXhNjAjTMWa8DL1nt6EXS3jl3VKC3mPsU/lUgVA==}
 
   better-call@1.0.19:
     resolution: {integrity: sha512-sI3GcA1SCVa3H+CDHl8W8qzhlrckwXOTKhqq3OOPXjgn5aTOMIqGY34zLY/pHA6tRRMjTUC3lz5Mi7EbDA24Kw==}
-
-  better-call@1.1.0:
-    resolution: {integrity: sha512-7CecYG+yN8J1uBJni/Mpjryp8bW/YySYsrGEWgFe048ORASjq17keGjbKI2kHEOSc6u8pi11UxzkJ7jIovQw6w==}
 
   better-opn@3.0.2:
     resolution: {integrity: sha512-aVNobHnJqLiUelTaHat9DZ1qM2w0C0Eym4LPI/3JxOnSokGVdsl1T1kN7TFvsEAD8G47A6VKQ0TVHqbBnYMJlQ==}
@@ -7530,33 +7465,10 @@ snapshots:
       nanostores: 1.1.0
       zod: 4.1.12
 
-  '@better-auth/core@1.4.0(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.0)(jose@6.1.2)(kysely@0.28.8)(nanostores@1.1.0)':
-    dependencies:
-      '@better-auth/utils': 0.3.0
-      '@better-fetch/fetch': 1.1.18
-      '@standard-schema/spec': 1.0.0
-      better-call: 1.1.0
-      jose: 6.1.2
-      kysely: 0.28.8
-      nanostores: 1.1.0
-      zod: 4.1.12
-
   '@better-auth/expo@1.3.8(better-auth@1.3.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0))':
     dependencies:
       '@better-fetch/fetch': 1.1.18
       better-auth: 1.3.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-
-  '@better-auth/expo@1.4.0(@better-auth/core@1.4.0(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.0)(jose@6.1.2)(kysely@0.28.8)(nanostores@1.1.0))(expo-constants@18.0.10)(expo-linking@8.0.9)(expo-network@8.0.7(expo@54.0.25)(react@19.1.0))(expo-web-browser@15.0.9(expo@54.0.25)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.10)(react@19.1.0)))':
-    dependencies:
-      '@better-auth/core': 1.4.0(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.0)(jose@6.1.2)(kysely@0.28.8)(nanostores@1.1.0)
-      '@better-fetch/fetch': 1.1.18
-      better-call: 1.1.0
-      zod: 4.1.12
-    optionalDependencies:
-      expo-constants: 18.0.10(expo@54.0.25)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.10)(react@19.1.0))
-      expo-linking: 8.0.9(expo@54.0.25)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.10)(react@19.1.0))(react@19.1.0)
-      expo-network: 8.0.7(expo@54.0.25)(react@19.1.0)
-      expo-web-browser: 15.0.9(expo@54.0.25)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.10)(react@19.1.0))
 
   '@better-auth/telemetry@1.3.34(better-call@1.0.19)(jose@6.1.2)(kysely@0.28.8)(nanostores@1.1.0)':
     dependencies:
@@ -7568,12 +7480,6 @@ snapshots:
       - jose
       - kysely
       - nanostores
-
-  '@better-auth/telemetry@1.4.0(@better-auth/core@1.4.0(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.0)(jose@6.1.2)(kysely@0.28.8)(nanostores@1.1.0))':
-    dependencies:
-      '@better-auth/core': 1.4.0(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.0)(jose@6.1.2)(kysely@0.28.8)(nanostores@1.1.0)
-      '@better-auth/utils': 0.3.0
-      '@better-fetch/fetch': 1.1.18
 
   '@better-auth/utils@0.2.6':
     dependencies:
@@ -9776,25 +9682,6 @@ snapshots:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
 
-  better-auth@1.4.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
-    dependencies:
-      '@better-auth/core': 1.4.0(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.0)(jose@6.1.2)(kysely@0.28.8)(nanostores@1.1.0)
-      '@better-auth/telemetry': 1.4.0(@better-auth/core@1.4.0(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.18)(better-call@1.1.0)(jose@6.1.2)(kysely@0.28.8)(nanostores@1.1.0))
-      '@better-auth/utils': 0.3.0
-      '@better-fetch/fetch': 1.1.18
-      '@noble/ciphers': 2.0.1
-      '@noble/hashes': 2.0.1
-      '@standard-schema/spec': 1.0.0
-      better-call: 1.1.0
-      defu: 6.1.4
-      jose: 6.1.2
-      kysely: 0.28.8
-      nanostores: 1.1.0
-      zod: 4.1.12
-    optionalDependencies:
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-
   better-call@1.0.16:
     dependencies:
       '@better-fetch/fetch': 1.1.18
@@ -9809,13 +9696,6 @@ snapshots:
       rou3: 0.5.1
       set-cookie-parser: 2.7.2
       uncrypto: 0.1.3
-
-  better-call@1.1.0:
-    dependencies:
-      '@better-auth/utils': 0.3.0
-      '@better-fetch/fetch': 1.1.18
-      rou3: 0.5.1
-      set-cookie-parser: 2.7.2
 
   better-opn@3.0.2:
     dependencies:
@@ -10465,13 +10345,13 @@ snapshots:
       - supports-color
       - typescript
 
-  eslint-config-next@16.0.3(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3):
+  eslint-config-next@16.0.3(@typescript-eslint/parser@8.47.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3):
     dependencies:
       '@next/eslint-plugin-next': 16.0.3
       eslint: 9.39.1(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))
-      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.1(jiti@2.6.1))
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.1(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.47.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-react: 7.37.5(eslint@9.39.1(jiti@2.6.1))
       eslint-plugin-react-hooks: 7.0.1(eslint@9.39.1(jiti@2.6.1))
@@ -10490,21 +10370,6 @@ snapshots:
       debug: 3.2.7
       is-core-module: 2.16.1
       resolve: 1.22.11
-    transitivePeerDependencies:
-      - supports-color
-
-  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1)):
-    dependencies:
-      '@nolyfill/is-core-module': 1.0.39
-      debug: 4.4.3
-      eslint: 9.39.1(jiti@2.6.1)
-      get-tsconfig: 4.13.0
-      is-bun-module: 2.0.0
-      stable-hash: 0.0.5
-      tinyglobby: 0.2.15
-      unrs-resolver: 1.11.1
-    optionalDependencies:
-      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.1(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
@@ -10531,16 +10396,6 @@ snapshots:
       eslint: 9.39.1(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.1(jiti@2.6.1))
-    transitivePeerDependencies:
-      - supports-color
-
-  eslint-module-utils@2.12.1(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1)):
-    dependencies:
-      debug: 3.2.7
-    optionalDependencies:
-      eslint: 9.39.1(jiti@2.6.1)
-      eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
@@ -10582,7 +10437,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-import@2.32.0(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.1(jiti@2.6.1)):
+  eslint-plugin-import@2.32.0(eslint@9.39.1(jiti@2.6.1)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -10593,7 +10448,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.39.1(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.47.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.1(jiti@2.6.1))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
