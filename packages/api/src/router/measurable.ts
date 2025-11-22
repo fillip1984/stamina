@@ -7,8 +7,8 @@ import {
 import { addDays, startOfDay } from "date-fns";
 import { z } from "zod";
 
+import { calculateMeasurableProgress } from "../client/measurableUtils";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { calculateProgress } from "../utils/progressUtil";
 
 export const measurableRouter = createTRPCRouter({
   create: protectedProcedure
@@ -108,7 +108,7 @@ export const measurableRouter = createTRPCRouter({
       // increment setDate to previous dueDate
       // if no previous due date, and type was seeking, set to elapsed days
       // if no previous due date, and type was tally, leave due date undefined
-      const { interval, elapsedDays } = calculateProgress(
+      const { interval, elapsedDays } = calculateMeasurableProgress(
         measurable.setDate,
         measurable.dueDate ?? new Date(),
       );
@@ -135,13 +135,13 @@ export const measurableRouter = createTRPCRouter({
         // result already accounted for these types
 
         return ctx.db.result.create({
-            data: {
-              measurableId: input,
-              date: new Date(),
-              notes: `Completed measurable: ${measurable.name}`,
-              userId: ctx.session.user.id,
-            },
-          })
+          data: {
+            measurableId: input,
+            date: new Date(),
+            notes: `Completed measurable: ${measurable.name}`,
+            userId: ctx.session.user.id,
+          },
+        });
       } else {
         const txResult = await ctx.db.$transaction([
           ctx.db.measurable.update({

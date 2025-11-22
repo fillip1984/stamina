@@ -8,7 +8,7 @@ import { differenceInCalendarDays, endOfYear } from "date-fns";
  *
  * If dueDate is not provided, set dueDate to the end of the current year and calculate accordingly.
  */
-export const calculateProgress = (setDate: Date, dueDate?: Date) => {
+export const calculateMeasurableProgress = (setDate: Date, dueDate?: Date) => {
   const currentDate = new Date();
   const elapsedDays = differenceInCalendarDays(currentDate, setDate);
 

@@ -1,8 +1,8 @@
 "use client";
 
-import { differenceInCalendarDays, endOfYear, format } from "date-fns";
-import { AnimatePresence, motion } from "motion/react";
 import { useContext, useState } from "react";
+import { format } from "date-fns";
+import { AnimatePresence, motion } from "motion/react";
 import {
   FaCalendarWeek,
   FaCheck,
@@ -15,6 +15,7 @@ import { GiDuration } from "react-icons/gi";
 import { TbTargetArrow } from "react-icons/tb";
 
 import type { MeasurableType } from "@stamina/api";
+import { calculateMeasurableProgress } from "@stamina/api/client";
 
 import { AppContext } from "~/contexts/AppContext";
 import { useModal } from "~/hooks/useModal";
@@ -32,35 +33,6 @@ import {
 import { Item, ItemActions, ItemContent, ItemTitle } from "../ui/item";
 import OnCompleteModal from "./onCompleteDialog";
 
-/**
- * Calculates progress metrics based on setDate and dueDate
- * @param setDate - The date when the measurable was set
- * @param dueDate - The date when the measurable is due (optional)
- * @returns An object containing interval, elapsedDays, daysRemaining, progress percentage, and overdue status
- *
- * If dueDate is not provided, set dueDate to the end of the current year and calculate accordingly.
- */
-export const calculateProgress = (setDate: Date, dueDate?: Date) => {
-  const currentDate = new Date();
-  const elapsedDays = differenceInCalendarDays(currentDate, setDate);
-
-  dueDate ??= endOfYear(currentDate);
-
-  // include both start and end dates in interval and daysRemaining calculations
-  const interval = differenceInCalendarDays(dueDate, setDate) + 1;
-  const daysRemaining = differenceInCalendarDays(dueDate, currentDate) + 1;
-  const progress = Math.round((elapsedDays / interval) * 100);
-  const overdue = currentDate > dueDate;
-
-  return {
-    interval,
-    elapsedDays,
-    daysRemaining,
-    progress: progress > 0 ? progress : 0,
-    overdue,
-  };
-};
-
 export default function MeasureableCard({
   measurable,
 }: {
@@ -70,7 +42,10 @@ export default function MeasureableCard({
 
   const [isExpanded, setIsExpanded] = useState(false);
   const { daysRemaining, progress, overdue, interval, elapsedDays } =
-    calculateProgress(measurable.setDate, measurable.dueDate ?? undefined);
+    calculateMeasurableProgress(
+      measurable.setDate,
+      measurable.dueDate ?? undefined,
+    );
 
   const utils = api.useUtils();
   const { mutateAsync: completeMeasurable } =
@@ -117,7 +92,7 @@ export default function MeasureableCard({
           </span>
           <div className="relative my-2 flex h-8 w-full items-center justify-center overflow-hidden rounded-2xl border">
             {measurable.dueDate && (
-              <div className="flex items-center gap-1 z-30">
+              <div className="z-30 flex items-center gap-1">
                 <span className="text-xl font-bold">
                   {daysRemaining > 0 ? daysRemaining : daysRemaining * -1}
                 </span>
@@ -132,12 +107,12 @@ export default function MeasureableCard({
             )}
 
             {(measurable.type === "Tally" || measurable.type === "Seeking") && (
-              <div className="absolute inset-0 flex items-center gap-1 z-30">
+              <div className="absolute inset-0 z-30 flex items-center gap-1">
                 <span className="text-xl font-bold">
                   {elapsedDays > 0 ? elapsedDays : 0}
                 </span>
                 {measurable.type === "Tally" ? (
-                    <span className="text-xs">days and counting</span>
+                  <span className="text-xs">days and counting</span>
                 ) : (
                   <span className="text-xs">days since</span>
                 )}
@@ -151,7 +126,7 @@ export default function MeasureableCard({
                 type: "spring",
                 bounce: progress > 100 && progress < 0 ? 0 : 0.3,
               }}
-              className="absolute inset-0 bg-blue-600/80 z-10"
+              className="absolute inset-0 z-10 bg-blue-600/80"
             ></motion.div>
             {overdue && (
               <motion.div
@@ -163,7 +138,7 @@ export default function MeasureableCard({
                   type: "spring",
                   bounce: progress > 100 ? 0 : 0.3,
                 }}
-                className="absolute inset-0 bg-red-600/80 z-20"
+                className="absolute inset-0 z-20 bg-red-600/80"
                 style={{
                   width: `
           ${progress - 100}%
