@@ -22,9 +22,9 @@ catalog:
   "@types/node": ^24.10.1
 catalogs:
   react19:
-    react: ^19.2.0
-    react-dom: ^19.2.0
-    "@types/react": ^19.2.5
+    react: 19.1.0
+    react-dom: 19.1.0
+    "@types/react": 19.1.10
     "@types/react-dom": ^19.2.3
 nodeLinker: hoisted
 onlyBuiltDependencies:
