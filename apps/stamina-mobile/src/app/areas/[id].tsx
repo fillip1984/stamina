@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { TextInput, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -16,6 +16,7 @@ export default function AreaDetailPage() {
   const [description, setDescription] = useState("");
 
   // IX: init form state
+  const nameInputRef = useRef<TextInput>(null);
   const { id } = useLocalSearchParams<{ id: string }>();
   const area = useQuery(
     trpc.area.findById.queryOptions({ id }, { enabled: !!id && id !== "new" }),
@@ -25,6 +26,8 @@ export default function AreaDetailPage() {
       setMode("Update");
       setName(area.data.name);
       setDescription(area.data.description);
+    } else {
+      nameInputRef.current?.focus();
     }
   }, [area.data]);
 
@@ -98,6 +101,7 @@ export default function AreaDetailPage() {
           onPress={handleSubmit}
           variant={"outline"}
           className="h-14 w-14 rounded-full"
+          disabled={!isValid}
         >
           <MaterialCommunityIcons name="check" size={20} color="white" />
         </Button>
@@ -106,6 +110,7 @@ export default function AreaDetailPage() {
         <TextInput
           value={name}
           onChangeText={setName}
+          ref={nameInputRef}
           placeholder="Area name..."
           className="rounded-lg border border-white px-2 text-xl"
         />
