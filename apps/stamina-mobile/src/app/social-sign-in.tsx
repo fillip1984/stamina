@@ -1,7 +1,7 @@
-import { Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Text, TouchableOpacity } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
+import Container from "~/components/ui/container";
 // import { Colors } from "~/styles/colors";
 import { authClient } from "~/utils/auth";
 
@@ -13,17 +13,17 @@ export default function SocialSignIn() {
     });
   };
   return (
-    <SafeAreaView>
-      <View className="bg-background mt-8 flex h-screen items-center">
-        <Text className="mb-12 text-3xl text-white">Sign in with</Text>
-        <TouchableOpacity
-          onPress={handleLogin}
-          className="flex flex-row items-center justify-center gap-8 rounded-lg border border-white p-6"
-        >
-          <AntDesign name="google" size={48} />
-          <Text className="text-4xl font-bold text-white">Google</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+    <Container>
+      {/* <View className="bg-background mt-8 flex h-screen items-center"> */}
+      <Text className="mb-12 text-3xl text-white">Sign in with</Text>
+      <TouchableOpacity
+        onPress={handleLogin}
+        className="flex flex-row items-center justify-center gap-8 rounded-lg border border-white p-6"
+      >
+        <AntDesign name="google" size={48} color={"white"} />
+        <Text className="text-4xl font-bold text-white">Google</Text>
+      </TouchableOpacity>
+      {/* </View> */}
+    </Container>
   );
 }

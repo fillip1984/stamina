@@ -16,9 +16,10 @@ import {
   startOfWeek,
 } from "date-fns";
 
-import { MeasurableType } from "@stamina/api";
+import { AreaType, MeasurableType } from "@stamina/api";
 import { calculateMeasurableProgress } from "@stamina/api/client";
 
+import Badge from "~/components/ui/badge";
 import Button from "~/components/ui/button";
 import Container from "~/components/ui/container";
 import {
@@ -27,17 +28,52 @@ import {
 } from "~/components/ui/typography";
 import { trpc } from "~/utils/api";
 
+export const AllAreas: AreaType = {
+  id: "All",
+  name: "All",
+  description: "All areas",
+};
+
 export default function Main() {
   const [selectedDateFilter, setSelectedDateFilter] = useState("Today");
 
+  const areas = useQuery(trpc.area.findAll.queryOptions());
+  const [areaFilter, setAreaFilter] = useState<null | {
+    id: string;
+    name: string;
+  }>(AllAreas);
+
   // const { data, error, isPending } = authClient.useSession();
-  const measurables = useQuery(trpc.measurable.findAll.queryOptions());
+  const measurables = useQuery(
+    trpc.measurable.findAll.queryOptions(undefined, {
+      enabled: !areas.isLoading,
+      select: (data) =>
+        data.map((measurable) => ({
+          ...measurable,
+          areaName:
+            areas.data?.find((area) => area.id === measurable.areaId)?.name ??
+            "Uncategorized",
+        })),
+    }),
+  );
   const [filteredMeasurables, setFilteredMeasurables] = useState<
-    MeasurableType[]
+    (MeasurableType & { areaName: string })[]
   >([]);
   useEffect(() => {
     if (!measurables.data) return;
-    let filtered = measurables.data;
+    const measurablesFilteredByArea = measurables.data.filter((measurable) => {
+      // All -> return all
+      // Uncategorized -> areaId is null
+      // Specific area -> areaId matches
+      if (areaFilter === null) {
+        return !measurable.areaId;
+      } else if (areaFilter.id === "All") {
+        return true;
+      } else {
+        return measurable.areaId === areaFilter.id;
+      }
+    });
+    let filtered = measurablesFilteredByArea;
 
     const now = new Date();
     if (selectedDateFilter === "Today") {
@@ -59,10 +95,10 @@ export default function Main() {
           isWithinInterval(m.dueDate, thisWeek),
       );
     } else if (selectedDateFilter === "All") {
-      filtered = measurables.data;
+      filtered = filtered;
     }
     setFilteredMeasurables(filtered);
-  }, [measurables.data, selectedDateFilter]);
+  }, [areaFilter, measurables.data, selectedDateFilter]);
 
   return (
     <Container className="relative">
@@ -91,7 +127,7 @@ export default function Main() {
           <Text>Sign out</Text>
         </TouchableOpacity>
       </View> */}
-      <View className="flex flex-row items-center justify-between">
+      <View className="flex w-full flex-row items-center justify-between">
         <Button variant={"outline"} className="h-14 w-14 rounded-full">
           <MaterialCommunityIcons
             name="palette-swatch-outline"
@@ -99,6 +135,47 @@ export default function Main() {
             color="white"
           />
         </Button>
+        <View className="mx-1 flex w-1/2 overflow-hidden">
+          <View className="flex flex-row gap-2 overflow-auto">
+            <Badge
+              variant={areaFilter?.id === "All" ? "default" : "outline"}
+              onPress={() => setAreaFilter(AllAreas)}
+            >
+              <Typography
+                className={
+                  areaFilter?.id === "All" ? "text-black" : "text-white"
+                }
+              >
+                All
+              </Typography>
+            </Badge>
+            {areas.data?.map((area) => (
+              <Badge
+                key={area.id}
+                variant={areaFilter?.id === area.id ? "default" : "outline"}
+                onPress={() => setAreaFilter(area)}
+              >
+                <Typography
+                  className={
+                    areaFilter?.id === area.id ? "text-black" : "text-white"
+                  }
+                >
+                  {area.name}
+                </Typography>
+              </Badge>
+            ))}
+            <Badge
+              variant={areaFilter === null ? "default" : "outline"}
+              onPress={() => setAreaFilter(null)}
+            >
+              <Typography
+                className={areaFilter === null ? "text-black" : "text-white"}
+              >
+                Uncategorized
+              </Typography>
+            </Badge>
+          </View>
+        </View>
         <Button variant={"outline"} className="h-14 w-14 rounded-full">
           <Ionicons name="trophy-outline" size={18} color="white" />
         </Button>
@@ -151,7 +228,11 @@ const Filters = ({
   );
 };
 
-const MeasureableCard = ({ measurable }: { measurable: MeasurableType }) => {
+const MeasureableCard = ({
+  measurable,
+}: {
+  measurable: MeasurableType & { areaName: string };
+}) => {
   const { daysRemaining, elapsedDays, overdue, progress } =
     calculateMeasurableProgress(
       measurable.setDate,
@@ -159,7 +240,12 @@ const MeasureableCard = ({ measurable }: { measurable: MeasurableType }) => {
     );
   return (
     <View className="rounded-2xl border border-white p-2">
-      <CustomText className="text-xl font-bold">{measurable.name}</CustomText>
+      <View className="flex flex-row items-center gap-1">
+        <CustomText className="text-xl font-bold">{measurable.name}</CustomText>
+        <Badge variant={"outline"}>
+          <Typography>{measurable.areaName}</Typography>
+        </Badge>
+      </View>
       <CustomText className="text-sm text-gray-400">
         {measurable.description}
       </CustomText>
