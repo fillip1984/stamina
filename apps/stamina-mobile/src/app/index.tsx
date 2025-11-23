@@ -62,16 +62,16 @@ export default function Main() {
   useEffect(() => {
     if (!measurables.data) return;
     const measurablesFilteredByArea = measurables.data.filter((measurable) => {
-      // All -> return all
       // Uncategorized -> areaId is null
-      // Specific area -> areaId matches
       if (areaFilter === null) {
         return !measurable.areaId;
-      } else if (areaFilter.id === "All") {
-        return true;
-      } else {
-        return measurable.areaId === areaFilter.id;
       }
+      // All -> return all
+      if (areaFilter.id === "All") {
+        return true;
+      }
+      // Specific area -> areaId matches
+      return measurable.areaId === areaFilter.id;
     });
     let filtered = measurablesFilteredByArea;
 
@@ -95,7 +95,7 @@ export default function Main() {
           isWithinInterval(m.dueDate, thisWeek),
       );
     } else if (selectedDateFilter === "All") {
-      filtered = filtered;
+      // no additional filtering
     }
     setFilteredMeasurables(filtered);
   }, [areaFilter, measurables.data, selectedDateFilter]);
