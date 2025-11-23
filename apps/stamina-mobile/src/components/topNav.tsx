@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -7,8 +7,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { useQuery } from "@tanstack/react-query";
 
-import { AllAreas } from "~/app";
-import { AppContext } from "~/contexts/AppContext";
+import { AllAreas, AppContext } from "~/contexts/AppContext";
 import { trpc } from "~/utils/api";
 import Badge from "./ui/badge";
 import Button from "./ui/button";
@@ -21,8 +20,10 @@ export default function TopNav({
 }) {
   const areas = useQuery(trpc.area.findAll.queryOptions());
   const { areaFilter, setAreaFilter } = useContext(AppContext);
+  useEffect(() => {
+    console.log({ areaFilter });
+  }, [areaFilter]);
 
-  console.log({ currentLocation: stackProps.route });
   // needed tighter control over padding, was leaving too much space underneath
   const insets = useSafeAreaInsets();
 
@@ -113,7 +114,7 @@ export default function TopNav({
         {stackProps.route.name.startsWith("results/") ? (
           <Button
             variant={"outline"}
-            onPress={() => router.push("/")}
+            onPress={() => router.push("/measurables")}
             className="h-14 w-14 rounded-full"
           >
             <MaterialCommunityIcons

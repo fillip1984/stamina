@@ -1,5 +1,5 @@
 import * as Network from "expo-network";
-import { router, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import {
   focusManager,
@@ -42,13 +42,7 @@ export default function RootLayout() {
   const { data: session } = authClient.useSession();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   useEffect(() => {
-    console.log({ session, settingLoggedIn: !!session?.user });
-    const newState = !!session?.user;
-
     setIsLoggedIn(!!session?.user);
-    if (newState) {
-      router.replace("/");
-    }
   }, [session]);
 
   return (
@@ -57,24 +51,17 @@ export default function RootLayout() {
         <Stack
           screenOptions={{
             header(props) {
-              return <TopNav stackProps={props} />;
+              return isLoggedIn ? <TopNav stackProps={props} /> : null;
             },
           }}
         >
+          <Stack.Screen name="+not-found" />
+          <Stack.Screen name="index" />
+
           <Stack.Protected guard={isLoggedIn}>
-            <Stack.Screen name="index" />
             <Stack.Screen name="areas/index" />
             <Stack.Screen name="results/index" />
           </Stack.Protected>
-
-          <Stack.Screen name="+not-found" />
-          <Stack.Screen
-            name="social-sign-in"
-            options={{
-              title: "Social Sign In",
-              headerShown: false,
-            }}
-          />
         </Stack>
       </AppContextProvider>
       <StatusBar style="light" />

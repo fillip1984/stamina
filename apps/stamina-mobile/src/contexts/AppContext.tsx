@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 import type { AreaType } from "@stamina/api";
 
@@ -50,6 +50,9 @@ export function AppContextProvider({
   children: React.ReactNode;
 }) {
   const [areaFilter, setAreaFilter] = useState<AreaType | null>(AllAreas);
+  useEffect(() => {
+    console.log({ msg: "Chnaged area filter", areaFilter });
+  }, [areaFilter]);
   // const [isCreateMeasurableModalOpen, setIsCreateMeasurableModalOpen] =
   //   useState(false);
   // const [measurableIdToEdit, setMeasurableIdToEdit] = useState<string>("");
