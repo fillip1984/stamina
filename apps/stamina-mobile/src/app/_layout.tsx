@@ -11,7 +11,12 @@ import "react-native-reanimated";
 import "~/styles/global.css";
 
 import { useEffect, useState } from "react";
-import { AppState, AppStateStatus, Platform } from "react-native";
+import {
+  AppState,
+  AppStateStatus,
+  Platform,
+  useWindowDimensions,
+} from "react-native";
 
 import TopNav from "~/components/topNav";
 import { AppContextProvider } from "~/contexts/AppContext";
@@ -19,6 +24,8 @@ import { queryClient } from "~/utils/api";
 import { authClient } from "~/utils/auth";
 
 export default function RootLayout() {
+  const { height } = useWindowDimensions();
+
   // refetch when network connection is restored
   onlineManager.setEventListener((setOnline) => {
     const eventSubscription = Network.addNetworkStateListener((state) => {
@@ -60,6 +67,17 @@ export default function RootLayout() {
 
           <Stack.Protected guard={isLoggedIn}>
             <Stack.Screen name="areas/index" />
+            <Stack.Screen
+              name="areas/[id]"
+              options={{
+                presentation: "formSheet",
+                sheetAllowedDetents: height > 700 ? [0.22] : "fitToContents",
+                sheetGrabberVisible: false,
+                sheetCornerRadius: 10,
+                headerShown: false,
+                sheetExpandsWhenScrolledToEdge: false,
+              }}
+            />
             <Stack.Screen name="results/index" />
           </Stack.Protected>
         </Stack>

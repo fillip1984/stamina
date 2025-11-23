@@ -1,5 +1,6 @@
 import React from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
+import { router } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 
 import Container from "~/components/ui/container";
@@ -22,9 +23,14 @@ export default function AreasPage() {
 
 const AreaCard = ({ area }: { area: AreaType }) => {
   return (
-    <View className="rounded-lg border border-white p-2">
+    <Pressable
+      onPress={() =>
+        router.push({ pathname: "/areas/[id]", params: { id: area.id } })
+      }
+      className="rounded-lg border border-white p-2"
+    >
       <Typography variant={"heading"}>{area.name}</Typography>
       <Typography variant={"muted"}>{area.description}</Typography>
-    </View>
+    </Pressable>
   );
 };

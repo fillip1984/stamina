@@ -27,10 +27,10 @@ export const areaRouter = createTRPCRouter({
     });
   }),
   findById: protectedProcedure
-    .input(z.string())
+    .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       return ctx.db.area.findUnique({
-        where: { id: input, userId: ctx.session.user.id },
+        where: { id: input.id, userId: ctx.session.user.id },
       });
     }),
   update: protectedProcedure
