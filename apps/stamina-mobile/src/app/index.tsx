@@ -1,5 +1,6 @@
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import Animated from "react-native-reanimated";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -17,7 +18,7 @@ import { trpc } from "~/utils/api";
 import { authClient } from "~/utils/auth";
 
 export default function Main() {
-  const { data, error, isPending, refetch } = authClient.useSession();
+  const { data, error, isPending } = authClient.useSession();
   const measurables = useQuery(trpc.measurable.findAll.queryOptions());
 
   return (
@@ -57,49 +58,81 @@ export default function Main() {
 }
 
 const MeasureableCard = ({ measurable }: { measurable: MeasurableType }) => {
-  const { daysRemaining, elapsedDays, interval, overdue, progress } =
+  const { daysRemaining, elapsedDays, overdue, progress } =
     calculateMeasurableProgress(
       measurable.setDate,
       measurable.dueDate ?? undefined,
     );
   return (
-    <View className="rounded border border-white p-2">
+    <View className="rounded-2xl border border-white p-2">
       <CustomText className="font-bold">{measurable.name}</CustomText>
       <CustomText className="text-gray-400">
         {measurable.description}
       </CustomText>
 
-      {/* render prgress label for count down mode */}
-      {measurable.dueDate && (
-        <View className="relative my-2 flex flex-row items-center justify-center rounded-2xl border border-white py-1">
-          <Typography className="px-2 text-2xl font-bold">
-            {daysRemaining > 0 ? daysRemaining : daysRemaining * -1}
-          </Typography>
-          <Typography>days {overdue ? "overdue" : "remaining"}</Typography>
-          <View className="ml-4 flex flex-row items-center gap-1">
-            <MaterialCommunityIcons
-              name="bullseye-arrow"
-              size={24}
-              color="white"
-            />
-            <Typography>{format(measurable.dueDate, "MMM do")}</Typography>
+      <View className="relative my-2 flex flex-row items-center justify-center rounded-3xl border border-white py-1">
+        {/* render prgress label for count down mode */}
+        {measurable.dueDate && (
+          <View className="flex flex-row items-center">
+            <Typography className="mr-2 text-2xl font-bold">
+              {daysRemaining > 0 ? daysRemaining : daysRemaining * -1}
+            </Typography>
+            <Typography>days {overdue ? "overdue" : "remaining"}</Typography>
+            <View className="ml-4 flex flex-row items-center gap-1">
+              <MaterialCommunityIcons
+                name="bullseye-arrow"
+                size={24}
+                color="white"
+              />
+              <Typography>{format(measurable.dueDate, "MMM do")}</Typography>
+            </View>
           </View>
-        </View>
-      )}
+        )}
 
-      {/* render prgress label for tally and seeking modes */}
-      {(measurable.type === "Tally" || measurable.type === "Seeking") && (
-        <View className="absolute inset-0 z-30 flex items-center gap-1">
-          <Typography className="text-xl font-bold">
-            {elapsedDays > 0 ? elapsedDays : 0}
-          </Typography>
-          {measurable.type === "Tally" ? (
-            <Typography className="text-xs">days and counting</Typography>
-          ) : (
-            <Typography className="text-xs">days since</Typography>
-          )}
-        </View>
-      )}
+        {/* render prgress label for tally and seeking modes */}
+        {(measurable.type === "Tally" || measurable.type === "Seeking") && (
+          <View className="flex flex-row items-center">
+            <Typography className="mr-2 text-2xl font-bold">
+              {elapsedDays > 0 ? elapsedDays : 0}
+            </Typography>
+            {measurable.type === "Tally" ? (
+              <Typography className="text-xs">days and counting</Typography>
+            ) : (
+              <Typography className="text-xs">days since</Typography>
+            )}
+          </View>
+        )}
+
+        {/* progress bar fill animations */}
+        <Animated.View
+          // initial={{ width: "0%" }}
+          // animate={{ width: `${progress}%` }}
+          // transition={{
+          //   duration: 0.3,
+          //   type: "spring",
+          //   bounce: progress > 100 && progress < 0 ? 0 : 0.3,
+          // }}
+          className="absolute inset-0 z-10 bg-blue-600/80"
+        ></Animated.View>
+        {overdue && (
+          <Animated.View
+            // initial={{ width: "0%" }}
+            // animate={{ width: `${progress - 100}%` }}
+            // transition={{
+            //   delay: 0.3,
+            //   duration: 0.8,
+            //    type: "spring",
+            // bounce: progress > 100 ? 0 : 0.3,
+            // }}
+            className="absolute inset-0 z-20 bg-red-600/80"
+            //   style={{
+            //     width: `
+            // ${progress - 100}%
+            // `,
+            //   }}
+          ></Animated.View>
+        )}
+      </View>
     </View>
   );
 };

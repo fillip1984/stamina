@@ -1,17 +1,15 @@
 "use client";
 
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { format } from "date-fns";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import {
-  FaCalendarWeek,
   FaCheck,
   FaEllipsisVertical,
   FaEye,
   FaPencil,
   FaTrash,
 } from "react-icons/fa6";
-import { GiDuration } from "react-icons/gi";
 import { TbTargetArrow } from "react-icons/tb";
 
 import type { MeasurableType } from "@stamina/api";
@@ -40,8 +38,8 @@ export default function MeasureableCard({
 }) {
   const { isOpen, show, hide } = useModal();
 
-  const [isExpanded, setIsExpanded] = useState(false);
-  const { daysRemaining, progress, overdue, interval, elapsedDays } =
+  // const [isExpanded, setIsExpanded] = useState(false);
+  const { daysRemaining, progress, overdue, elapsedDays } =
     calculateMeasurableProgress(
       measurable.setDate,
       measurable.dueDate ?? undefined,
@@ -80,7 +78,7 @@ export default function MeasureableCard({
         className="bg-card relative w-full items-start p-2"
       >
         <ItemContent
-          onClick={() => setIsExpanded((prev) => !prev)}
+          // onClick={() => setIsExpanded((prev) => !prev)}
           className="cursor-pointer gap-0"
         >
           <ItemTitle>
@@ -91,6 +89,7 @@ export default function MeasureableCard({
             {measurable.description}
           </span>
           <div className="relative my-2 flex h-8 w-full items-center justify-center overflow-hidden rounded-2xl border">
+            {/* render prgress label for count down mode */}
             {measurable.dueDate && (
               <div className="z-30 flex items-center gap-1">
                 <span className="text-xl font-bold">
@@ -106,8 +105,9 @@ export default function MeasureableCard({
               </div>
             )}
 
+            {/* render prgress label for tally and seeking modes */}
             {(measurable.type === "Tally" || measurable.type === "Seeking") && (
-              <div className="absolute inset-0 z-30 flex items-center gap-1">
+              <div className="z-30 flex items-center gap-1">
                 <span className="text-xl font-bold">
                   {elapsedDays > 0 ? elapsedDays : 0}
                 </span>
@@ -118,6 +118,8 @@ export default function MeasureableCard({
                 )}
               </div>
             )}
+
+            {/* progress bar fill animations */}
             <motion.div
               initial={{ width: "0%" }}
               animate={{ width: `${progress}%` }}
@@ -147,7 +149,7 @@ export default function MeasureableCard({
               ></motion.div>
             )}
           </div>
-          <AnimatePresence initial={false}>
+          {/* <AnimatePresence initial={false}>
             {isExpanded && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
@@ -173,7 +175,7 @@ export default function MeasureableCard({
                 </span>
               </motion.div>
             )}
-          </AnimatePresence>
+          </AnimatePresence> */}
         </ItemContent>
         <ItemActions className="flex flex-col">
           <Button
