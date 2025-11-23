@@ -1,7 +1,14 @@
 "use client";
 
 import { useContext, useEffect, useState } from "react";
-import { isPast } from "date-fns";
+import {
+  endOfWeek,
+  interval,
+  isEqual,
+  isPast,
+  isWithinInterval,
+  startOfWeek,
+} from "date-fns";
 import { isToday } from "date-fns/isToday";
 import { AnimatePresence, motion } from "motion/react";
 import { GiStoneStack } from "react-icons/gi";
@@ -46,7 +53,8 @@ export default function Home() {
   const [filteredMeasurables, setFilteredMeasurables] = useState<
     (MeasurableType & { areaName: string })[]
   >([]);
-  const [selectedFilter, setSelectedFilter] = useState("Today");
+  const [selectedDateFilter, setSelectedDateFilter] = useState("Today");
+  const dateFilters = ["Today", "Tomorrow", "This week", "All"];
 
   useEffect(() => {
     if (!measurables) return;
@@ -62,44 +70,33 @@ export default function Home() {
         return measurable.areaId === areaFilter.id;
       }
     });
-    if (selectedFilter === "All") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setFilteredMeasurables(measurablesFilteredByArea);
-      return;
-    } else if (selectedFilter === "Today") {
-      setFilteredMeasurables(
-        measurablesFilteredByArea.filter(
-          (measurable) =>
-            !measurable.dueDate ||
-            isPast(measurable.dueDate) ||
-            isToday(measurable.dueDate),
-        ),
+    let filtered = measurablesFilteredByArea;
+
+    const now = new Date();
+    if (selectedDateFilter === "Today") {
+      filtered = filtered.filter(
+        (m) => !m.dueDate || isPast(m.dueDate) || isToday(m.dueDate),
       );
-    } else if (selectedFilter === "Tomorrow") {
-      const tomorrow = new Date();
+    } else if (selectedDateFilter === "Tomorrow") {
+      const tomorrow = new Date(now);
       tomorrow.setDate(tomorrow.getDate() + 1);
-      setFilteredMeasurables(
-        measurablesFilteredByArea.filter(
-          (measurable) =>
-            !measurable.dueDate ||
-            (measurable.dueDate.getDate() === tomorrow.getDate() &&
-              measurable.dueDate.getMonth() === tomorrow.getMonth() &&
-              measurable.dueDate.getFullYear() === tomorrow.getFullYear()),
-        ),
+      filtered = filtered.filter(
+        (m) => !m.dueDate || isPast(m.dueDate) || isEqual(m.dueDate, tomorrow),
       );
-    } else if (selectedFilter === "This week") {
-      const now = new Date();
-      const endOfWeek = new Date();
-      endOfWeek.setDate(now.getDate() + (7 - now.getDay()));
-      setFilteredMeasurables(
-        measurablesFilteredByArea.filter(
-          (measurable) =>
-            !measurable.dueDate ||
-            (measurable.dueDate >= now && measurable.dueDate <= endOfWeek),
-        ),
+    } else if (selectedDateFilter === "This week") {
+      const thisWeek = interval(startOfWeek(now), endOfWeek(now));
+      filtered = filtered.filter(
+        (m) =>
+          !m.dueDate ||
+          isPast(m.dueDate) ||
+          isWithinInterval(m.dueDate, thisWeek),
       );
+    } else if (selectedDateFilter === "All") {
+      filtered = measurablesFilteredByArea;
     }
-  }, [measurables, selectedFilter, areaFilter]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFilteredMeasurables(filtered);
+  }, [measurables, selectedDateFilter, areaFilter]);
 
   if (isLoadingMeasurables || isLoadingAreas || isError) {
     return (
@@ -114,54 +111,38 @@ export default function Home() {
   return (
     <ScrollableContainer scrollToTopButton={true}>
       {/* TODO: maybe: https://theodorusclarence.com/blog/list-animation */}
-      {
-        <>
-          <div className="mx-2 my-4 flex gap-2">
-            <Button
-              variant={selectedFilter === "Today" ? "default" : "outline"}
-              onClick={() => setSelectedFilter("Today")}
-            >
-              Today
-            </Button>
-            <Button
-              variant={selectedFilter === "Tomorrow" ? "default" : "outline"}
-              onClick={() => setSelectedFilter("Tomorrow")}
-            >
-              Tomorrow
-            </Button>
-            <Button
-              variant={selectedFilter === "This week" ? "default" : "outline"}
-              onClick={() => setSelectedFilter("This week")}
-            >
-              This week
-            </Button>
-            <Button
-              variant={selectedFilter === "All" ? "default" : "outline"}
-              onClick={() => setSelectedFilter("All")}
-            >
-              All
-            </Button>
-          </div>
 
-          <div className="flex w-full flex-col gap-2">
-            <AnimatePresence>
-              {filteredMeasurables.map((measurable) => (
-                <motion.div
-                  key={measurable.id}
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{
-                    delayChildren: 0.2,
-                  }}
-                >
-                  <MeasureableCard measurable={measurable} />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        </>
-      }
+      <>
+        <div className="mx-2 my-4 flex gap-2">
+          {dateFilters.map((filter) => (
+            <Button
+              variant={selectedDateFilter === filter ? "default" : "outline"}
+              onClick={() => setSelectedDateFilter(filter)}
+            >
+              {filter}
+            </Button>
+          ))}
+        </div>
+
+        <div className="flex w-full flex-col gap-2">
+          <AnimatePresence>
+            {filteredMeasurables.map((measurable) => (
+              <motion.div
+                key={measurable.id}
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{
+                  delayChildren: 0.2,
+                }}
+              >
+                <MeasureableCard measurable={measurable} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      </>
+
       {measurables?.length === 0 && <EmptyView />}
     </ScrollableContainer>
   );
