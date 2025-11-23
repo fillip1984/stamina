@@ -6,6 +6,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import Button from "~/components/ui/button";
 import Container from "~/components/ui/container";
+import Typography from "~/components/ui/typography";
 import { queryClient, trpc } from "~/utils/api";
 
 export default function AreaDetailPage() {
@@ -17,7 +18,7 @@ export default function AreaDetailPage() {
   // IX: init form state
   const { id } = useLocalSearchParams<{ id: string }>();
   const area = useQuery(
-    trpc.area.findById.queryOptions({ id }, { enabled: !!id }),
+    trpc.area.findById.queryOptions({ id }, { enabled: !!id && id !== "new" }),
   );
   useEffect(() => {
     if (area.data) {
@@ -74,38 +75,61 @@ export default function AreaDetailPage() {
     }
   };
 
+  const deleteArea = useMutation(
+    trpc.area.delete.mutationOptions({
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(trpc.area.findAll.queryFilter());
+        router.dismiss();
+      },
+    }),
+  );
+
   return (
-    <Container className="flex h-full bg-zinc-700">
-      <View className="flex flex-row justify-between bg-zinc-700 p-4">
+    <Container className="bg-cardBackground flex h-full grow">
+      <View className="flex-row justify-between px-4 py-2">
         <Button
           onPress={() => router.dismiss()}
           variant={"outline"}
-          className="rounded-full"
+          className="h-14 w-14 rounded-full"
         >
           <MaterialCommunityIcons name="close-thick" size={20} color="white" />
         </Button>
         <Button
           onPress={handleSubmit}
           variant={"outline"}
-          className="rounded-full"
+          className="h-14 w-14 rounded-full"
         >
           <MaterialCommunityIcons name="check" size={20} color="white" />
         </Button>
       </View>
-      <View className="flex h-full gap-2 bg-zinc-700">
+      <View className="m-4 flex gap-1 rounded-xl bg-white">
         <TextInput
           value={name}
           onChangeText={setName}
-          className="rounded-lg border border-white p-2 text-xl text-white"
+          placeholder="Area name..."
+          className="rounded-lg border border-white px-2 text-xl"
         />
+        <View className="mx-2 h-0.5 rounded-lg bg-gray-300" />
         <TextInput
           value={description}
           onChangeText={setDescription}
           multiline
-          numberOfLines={4}
-          className="rounded-lg border border-white p-2 text-lg text-white"
+          numberOfLines={3}
+          placeholder="Area description..."
+          className="h-20 rounded-lg border border-white px-2 text-lg"
         />
       </View>
+      {id !== "new" && (
+        <View className="mt-4 flex items-center justify-center">
+          <Button
+            onPress={() => deleteArea.mutateAsync({ id })}
+            variant="destructive"
+            size={"lg"}
+          >
+            <Typography variant={"heading"}>Delete</Typography>
+          </Button>
+        </View>
+      )}
     </Container>
   );
 }

@@ -51,10 +51,10 @@ export const areaRouter = createTRPCRouter({
       });
     }),
   delete: protectedProcedure
-    .input(z.string())
+    .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.area.delete({
-        where: { id: input, userId: ctx.session.user.id },
+        where: { id: input.id, userId: ctx.session.user.id },
       });
     }),
 });

@@ -5,6 +5,7 @@ module.exports = {
     secondary: "#eaefd3",
     accent: "#f5f5f5",
     background: "#000",
+    cardBackground: "#000",
     foreground: "#fff",
     white: "#ffffff",
     black: "#000000",

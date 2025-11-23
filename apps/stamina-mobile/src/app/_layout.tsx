@@ -71,7 +71,7 @@ export default function RootLayout() {
               name="areas/[id]"
               options={{
                 presentation: "formSheet",
-                sheetAllowedDetents: height > 700 ? [0.22] : "fitToContents",
+                sheetAllowedDetents: height > 700 ? [0.5] : "fitToContents",
                 sheetGrabberVisible: false,
                 sheetCornerRadius: 10,
                 headerShown: false,
