@@ -1,4 +1,4 @@
-import { TouchableOpacity } from "react-native";
+import { Pressable } from "react-native";
 import { cva, VariantProps } from "class-variance-authority";
 
 import { cn } from "~/styles/utils";
@@ -11,8 +11,7 @@ const buttonVariants = cva(
         default: "text-primary-foreground hover:bg-primary/90 bg-white",
         destructive:
           "dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 bg-red-400 text-white hover:bg-red-400/90 focus-visible:ring-red-400/20",
-        outline:
-          "bg-background hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs",
+        outline: "border border-white bg-black",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost:
@@ -41,14 +40,14 @@ export default function Button({
   size,
   children,
   ...props
-}: React.ComponentProps<typeof TouchableOpacity> &
+}: React.ComponentProps<typeof Pressable> &
   VariantProps<typeof buttonVariants>) {
   return (
-    <TouchableOpacity
+    <Pressable
       className={cn(buttonVariants({ variant, size }), className)}
       {...props}
     >
       {children}
-    </TouchableOpacity>
+    </Pressable>
   );
 }

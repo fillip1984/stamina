@@ -1,6 +1,7 @@
 "use client";
 
 import { useContext, useEffect, useState } from "react";
+import { isPast } from "date-fns";
 import { isToday } from "date-fns/isToday";
 import { AnimatePresence, motion } from "motion/react";
 import { GiStoneStack } from "react-icons/gi";
@@ -68,7 +69,10 @@ export default function Home() {
     } else if (selectedFilter === "Today") {
       setFilteredMeasurables(
         measurablesFilteredByArea.filter(
-          (measurable) => !measurable.dueDate || isToday(measurable.dueDate),
+          (measurable) =>
+            !measurable.dueDate ||
+            isPast(measurable.dueDate) ||
+            isToday(measurable.dueDate),
         ),
       );
     } else if (selectedFilter === "Tomorrow") {

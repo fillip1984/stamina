@@ -1,11 +1,35 @@
-import { PropsWithChildren } from "react";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { cva, VariantProps } from "class-variance-authority";
 
-export default function Container({ children }: PropsWithChildren) {
+import { cn } from "~/styles/utils";
+
+const containerVariants = cva("flex h-full", {
+  variants: {
+    variant: {
+      default: "bg-black",
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+  },
+});
+
+export default function Container({
+  className,
+  variant,
+  children,
+  ...props
+}: React.ComponentProps<typeof SafeAreaView> &
+  VariantProps<typeof containerVariants>) {
   return (
     <SafeAreaView style={{ backgroundColor: "#000" }}>
-      <View className="flex h-full">{children}</View>
+      <View
+        className={cn(containerVariants({ variant }), className)}
+        {...props}
+      >
+        {children}
+      </View>
     </SafeAreaView>
   );
 }
