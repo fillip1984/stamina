@@ -20,9 +20,6 @@ export default function TopNav({
 }) {
   const areas = useQuery(trpc.area.findAll.queryOptions());
   const { areaFilter, setAreaFilter } = useContext(AppContext);
-  useEffect(() => {
-    console.log({ areaFilter });
-  }, [areaFilter]);
 
   // needed tighter control over padding, was leaving too much space underneath
   const insets = useSafeAreaInsets();
