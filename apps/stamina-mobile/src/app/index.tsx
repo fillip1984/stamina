@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View } from "react-native";
 import Animated, { SlideInLeft } from "react-native-reanimated";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -25,6 +25,7 @@ import {
   default as CustomText,
   default as Typography,
 } from "~/components/ui/typography";
+import { AppContext } from "~/contexts/AppContext";
 import { trpc } from "~/utils/api";
 
 export const AllAreas: AreaType = {
@@ -37,10 +38,7 @@ export default function Main() {
   const [selectedDateFilter, setSelectedDateFilter] = useState("Today");
 
   const areas = useQuery(trpc.area.findAll.queryOptions());
-  const [areaFilter, setAreaFilter] = useState<null | {
-    id: string;
-    name: string;
-  }>(AllAreas);
+  const { areaFilter } = useContext(AppContext);
 
   // const { data, error, isPending } = authClient.useSession();
   const measurables = useQuery(
@@ -101,88 +99,6 @@ export default function Main() {
 
   return (
     <Container className="relative">
-      {/* <View className="flex items-center justify-center">
-        <CustomText>Main</CustomText>
-        <Text className="bg-amber-400">
-          {isPending ? "Loading..." : "Loaded"}
-        </Text>
-        <Text className="bg-amber-400">
-          {error ? error.message : "No errors"}
-        </Text>
-        <Text className="bg-amber-400">
-          {data?.user.name ?? "Not logged in"}
-        </Text>
-        <Button onPress={() => authClient.signOut()}>
-          <Text>Sign out</Text>
-        </Button>
-        <Button
-          variant={"destructive"}
-          size={"lg"}
-          onPress={() => authClient.signOut()}
-        >
-          <Text>Sign out</Text>
-        </Button>
-        <TouchableOpacity onPress={() => authClient.signOut()}>
-          <Text>Sign out</Text>
-        </TouchableOpacity>
-      </View> */}
-      {/* <View className="flex w-full flex-row items-center justify-between">
-        <Button
-          variant={"outline"}
-          onPress={() => router.push("/areas")}
-          className="h-14 w-14 rounded-full"
-        >
-          <MaterialCommunityIcons
-            name="palette-swatch-outline"
-            size={20}
-            color="white"
-          />
-        </Button>
-        <View className="mx-1 flex w-1/2 overflow-hidden">
-          <View className="flex flex-row gap-2 overflow-auto">
-            <Badge
-              variant={areaFilter?.id === "All" ? "default" : "outline"}
-              onPress={() => setAreaFilter(AllAreas)}
-            >
-              <Typography
-                className={
-                  areaFilter?.id === "All" ? "text-black" : "text-white"
-                }
-              >
-                All
-              </Typography>
-            </Badge>
-            {areas.data?.map((area) => (
-              <Badge
-                key={area.id}
-                variant={areaFilter?.id === area.id ? "default" : "outline"}
-                onPress={() => setAreaFilter(area)}
-              >
-                <Typography
-                  className={
-                    areaFilter?.id === area.id ? "text-black" : "text-white"
-                  }
-                >
-                  {area.name}
-                </Typography>
-              </Badge>
-            ))}
-            <Badge
-              variant={areaFilter === null ? "default" : "outline"}
-              onPress={() => setAreaFilter(null)}
-            >
-              <Typography
-                className={areaFilter === null ? "text-black" : "text-white"}
-              >
-                Uncategorized
-              </Typography>
-            </Badge>
-          </View>
-        </View>
-        <Button variant={"outline"} className="h-14 w-14 rounded-full">
-          <Ionicons name="trophy-outline" size={18} color="white" />
-        </Button>
-      </View> */}
       <Filters
         selectedDateFilter={selectedDateFilter}
         setSelectedDateFilter={setSelectedDateFilter}

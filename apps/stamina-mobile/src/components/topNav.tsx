@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -8,6 +8,7 @@ import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { useQuery } from "@tanstack/react-query";
 
 import { AllAreas } from "~/app";
+import { AppContext } from "~/contexts/AppContext";
 import { trpc } from "~/utils/api";
 import Badge from "./ui/badge";
 import Button from "./ui/button";
@@ -19,13 +20,32 @@ export default function TopNav({
   stackProps: NativeStackHeaderProps;
 }) {
   const areas = useQuery(trpc.area.findAll.queryOptions());
-  const [areaFilter, setAreaFilter] = useState<null | {
-    id: string;
-    name: string;
-  }>(AllAreas);
+  const { areaFilter, setAreaFilter } = useContext(AppContext);
 
-  console.log({ stackProps });
+  console.log({ currentLocation: stackProps.route });
+  // needed tighter control over padding, was leaving too much space underneath
   const insets = useSafeAreaInsets();
+
+  if (stackProps.route.name.startsWith("areas/")) {
+    return (
+      <View
+        style={{
+          paddingTop: insets.top - 10,
+          paddingBottom: insets.bottom - 30,
+          backgroundColor: "#000",
+        }}
+        className="bg-sky-500"
+      >
+        <Button
+          variant={"outline"}
+          onPress={() => router.back()}
+          className="h-14 w-14 rounded-full"
+        >
+          <Ionicons name="chevron-back-outline" size={20} color="white" />
+        </Button>
+      </View>
+    );
+  }
 
   return (
     <View
@@ -48,6 +68,7 @@ export default function TopNav({
             color="white"
           />
         </Button>
+
         <View className="mx-1 flex w-1/2 overflow-hidden">
           <View className="flex flex-row gap-2 overflow-auto">
             <Badge
@@ -89,9 +110,27 @@ export default function TopNav({
             </Badge>
           </View>
         </View>
-        <Button variant={"outline"} className="h-14 w-14 rounded-full">
-          <Ionicons name="trophy-outline" size={18} color="white" />
-        </Button>
+        {stackProps.route.name.startsWith("results/") ? (
+          <Button
+            variant={"outline"}
+            onPress={() => router.push("/")}
+            className="h-14 w-14 rounded-full"
+          >
+            <MaterialCommunityIcons
+              name="checkbox-marked-circle-outline"
+              size={18}
+              color="white"
+            />
+          </Button>
+        ) : (
+          <Button
+            variant={"outline"}
+            onPress={() => router.push("/results")}
+            className="h-14 w-14 rounded-full"
+          >
+            <Ionicons name="trophy-outline" size={18} color="white" />
+          </Button>
+        )}
       </View>
     </View>
   );

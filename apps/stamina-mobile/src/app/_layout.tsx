@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { AppState, AppStateStatus, Platform } from "react-native";
 
 import TopNav from "~/components/topNav";
+import { AppContextProvider } from "~/contexts/AppContext";
 import { queryClient } from "~/utils/api";
 import { authClient } from "~/utils/auth";
 
@@ -52,27 +53,30 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Stack
-        screenOptions={{
-          header(props) {
-            return <TopNav stackProps={props} />;
-          },
-        }}
-      >
-        <Stack.Protected guard={isLoggedIn}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="areas/index" />
-        </Stack.Protected>
-
-        <Stack.Screen name="+not-found" />
-        <Stack.Screen
-          name="social-sign-in"
-          options={{
-            title: "Social Sign In",
-            headerShown: false,
+      <AppContextProvider>
+        <Stack
+          screenOptions={{
+            header(props) {
+              return <TopNav stackProps={props} />;
+            },
           }}
-        />
-      </Stack>
+        >
+          <Stack.Protected guard={isLoggedIn}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="areas/index" />
+            <Stack.Screen name="results/index" />
+          </Stack.Protected>
+
+          <Stack.Screen name="+not-found" />
+          <Stack.Screen
+            name="social-sign-in"
+            options={{
+              title: "Social Sign In",
+              headerShown: false,
+            }}
+          />
+        </Stack>
+      </AppContextProvider>
       <StatusBar style="light" />
     </QueryClientProvider>
   );
