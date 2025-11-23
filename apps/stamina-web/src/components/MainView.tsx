@@ -4,8 +4,8 @@ import { useContext, useEffect, useState } from "react";
 import {
   endOfWeek,
   interval,
-  isEqual,
   isPast,
+  isSameDay,
   isWithinInterval,
   startOfWeek,
 } from "date-fns";
@@ -81,7 +81,8 @@ export default function Home() {
       const tomorrow = new Date(now);
       tomorrow.setDate(tomorrow.getDate() + 1);
       filtered = filtered.filter(
-        (m) => !m.dueDate || isPast(m.dueDate) || isEqual(m.dueDate, tomorrow),
+        (m) =>
+          !m.dueDate || isPast(m.dueDate) || isSameDay(m.dueDate, tomorrow),
       );
     } else if (selectedDateFilter === "This week") {
       const thisWeek = interval(startOfWeek(now), endOfWeek(now));

@@ -1,5 +1,5 @@
 import { DayOfWeekEnum, DaytimeEnum, MeasurableTypeEnum } from "@prisma/client";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 

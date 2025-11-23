@@ -50,6 +50,7 @@ export default function MeasureableCard({
     api.measurable.complete.useMutation({
       onSuccess: async () => {
         await utils.measurable.findAll.invalidate();
+        await utils.result.findAll.invalidate();
       },
     });
   const { mutateAsync: deleteMeasurable } = api.measurable.delete.useMutation({
@@ -62,7 +63,7 @@ export default function MeasureableCard({
     if (measurable.onComplete) {
       show();
     } else {
-      await completeMeasurable(measurable.id);
+      await completeMeasurable({ id: measurable.id });
     }
   };
 
@@ -221,13 +222,7 @@ export default function MeasureableCard({
         </ItemActions>
       </Item>
 
-      {isOpen && (
-        <OnCompleteModal
-          measurable={measurable}
-          dismiss={hide}
-          onComplete={() => completeMeasurable(measurable.id)}
-        />
-      )}
+      {isOpen && <OnCompleteModal measurable={measurable} dismiss={hide} />}
     </>
   );
 }

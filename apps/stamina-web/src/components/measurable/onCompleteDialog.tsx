@@ -35,28 +35,14 @@ import { Label } from "../ui/label";
 export default function OnCompleteModal({
   measurable,
   dismiss,
-  onComplete,
 }: {
   measurable: MeasurableType;
   dismiss: () => void;
-  onComplete: () => void;
 }) {
   if (measurable.onComplete === "Weigh_in") {
-    return (
-      <WeighIn
-        measurable={measurable}
-        dismiss={dismiss}
-        onComplete={onComplete}
-      />
-    );
+    return <WeighIn measurable={measurable} dismiss={dismiss} />;
   } else if (measurable.onComplete === "Blood_pressure_reading") {
-    return (
-      <BloodPressureReading
-        measurable={measurable}
-        dismiss={dismiss}
-        onComplete={onComplete}
-      />
-    );
+    return <BloodPressureReading measurable={measurable} dismiss={dismiss} />;
   } else {
     return null;
   }
@@ -65,11 +51,9 @@ export default function OnCompleteModal({
 const WeighIn = ({
   measurable,
   dismiss,
-  onComplete,
 }: {
   measurable: MeasurableType;
   dismiss: () => void;
-  onComplete: () => void;
 }) => {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [date, setDate] = useState(new Date());
@@ -77,22 +61,24 @@ const WeighIn = ({
   const [bodyFatPercentage, setBodyFatPercentage] = useState("");
 
   const utils = api.useUtils();
-  const { mutate: createWeighIn } = api.weighIn.create.useMutation({
-    onSuccess: () => {
-      void utils.weighIn.invalidate();
-      onComplete();
+  const { mutate: completeWeighIn } = api.measurable.complete.useMutation({
+    onSuccess: async () => {
+      await utils.measurable.findAll.invalidate();
+      await utils.result.findAll.invalidate();
       dismiss();
     },
   });
 
   const handleSaveWeighIn = () => {
-    createWeighIn({
-      measurableId: measurable.id,
-      date,
-      weight: parseFloat(weight),
-      bodyFatPercentage: bodyFatPercentage
-        ? parseFloat(bodyFatPercentage)
-        : undefined,
+    completeWeighIn({
+      id: measurable.id,
+      weighIn: {
+        date,
+        weight: parseFloat(weight),
+        bodyFatPercentage: bodyFatPercentage
+          ? parseFloat(bodyFatPercentage)
+          : undefined,
+      },
     });
   };
 
@@ -172,11 +158,9 @@ const WeighIn = ({
 const BloodPressureReading = ({
   measurable,
   dismiss,
-  onComplete,
 }: {
   measurable: MeasurableType;
   dismiss: () => void;
-  onComplete: () => void;
 }) => {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [date, setDate] = useState(new Date());
@@ -185,22 +169,24 @@ const BloodPressureReading = ({
   const [heartRate, setHeartRate] = useState("");
 
   const utils = api.useUtils();
-  const { mutateAsync: createBloodPressure } =
-    api.bloodPressureReading.create.useMutation({
-      onSuccess: () => {
-        void utils.bloodPressureReading.invalidate();
-        onComplete();
+  const { mutateAsync: completeBloodPressure } =
+    api.measurable.complete.useMutation({
+      onSuccess: async () => {
+        await utils.measurable.findAll.invalidate();
+        await utils.result.findAll.invalidate();
         dismiss();
       },
     });
 
   const handleSaveBloodPressure = async () => {
-    await createBloodPressure({
-      measurableId: measurable.id,
-      date,
-      systolic: parseInt(systolic),
-      diastolic: parseInt(diastolic),
-      pulse: heartRate ? parseInt(heartRate) : undefined,
+    await completeBloodPressure({
+      id: measurable.id,
+      bloodPressureReading: {
+        date,
+        systolic: parseInt(systolic),
+        diastolic: parseInt(diastolic),
+        pulse: heartRate ? parseInt(heartRate) : undefined,
+      },
     });
   };
 
