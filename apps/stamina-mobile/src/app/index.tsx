@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import Animated, { SlideInLeft } from "react-native-reanimated";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -127,8 +126,12 @@ export default function Main() {
           <Text>Sign out</Text>
         </TouchableOpacity>
       </View> */}
-      <View className="flex w-full flex-row items-center justify-between">
-        <Button variant={"outline"} className="h-14 w-14 rounded-full">
+      {/* <View className="flex w-full flex-row items-center justify-between">
+        <Button
+          variant={"outline"}
+          onPress={() => router.push("/areas")}
+          className="h-14 w-14 rounded-full"
+        >
           <MaterialCommunityIcons
             name="palette-swatch-outline"
             size={20}
@@ -179,7 +182,7 @@ export default function Main() {
         <Button variant={"outline"} className="h-14 w-14 rounded-full">
           <Ionicons name="trophy-outline" size={18} color="white" />
         </Button>
-      </View>
+      </View> */}
       <Filters
         selectedDateFilter={selectedDateFilter}
         setSelectedDateFilter={setSelectedDateFilter}
@@ -210,7 +213,7 @@ const Filters = ({
 }) => {
   const dateFilters = ["Today", "Tomorrow", "This week", "All"];
   return (
-    <View className="my-8 flex flex-row justify-center gap-2">
+    <View className="mt-2 mb-4 flex flex-row justify-center gap-2">
       {dateFilters.map((filter) => (
         <Button
           key={filter}

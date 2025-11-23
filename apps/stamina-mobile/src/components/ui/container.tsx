@@ -23,13 +23,8 @@ export default function Container({
 }: React.ComponentProps<typeof SafeAreaView> &
   VariantProps<typeof containerVariants>) {
   return (
-    <SafeAreaView style={{ backgroundColor: "#000" }}>
-      <View
-        className={cn(containerVariants({ variant }), className)}
-        {...props}
-      >
-        {children}
-      </View>
-    </SafeAreaView>
+    <View className={cn(containerVariants({ variant }), className)} {...props}>
+      {children}
+    </View>
   );
 }

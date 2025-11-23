@@ -13,6 +13,7 @@ import "~/styles/global.css";
 import { useEffect, useState } from "react";
 import { AppState, AppStateStatus, Platform } from "react-native";
 
+import TopNav from "~/components/topNav";
 import { queryClient } from "~/utils/api";
 import { authClient } from "~/utils/auth";
 
@@ -51,15 +52,19 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Stack>
+      <Stack
+        screenOptions={{
+          header(props) {
+            return <TopNav stackProps={props} />;
+          },
+        }}
+      >
         <Stack.Protected guard={isLoggedIn}>
-          <Stack.Screen
-            name="index"
-            options={{ title: "Main", headerShown: false }}
-          />
+          <Stack.Screen name="index" />
+          <Stack.Screen name="areas/index" />
         </Stack.Protected>
 
-        {/* <Stack.Screen name="+not-found" /> */}
+        <Stack.Screen name="+not-found" />
         <Stack.Screen
           name="social-sign-in"
           options={{
