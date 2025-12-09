@@ -22,10 +22,10 @@ catalog:
   "@types/node": ^24.10.1
 catalogs:
   react19:
-    react: 19.1.0
-    react-dom: 19.1.0
-    "@types/react": 19.1.10
-    "@types/react-dom": ^19.2.3
+    react: 19.2.1
+    react-dom: 19.2.1
+    "@types/react": 19.2.7
+    "@types/react-dom": 19.2.3
 nodeLinker: hoisted
 onlyBuiltDependencies:
   - "@prisma/client"
