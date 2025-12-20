@@ -13,13 +13,13 @@
   },
   "dependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
-    "prettier": "catalog:",
-    "prettier-plugin-tailwindcss": "^0.7.1"
+    "prettier": "^3.7.4",
+    "prettier-plugin-tailwindcss": "^0.7.2"
   },
   "devDependencies": {
     "@stamina/tsconfig": "workspace:*",
-    "@types/node": "catalog:",
-    "typescript": "catalog:"
+    "@types/node": "^24.10.4",
+    "typescript": "^5.9.3"
   },
   "prettier": "@stamina/prettier-config"
 }

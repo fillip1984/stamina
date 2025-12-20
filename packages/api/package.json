@@ -26,18 +26,18 @@
     "@stamina/api": "workspace:*",
     "@stamina/auth": "workspace:*",
     "@stamina/db": "workspace:*",
-    "@trpc/server": "catalog:",
-    "date-fns": "catalog:",
-    "superjson": "catalog:",
-    "zod": "catalog:"
+    "@trpc/server": "^11.8.0",
+    "date-fns": "^4.1.0",
+    "superjson": "^2.2.6",
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@stamina/prettier-config": "workspace:*",
     "@stamina/tsconfig": "workspace:*",
-    "@types/node": "catalog:",
-    "eslint": "catalog:",
-    "prettier": "catalog:",
-    "typescript": "catalog:"
+    "@types/node": "^24.10.4",
+    "eslint": "^9.39.2",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3"
   },
   "prettier": "@stamina/prettier-config"
 }

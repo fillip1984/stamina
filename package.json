@@ -4,9 +4,9 @@
   "type": "module",
   "engines": {
     "node": ">=22.14.0",
-    "pnpm": ">=10.11.1"
+    "pnpm": ">=10.26.1"
   },
-  "packageManager": "pnpm@10.11.1",
+  "packageManager": "pnpm@10.26.1",
   "scripts": {
     "build": "pnpm -r run build",
     "build:mobile": "pnpm --filter !stamina-web run build",
@@ -31,17 +31,17 @@
     }
   },
   "dependencies": {
-    "sst": "^3.17.23"
+    "sst": "^3.17.25"
   },
   "devDependencies": {
     "@eslint/compat": "^1.4.1",
     "@stamina/eslint-config": "workspace:*",
     "@stamina/prettier-config": "workspace:*",
     "@types/aws-lambda": "8.10.152",
-    "dotenv-cli": "catalog:",
-    "eslint": "catalog:",
-    "prettier": "catalog:",
-    "typescript": "catalog:"
+    "dotenv-cli": "^11.0.0",
+    "eslint": "^9.39.2",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3"
   },
   "prettier": "@stamina/prettier-config"
 }

@@ -14,21 +14,21 @@
   },
   "dependencies": {
     "@eslint/compat": "^1.4.1",
-    "@next/eslint-plugin-next": "^16.0.3",
+    "@next/eslint-plugin-next": "^16.1.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-turbo": "^2.6.1",
-    "typescript-eslint": "^8.47.0"
+    "eslint-plugin-turbo": "^2.6.3",
+    "typescript-eslint": "^8.50.0"
   },
   "devDependencies": {
     "@stamina/prettier-config": "workspace:*",
     "@stamina/tsconfig": "workspace:*",
-    "@types/node": "catalog:",
-    "eslint": "catalog:",
-    "prettier": "catalog:",
-    "typescript": "catalog:"
+    "@types/node": "^24.10.4",
+    "eslint": "^9.39.2",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3"
   },
   "prettier": "@stamina/prettier-config"
 }
