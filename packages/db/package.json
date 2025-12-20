@@ -15,6 +15,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc",
+    "postinstall": "pnpm with-env prisma generate",
     "format": "prettier --write . --ignore-path ../../.gitignore",
     "lint": "eslint",
     "generate": "pnpm with-env prisma generate",
@@ -32,7 +33,7 @@
     "dotenv-cli": "^11.0.0",
     "eslint": "^9.39.2",
     "prettier": "^3.7.4",
-    "prisma": "^6.19.1",
+    "prisma": "^6.19.0",
     "typescript": "^5.9.3"
   },
   "prettier": "@stamina/prettier-config"
