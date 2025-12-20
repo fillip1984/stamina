@@ -7,7 +7,7 @@ nodeLinker: hoisted
 
 onlyBuiltDependencies:
   - '@prisma/client'
-  - '@prisma/engines'
+  - '@prisma/engines@6.19.1'
   - aws-sdk
   - prisma
   - sharp
