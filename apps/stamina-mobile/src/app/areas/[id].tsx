@@ -88,7 +88,7 @@ export default function AreaDetailPage() {
   );
 
   return (
-    <Container className="bg-cardBackground flex h-full grow">
+    <Container variant={"sheet"}>
       <View className="flex-row justify-between px-4 py-2">
         <Button
           onPress={() => router.dismiss()}

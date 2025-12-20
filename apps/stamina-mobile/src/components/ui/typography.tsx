@@ -10,14 +10,16 @@ const typographyVariants = cva(
       variant: {
         default: "text-white",
         destructive: "text-red-400",
-        heading: "text-2xl font-bold text-white",
+        heading: "font-bold text-white",
         muted: "text-gray-400",
       },
       size: {
         default: "text-base",
-        sm: "text-sm",
-        lg: "text-xl",
-        xl: "text-2xl",
+        small: "text-sm",
+        large: "text-xl",
+        subheading: "text-3xl",
+        heading: "text-2xl",
+        title: "text-4xl",
       },
     },
     defaultVariants: {

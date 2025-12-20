@@ -1,13 +1,19 @@
-import { View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import { cva, VariantProps } from "class-variance-authority";
 
 import { cn } from "~/styles/utils";
 
-const containerVariants = cva("flex h-full", {
+const containerVariants = cva("flex h-screen", {
   variants: {
     variant: {
       default: "bg-black",
+      sheet: "bg-zinc-800",
     },
   },
   defaultVariants: {
@@ -20,11 +26,23 @@ export default function Container({
   variant,
   children,
   ...props
-}: React.ComponentProps<typeof SafeAreaView> &
+}: React.ComponentProps<typeof TouchableWithoutFeedback> &
   VariantProps<typeof containerVariants>) {
   return (
-    <View className={cn(containerVariants({ variant }), className)} {...props}>
-      {children}
-    </View>
+    <TouchableWithoutFeedback
+      onPress={() => Keyboard.dismiss()}
+      className={cn(containerVariants({ variant }), className)}
+      {...props}
+    >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"} // 'padding' or 'height' often work well for formsheets
+        style={{ flex: 1 }} // Ensures the view takes up available space
+        contentContainerStyle={{ flexGrow: 1 }} // Useful if you have scrollable content
+      >
+        <View className={cn(containerVariants({ variant }), className)}>
+          {children}
+        </View>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }
