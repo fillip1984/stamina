@@ -45,5 +45,6 @@ jobs:
           AUTH_GOOGLE_SECRET: ${{ secrets.AUTH_GOOGLE_SECRET }}
           PRODUCTION_URL: "https://stamina.illizen.com"
         run: |
-          pnpm run build:web
+          pnpm db:generate
+          pnpm build:web
           pnpx sst deploy --stage prod
