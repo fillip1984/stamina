@@ -37,7 +37,7 @@ jobs:
 
       - name: Regenerate Prisma Client
         run: |
-          npx prisma@6.19.1 generate --schema=./packages/db/prisma/schema.prisma
+          pnpm db:generate
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
