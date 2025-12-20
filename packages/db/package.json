@@ -17,7 +17,7 @@
     "dev": "tsc",
     "format": "prettier --write . --ignore-path ../../.gitignore",
     "lint": "eslint",
-    "generate": "pnpm with-env pnpx prisma@6.19.1 generate",
+    "generate": "pnpm with-env prisma generate",
     "push": "pnpm with-env prisma db push",
     "studio": "pnpm with-env prisma studio",
     "with-env": "dotenv -e ../../.env --"
