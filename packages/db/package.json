@@ -13,9 +13,8 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "pnpm generate & tsc",
     "dev": "tsc",
-    "postinstall": "pnpm with-env prisma generate",
     "format": "prettier --write . --ignore-path ../../.gitignore",
     "lint": "eslint",
     "generate": "pnpm with-env prisma generate",
@@ -24,7 +23,8 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "@prisma/client": "catalog:",
+    "@prisma/client": "^6.19.0",
+    "prisma": "^6.19.0",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -33,7 +33,6 @@
     "dotenv-cli": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",
-    "prisma": "catalog:",
     "typescript": "catalog:"
   },
   "prettier": "@stamina/prettier-config"
