@@ -1,7 +1,7 @@
 import type { BetterAuthOptions } from "better-auth";
 import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { oAuthProxy } from "better-auth/plugins";
 
 import { db } from "@stamina/db";
@@ -17,8 +17,8 @@ export function initAuth(options: {
   googleClientSecret: string;
 }) {
   const config = {
-    database: prismaAdapter(db, {
-      provider: "postgresql",
+    database: drizzleAdapter(db, {
+      provider: "pg",
     }),
     baseURL: options.baseUrl,
     secret: options.secret,

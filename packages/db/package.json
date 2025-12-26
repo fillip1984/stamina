@@ -10,6 +10,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./src/index.ts"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "default": "./src/client.ts"
+    },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "default": "./src/schema.ts"
     }
   },
   "scripts": {
@@ -17,23 +25,25 @@
     "dev": "tsc",
     "format": "prettier --write . --ignore-path ../../.gitignore",
     "lint": "eslint",
-    "generate": "pnpm with-env prisma generate",
-    "push": "pnpm with-env prisma db push",
-    "studio": "pnpm with-env prisma studio",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
+    "push": "drizzle-kit push",
+    "studio": "drizzle-kit studio",
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "@prisma/client": "^6.19.0",
-    "prisma": "^6.19.0",
-    "zod": "catalog:"
+    "drizzle-orm": "^0.45.1",
+    "postgres": "^3.4.7",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@stamina/prettier-config": "workspace:*",
     "@stamina/tsconfig": "workspace:*",
-    "dotenv-cli": "catalog:",
-    "eslint": "catalog:",
-    "prettier": "catalog:",
-    "typescript": "catalog:"
+    "dotenv-cli": "^11.0.0",
+    "drizzle-kit": "^0.31.8",
+    "eslint": "^9.39.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3"
   },
   "prettier": "@stamina/prettier-config"
 }
