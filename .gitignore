@@ -70,7 +70,7 @@ expo-env.d.ts
 
 # sst
 .sst
-
+sst-env.d.ts
 
 # open-next
 .open-next
