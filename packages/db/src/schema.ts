@@ -11,41 +11,56 @@ import {
 import { user } from "./auth-schema";
 import { appSchema, baseFields } from "./db-schema";
 
-// Enums
-export const measurableTypeEnum = pgEnum("MeasurableTypeEnum", [
-  "Tally",
-  "Countdown",
-  "Seeking",
-]);
-export const daytimeEnum = pgEnum("DaytimeEnum", [
-  "Morning",
-  "Afternoon",
-  "Evening",
-  "Night",
-]);
-export const dayOfWeekEnum = pgEnum("DayOfWeekEnum", [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-]);
-export const onCompleteEnum = pgEnum("OnCompleteEnum", [
-  "Note",
-  "Weigh_in",
-  "Blood_pressure_reading",
-  "Runners_log",
-]);
-export const bloodPressureCategoryEnum = pgEnum("BloodPressureCategoryEnum", [
-  "Low",
-  "Normal",
-  "Elevated",
-  "Hypertension_1",
-  "Hypertension_2",
-  "Hypertension_crisis",
-]);
+// Enums, https://github.com/drizzle-team/drizzle-orm/discussions/1914
+export enum MeasurableTypeEnum {
+  Tally = "Tally",
+  Countdown = "Countdown",
+  Seeking = "Seeking",
+}
+export const measurableTypePgEnum = pgEnum(
+  "MeasurableTypeEnum",
+  MeasurableTypeEnum,
+);
+
+export enum DaytimeEnum {
+  Morning = "Morning",
+  Afternoon = "Afternoon",
+  Evening = "Evening",
+  Night = "Night",
+}
+export const daytimePgEnum = pgEnum("DaytimeEnum", DaytimeEnum);
+
+export enum DayOfWeekEnum {
+  Sunday = "Sunday",
+  Monday = "Monday",
+  Tuesday = "Tuesday",
+  Wednesday = "Wednesday",
+  Thursday = "Thursday",
+  Friday = "Friday",
+  Saturday = "Saturday",
+}
+export const dayOfWeekPgEnum = pgEnum("DayOfWeekEnum", DayOfWeekEnum);
+
+export enum OnCompleteEnum {
+  Note = "Note",
+  Weigh_in = "Weigh_in",
+  Blood_pressure_reading = "Blood_pressure_reading",
+  Runners_log = "Runners_log",
+}
+export const onCompletePgEnum = pgEnum("OnCompleteEnum", OnCompleteEnum);
+
+export enum BloodPressureCategoryEnum {
+  Low = "Low",
+  Normal = "Normal",
+  Elevated = "Elevated",
+  Hypertension_1 = "Hypertension_1",
+  Hypertension_2 = "Hypertension_2",
+  Hypertension_crisis = "Hypertension_crisis",
+}
+export const bloodPressureCategoryPgEnum = pgEnum(
+  "BloodPressureCategoryEnum",
+  BloodPressureCategoryEnum,
+);
 
 // Tables
 export const areas = appSchema.table(
@@ -68,13 +83,13 @@ export const measurables = appSchema.table(
     ...baseFields,
     name: text("name").notNull(),
     description: text("description").notNull(),
-    type: measurableTypeEnum("type").notNull(),
+    type: measurableTypePgEnum("type").notNull(),
     setDate: timestamp("setDate").notNull(),
     dueDate: timestamp("dueDate"),
-    suggestedDayTime: daytimeEnum("suggestedDayTime"),
-    suggestedDay: dayOfWeekEnum("suggestedDay"),
+    suggestedDayTime: daytimePgEnum("suggestedDayTime"),
+    suggestedDay: dayOfWeekPgEnum("suggestedDay"),
     interval: integer("interval"),
-    onComplete: onCompleteEnum("onComplete"),
+    onComplete: onCompletePgEnum("onComplete"),
     areaId: text("areaId").references(() => areas.id, { onDelete: "set null" }),
     userId: text("userId")
       .notNull()
@@ -132,7 +147,7 @@ export const bloodPressureReadings = appSchema.table("BloodPressureReading", {
   systolic: integer("systolic").notNull(),
   diastolic: integer("diastolic").notNull(),
   pulse: integer("pulse"),
-  category: bloodPressureCategoryEnum("category").notNull(),
+  category: bloodPressureCategoryPgEnum("category").notNull(),
   previousBloodPressureReadingId: text("previousBloodPressureReadingId"),
   resultId: text("resultId")
     .notNull()

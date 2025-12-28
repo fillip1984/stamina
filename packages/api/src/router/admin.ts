@@ -3,10 +3,10 @@ import { z } from "zod/v4";
 import { and, eq } from "@stamina/db";
 import {
   areas,
-  dayOfWeekEnum,
-  daytimeEnum,
+  DayOfWeekEnum,
+  DaytimeEnum,
   measurables,
-  measurableTypeEnum,
+  MeasurableTypeEnum,
 } from "@stamina/db/schema";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
@@ -42,9 +42,9 @@ export const adminRouter = createTRPCRouter({
             name: z.string(),
             description: z.string(),
             areaId: z.string().nullable(),
-            suggestedDay: z.enum(dayOfWeekEnum.enumValues).nullable(),
-            suggestedDayTime: z.enum(daytimeEnum.enumValues).nullable(),
-            type: z.enum(measurableTypeEnum.enumValues),
+            suggestedDay: z.enum(DayOfWeekEnum).nullable(),
+            suggestedDayTime: z.enum(DaytimeEnum).nullable(),
+            type: z.enum(MeasurableTypeEnum),
             dueDate: z.date().nullable(),
             interval: z.number().min(1).optional(),
           }),

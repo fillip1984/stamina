@@ -3,12 +3,13 @@ import { z } from "zod/v4";
 
 import { and, desc, eq, lt } from "@stamina/db";
 import {
+  BloodPressureCategoryEnum,
   bloodPressureReadings,
-  dayOfWeekEnum,
-  daytimeEnum,
+  DayOfWeekEnum,
+  DaytimeEnum,
   measurables,
-  measurableTypeEnum,
-  onCompleteEnum,
+  MeasurableTypeEnum,
+  OnCompleteEnum,
   results,
   weighIns,
 } from "@stamina/db/schema";
@@ -23,12 +24,12 @@ export const measurableRouter = createTRPCRouter({
         name: z.string(),
         description: z.string(),
         areaId: z.string().nullable(),
-        type: z.enum(measurableTypeEnum.enumValues),
-        suggestedDay: z.enum(dayOfWeekEnum.enumValues).nullable(),
-        suggestedDayTime: z.enum(daytimeEnum.enumValues).nullable(),
+        type: z.enum(MeasurableTypeEnum),
+        suggestedDay: z.enum(DayOfWeekEnum).nullable(),
+        suggestedDayTime: z.enum(DaytimeEnum).nullable(),
         dueDate: z.date().nullable(),
         interval: z.number().min(1).optional(),
-        onComplete: z.enum(onCompleteEnum.enumValues).nullable(),
+        onComplete: z.enum(OnCompleteEnum).nullable(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -78,12 +79,12 @@ export const measurableRouter = createTRPCRouter({
         name: z.string().min(1).optional(),
         description: z.string().min(1).optional(),
         areaId: z.string().nullable(),
-        type: z.enum(measurableTypeEnum.enumValues).optional(),
-        suggestedDay: z.enum(dayOfWeekEnum.enumValues).nullable(),
-        suggestedDayTime: z.enum(daytimeEnum.enumValues).nullable(),
+        type: z.enum(MeasurableTypeEnum).optional(),
+        suggestedDay: z.enum(DayOfWeekEnum).nullable(),
+        suggestedDayTime: z.enum(DaytimeEnum).nullable(),
         dueDate: z.date().nullable(),
         interval: z.number().min(1).optional(),
-        onComplete: z.enum(onCompleteEnum.enumValues).nullable(),
+        onComplete: z.enum(OnCompleteEnum).nullable(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -139,20 +140,13 @@ export const measurableRouter = createTRPCRouter({
       if (!measurable) {
         throw new Error("Measurable not found");
       }
-      if (
-        measurable.onComplete ===
-          onCompleteEnum.enumValues.find((e) => e === "Weigh_in") &&
-        !weighIn
-      ) {
+      if (measurable.onComplete === OnCompleteEnum.Weigh_in && !weighIn) {
         throw new Error(
           "Weigh in data is required to complete this measurable",
         );
       }
       if (
-        measurable.onComplete ===
-          onCompleteEnum.enumValues.find(
-            (e) => e === "Blood_pressure_reading",
-          ) &&
+        measurable.onComplete === OnCompleteEnum.Blood_pressure_reading &&
         !bloodPressureReading
       ) {
         throw new Error(
@@ -170,9 +164,9 @@ export const measurableRouter = createTRPCRouter({
       const effectiveInterval = measurable.interval ?? interval;
       const newSetDate = startOfDay(measurable.dueDate ?? new Date());
       const newDueDate =
-        measurable.type === "Countdown"
+        measurable.type === MeasurableTypeEnum.Countdown
           ? startOfDay(addDays(newSetDate, effectiveInterval))
-          : measurable.type === "Seeking"
+          : measurable.type === MeasurableTypeEnum.Seeking
             ? startOfDay(addDays(newSetDate, elapsedDays))
             : undefined;
       // measurable.setDate = newSetDate;
@@ -181,7 +175,9 @@ export const measurableRouter = createTRPCRouter({
       // if we were seeking for interval and have set a dueDate, change to count down
       // if type was Countdown or Tally, leave alone
       const newType =
-        measurable.type === "Seeking" ? "Countdown" : measurable.type;
+        measurable.type === MeasurableTypeEnum.Seeking
+          ? MeasurableTypeEnum.Countdown
+          : measurable.type;
 
       const tx = ctx.db.transaction(async (db) => {
         const updatedMeasurable = await db
@@ -248,7 +244,7 @@ export const measurableRouter = createTRPCRouter({
             systolic: bloodPressureReading.systolic,
             diastolic: bloodPressureReading.diastolic,
             pulse: bloodPressureReading.pulse,
-            category: category, //as bloodPressureCategoryEnum,
+            category: category as BloodPressureCategoryEnum,
             previousBloodPressureReadingId:
               previousBloodPressureReading?.id ?? null,
             resultId: result[0].id,

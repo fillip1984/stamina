@@ -9,6 +9,7 @@ import { IoScaleOutline } from "react-icons/io5";
 import { PiPersonBold } from "react-icons/pi";
 
 import type { MeasurableType } from "@stamina/api";
+import { OnCompleteEnum } from "@stamina/db/schema";
 
 import {
   Dialog,
@@ -39,9 +40,9 @@ export default function OnCompleteModal({
   measurable: MeasurableType;
   dismiss: () => void;
 }) {
-  if (measurable.onComplete === "Weigh_in") {
+  if (OnCompleteEnum.Weigh_in === measurable.onComplete) {
     return <WeighIn measurable={measurable} dismiss={dismiss} />;
-  } else if (measurable.onComplete === "Blood_pressure_reading") {
+  } else if (OnCompleteEnum.Blood_pressure_reading === measurable.onComplete) {
     return <BloodPressureReading measurable={measurable} dismiss={dismiss} />;
   } else {
     return null;

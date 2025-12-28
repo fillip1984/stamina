@@ -9,7 +9,12 @@ import { ImHourGlass } from "react-icons/im";
 import { LuTally4, LuTelescope } from "react-icons/lu";
 
 import type { AreaType, MeasurableType } from "@stamina/api";
-import { dayOfWeekEnum, daytimeEnum, onCompleteEnum } from "@stamina/db/schema";
+import type {
+  DayOfWeekEnum,
+  DaytimeEnum,
+  OnCompleteEnum,
+} from "@stamina/db/schema";
+import { MeasurableTypeEnum } from "@stamina/db/schema";
 
 import {
   Dialog,
@@ -34,7 +39,7 @@ import Combobox from "../ui/my-ui/combobox";
 import { Spinner } from "../ui/spinner";
 import { Textarea } from "../ui/textarea";
 
-type DaytimeEnum = (typeof daytimeEnum.enumValues)[number];
+// type DaytimeEnum = (typeof daytimeEnum.enumValues)[number];
 
 export default function MeasurableDialog() {
   const {
@@ -74,14 +79,16 @@ export default function MeasurableDialog() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [area, setArea] = useState<AreaType | null>(null);
-  const [type, setType] = useState<MeasurableType["type"]>("Countdown");
+  const [type, setType] = useState<MeasurableType["type"]>(
+    "Countdown" as MeasurableType["type"],
+  );
   const [suggestedDayTime, setSuggestedDayTime] = useState<DaytimeEnum | null>(
     null,
   );
-  const [suggestedDay, setSuggestedDay] = useState<dayOfWeekEnum | null>(null);
+  const [suggestedDay, setSuggestedDay] = useState<DayOfWeekEnum | null>(null);
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [interval, setInterval] = useState<number>();
-  const [onComplete, setOnComplete] = useState<onCompleteEnum | null>(null);
+  const [onComplete, setOnComplete] = useState<OnCompleteEnum | null>(null);
 
   const handleCreateOrUpdate = async () => {
     if (mode === "Update" && id) {
@@ -116,13 +123,12 @@ export default function MeasurableDialog() {
   const validateForm = () => {
     if (name.trim().length === 0) return false;
     if (description.trim().length === 0) return false;
-    if (type === "Countdown" && !dueDate) return false;
+    if (type === MeasurableTypeEnum.Countdown && !dueDate) return false;
 
     return true;
   };
   useEffect(() => {
     setValidToCreate(validateForm());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, description, type, dueDate]);
 
   // UX: when editing, populate fields or set defaults when creating new
@@ -144,7 +150,7 @@ export default function MeasurableDialog() {
       setName("");
       setDescription("");
       setArea(null);
-      setType("Countdown");
+      setType(MeasurableTypeEnum.Countdown);
       setSuggestedDayTime(null);
       setSuggestedDay(null);
       setDueDate(null);
@@ -166,7 +172,7 @@ export default function MeasurableDialog() {
 
   // UX: set dueDate to next instance of suggestedDay when it is selected
   useEffect(() => {
-    if (type !== "Countdown") return;
+    if (type !== MeasurableTypeEnum.Countdown) return;
     if (!suggestedDay) return;
     // only update if changed
     if (measurableToEdit?.suggestedDay === suggestedDay) return;
@@ -174,7 +180,7 @@ export default function MeasurableDialog() {
     const today = new Date();
     const todayDayOfWeek = today.getDay(); // 0 (Sun) - 6 (Sat)
     const targetDayOfWeek = daysOfWeek.findIndex(
-      (d) => d.label === suggestedDay,
+      (d) => (d.label as DayOfWeekEnum) === suggestedDay,
     );
 
     // if today, set today
@@ -189,7 +195,6 @@ export default function MeasurableDialog() {
     if (!interval) {
       setInterval(7);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [suggestedDay, type]);
 
   const measurableTypes = [
@@ -308,7 +313,7 @@ export default function MeasurableDialog() {
                 <div
                   key={t.label}
                   onClick={() => setType(t.label as MeasurableType["type"])}
-                  className={`flex h-24 w-32 flex-col items-center justify-center gap-2 rounded-md select-none ${type === t.label ? "border-accent bg-accent/40 border-2" : "border"} p-4`}
+                  className={`flex h-24 w-32 flex-col items-center justify-center gap-2 rounded-md select-none ${type === (t.label as MeasurableTypeEnum) ? "border-accent bg-accent/40 border-2" : "border"} p-4`}
                 >
                   {t.label}
                   {t.icon}
@@ -316,11 +321,15 @@ export default function MeasurableDialog() {
               ))}
             </div>
             <span className="text-muted-foreground h-10 text-sm">
-              {measurableTypes.find((mt) => mt.label === type)?.description}
+              {
+                measurableTypes.find(
+                  (mt) => (mt.label as MeasurableTypeEnum) === type,
+                )?.description
+              }
             </span>
           </div>
           <AnimatePresence initial={false}>
-            {type === "Countdown" && (
+            {type === MeasurableTypeEnum.Countdown && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
