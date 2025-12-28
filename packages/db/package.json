@@ -35,15 +35,15 @@
     "@paralleldrive/cuid2": "^3.0.4",
     "drizzle-orm": "^0.45.1",
     "postgres": "^3.4.7",
-    "zod": "^4.1.12"
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@stamina/prettier-config": "workspace:*",
     "@stamina/tsconfig": "workspace:*",
     "dotenv-cli": "^11.0.0",
     "drizzle-kit": "^0.31.8",
-    "eslint": "^9.39.1",
-    "prettier": "^3.6.2",
+    "eslint": "^9.39.2",
+    "prettier": "^3.7.4",
     "typescript": "^5.9.3"
   },
   "prettier": "@stamina/prettier-config"

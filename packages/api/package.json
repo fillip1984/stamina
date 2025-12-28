@@ -26,7 +26,7 @@
     "@stamina/api": "workspace:*",
     "@stamina/auth": "workspace:*",
     "@stamina/db": "workspace:*",
-    "@trpc/server": "^11.8.0",
+    "@trpc/server": "^11.8.1",
     "date-fns": "^4.1.0",
     "superjson": "^2.2.6",
     "zod": "^4.2.1"
