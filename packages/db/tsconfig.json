@@ -5,6 +5,6 @@
       "~/*": ["./src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "env.js"],
   "exclude": ["node_modules"]
 }

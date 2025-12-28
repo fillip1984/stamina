@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "pnpm with-env next build",
+    "build": "pnpm lint && pnpm with-env next build",
     "dev": "pnpm with-env next dev",
     "start": "pnpm with-env next start",
     "format": "prettier --write . --ignore-path ../../.gitignore",

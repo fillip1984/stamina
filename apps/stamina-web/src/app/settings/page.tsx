@@ -148,7 +148,6 @@ const WeightGoalsSection = () => {
   const { data: existingWeightGoal } = api.weighIn.getWeightGoal.useQuery();
   useEffect(() => {
     if (existingWeightGoal?.weight) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWeightGoal(existingWeightGoal.weight.toString());
     }
   }, [existingWeightGoal]);

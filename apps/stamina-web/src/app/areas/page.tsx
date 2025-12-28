@@ -152,7 +152,7 @@ const AreaCard = ({ area, edit }: { area: AreaType; edit: () => void }) => {
             <DropdownMenuGroup>
               <DropdownMenuItem
                 variant="destructive"
-                onClick={() => deleteArea(area.id)}
+                onClick={() => deleteArea({ id: area.id })}
               >
                 <FaTrash />
                 Delete
@@ -200,7 +200,6 @@ const AreaModal = ({
   };
   useEffect(() => {
     setIsValid(validateForm());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, description]);
 
   // MX: create/update area

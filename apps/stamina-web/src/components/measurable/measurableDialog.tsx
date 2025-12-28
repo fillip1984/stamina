@@ -9,6 +9,7 @@ import { ImHourGlass } from "react-icons/im";
 import { LuTally4, LuTelescope } from "react-icons/lu";
 
 import type { AreaType, MeasurableType } from "@stamina/api";
+import { dayOfWeekEnum, daytimeEnum, onCompleteEnum } from "@stamina/db/schema";
 
 import {
   Dialog,
@@ -32,6 +33,8 @@ import { Input } from "../ui/input";
 import Combobox from "../ui/my-ui/combobox";
 import { Spinner } from "../ui/spinner";
 import { Textarea } from "../ui/textarea";
+
+type DaytimeEnum = (typeof daytimeEnum.enumValues)[number];
 
 export default function MeasurableDialog() {
   const {
@@ -75,10 +78,10 @@ export default function MeasurableDialog() {
   const [suggestedDayTime, setSuggestedDayTime] = useState<DaytimeEnum | null>(
     null,
   );
-  const [suggestedDay, setSuggestedDay] = useState<DayOfWeekEnum | null>(null);
+  const [suggestedDay, setSuggestedDay] = useState<dayOfWeekEnum | null>(null);
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [interval, setInterval] = useState<number>();
-  const [onComplete, setOnComplete] = useState<OnCompleteEnum | null>(null);
+  const [onComplete, setOnComplete] = useState<onCompleteEnum | null>(null);
 
   const handleCreateOrUpdate = async () => {
     if (mode === "Update" && id) {

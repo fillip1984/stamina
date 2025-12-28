@@ -102,7 +102,6 @@ const WeighInResult = ({ weighIn }: { weighIn: WeighInType }) => {
   useEffect(() => {
     if (lastWeighIn) {
       const weightDiff = (weighIn.weight - lastWeighIn.weight).toFixed(2);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWeightTrendValue(Number(weightDiff));
 
       if (weighIn.bodyFatPercentage && lastWeighIn.bodyFatPercentage) {
@@ -222,7 +221,6 @@ const BloodPressureResult = ({
       const systolicDiff = (
         bloodPressureReading.systolic - lastBloodPressureReading.systolic
       ).toFixed(2);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSystolicTrendValue(Number(systolicDiff));
 
       const diastolicDiff = (

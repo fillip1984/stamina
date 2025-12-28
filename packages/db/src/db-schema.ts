@@ -1,7 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
-import { pgSchema, text, timestamp, uuid } from "drizzle-orm/pg-core";
-
-import { env } from "~/env";
+import { pgSchema, text, timestamp } from "drizzle-orm/pg-core";
 
 console.log("DB SCHEMA:", "stamina");
 export const appSchema = pgSchema("stamina");

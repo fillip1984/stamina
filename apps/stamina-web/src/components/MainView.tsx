@@ -95,7 +95,6 @@ export default function Home() {
     } else if (selectedDateFilter === "All") {
       filtered = measurablesFilteredByArea;
     }
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFilteredMeasurables(filtered);
   }, [measurables, selectedDateFilter, areaFilter]);
 

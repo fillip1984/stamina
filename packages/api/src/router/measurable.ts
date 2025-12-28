@@ -3,7 +3,6 @@ import { z } from "zod/v4";
 
 import { and, desc, eq, lt } from "@stamina/db";
 import {
-  bloodPressureCategoryEnum,
   bloodPressureReadings,
   dayOfWeekEnum,
   daytimeEnum,
@@ -201,15 +200,24 @@ export const measurableRouter = createTRPCRouter({
           )
           .returning();
 
+        if (!updatedMeasurable[0]) {
+          throw new Error("Failed to find measurable being completed");
+        }
+
         const result = await db
           .insert(results)
           .values({
             measurableId: id,
             userId: ctx.session.user.id,
             date: new Date(),
-            notes: `Completed ${updatedMeasurable[0]!.name}`,
+            notes: `Completed ${updatedMeasurable[0].name}`,
           })
           .returning();
+
+        if (!result[0]) {
+          throw new Error("Failed to record result of completing measurable");
+        }
+
         if (weighIn) {
           const previousWeighIn = await db.query.weighIns.findFirst({
             where: eq(weighIns.userId, ctx.session.user.id),
@@ -222,7 +230,7 @@ export const measurableRouter = createTRPCRouter({
             weight: weighIn.weight,
             bodyFatPercentage: weighIn.bodyFatPercentage,
             previousWeighInId: previousWeighIn ? previousWeighIn.id : null,
-            resultId: result[0]!.id,
+            resultId: result[0].id,
           });
         } else if (bloodPressureReading) {
           const previousBloodPressureReading =
@@ -243,7 +251,7 @@ export const measurableRouter = createTRPCRouter({
             category: category, //as bloodPressureCategoryEnum,
             previousBloodPressureReadingId:
               previousBloodPressureReading?.id ?? null,
-            resultId: result[0]!.id,
+            resultId: result[0].id,
           });
         }
 
