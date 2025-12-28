@@ -22,7 +22,15 @@ jobs:
           node-version: "22"
           cache: "pnpm"
 
-      # - name: Restore cache
+      - name: Install dependencies
+        run: pnpm install
+
+      # After testing I've discovered that caching the NextJs build cache
+      # does not significantly speed up the build time in this monorepo setup.
+      # Therefore, the NextJs cache step is commented out for now.
+      # Numbers were, ~ 24s to restore it and ~ 40s to save it so close to 1m to
+      # maintain the cache and the build is only taking ~ 9s.
+      # - name: Restore NextJs cache
       #   uses: actions/cache@v4
       #   with:
       #     path: |
@@ -31,9 +39,6 @@ jobs:
       #     key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
       #     restore-keys: |
       #       ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
-
-      - name: Install dependencies
-        run: pnpm install
 
       - name: Build and Deploy
         env:
@@ -46,5 +51,5 @@ jobs:
           AUTH_GOOGLE_SECRET: ${{ secrets.AUTH_GOOGLE_SECRET }}
           PRODUCTION_URL: "https://stamina.illizen.com"
         run: |
-          pnpm build:web
+          pnpm build:packages
           pnpx sst deploy --stage prod
