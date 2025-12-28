@@ -51,17 +51,16 @@ export const bloodPressureCategoryEnum = pgEnum("BloodPressureCategoryEnum", [
 // Tables
 export const areas = appSchema.table(
   "Area",
-  {
+  (t) => ({
     ...baseFields,
-    name: text("name").notNull(),
-    description: text("description").notNull(),
-    userId: text("userId")
+    name: t.text("name").notNull(),
+    description: t.text("description").notNull(),
+    userId: t
+      .text("userId")
       .notNull()
       .references(() => user.id),
-  },
-  (table) => ({
-    nameUserIdIdx: index().on(table.name, table.userId),
   }),
+  (table) => [index().on(table.name, table.userId)],
 );
 
 export const measurables = appSchema.table(
@@ -196,3 +195,5 @@ export const bloodPressureReadingsRelations = relations(
     }),
   }),
 );
+
+export * from "./auth-schema";

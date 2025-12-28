@@ -11,7 +11,7 @@ import superjson from "superjson";
 import z, { ZodError } from "zod/v4";
 
 import type { Auth } from "@stamina/auth";
-import { db } from "@stamina/db";
+import { db } from "@stamina/db/client";
 
 /**
  * 1. CONTEXT

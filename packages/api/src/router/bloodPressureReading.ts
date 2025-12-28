@@ -1,5 +1,8 @@
 import z from "zod/v4";
 
+import { and, eq } from "@stamina/db";
+import { bloodPressureReadings } from "@stamina/db/schema";
+
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const BloodPressureReadingRouter = createTRPCRouter({
@@ -102,11 +105,15 @@ export const BloodPressureReadingRouter = createTRPCRouter({
   readById: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      return await ctx.db.bloodPressureReading.findUnique({
-        where: {
-          id: input.id,
-          userId: ctx.session.user.id,
-        },
+      return await ctx.db.query.bloodPressureReadings.findFirst({
+        where: and(
+          eq(bloodPressureReadings.id, input.id),
+          eq(bloodPressureReadings.userId, ctx.session.user.id),
+        ),
+        // where: {
+        //   id: input.id,
+        //   userId: ctx.session.user.id,
+        // },
       });
     }),
 });

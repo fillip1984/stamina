@@ -1,12 +1,18 @@
-import type { BloodPressureCategoryEnum } from "@prisma/client";
-import {
-  DayOfWeekEnum,
-  DaytimeEnum,
-  MeasurableTypeEnum,
-  OnCompleteEnum,
-} from "@prisma/client";
 import { addDays, startOfDay } from "date-fns";
 import { z } from "zod/v4";
+
+import { and, desc, eq, lt } from "@stamina/db";
+import {
+  bloodPressureCategoryEnum,
+  bloodPressureReadings,
+  dayOfWeekEnum,
+  daytimeEnum,
+  measurables,
+  measurableTypeEnum,
+  onCompleteEnum,
+  results,
+  weighIns,
+} from "@stamina/db/schema";
 
 import { calculateMeasurableProgress } from "../client/measurableUtils";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
@@ -18,51 +24,52 @@ export const measurableRouter = createTRPCRouter({
         name: z.string(),
         description: z.string(),
         areaId: z.string().nullable(),
-        type: z.enum(MeasurableTypeEnum),
-        suggestedDay: z.enum(DayOfWeekEnum).nullable(),
-        suggestedDayTime: z.enum(DaytimeEnum).nullable(),
+        type: z.enum(measurableTypeEnum.enumValues),
+        suggestedDay: z.enum(dayOfWeekEnum.enumValues).nullable(),
+        suggestedDayTime: z.enum(daytimeEnum.enumValues).nullable(),
         dueDate: z.date().nullable(),
         interval: z.number().min(1).optional(),
-        onComplete: z.enum(OnCompleteEnum).nullable(),
+        onComplete: z.enum(onCompleteEnum.enumValues).nullable(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.measurable.create({
-        data: {
-          setDate: new Date(),
-          name: input.name,
-          description: input.description,
-          areaId: input.areaId,
-          type: input.type,
-          suggestedDay: input.suggestedDay,
-          suggestedDayTime: input.suggestedDayTime,
-          dueDate: input.dueDate,
-          interval: input.interval,
-          onComplete: input.onComplete,
-          userId: ctx.session.user.id,
-        },
+      return ctx.db.insert(measurables).values({
+        setDate: new Date(),
+        name: input.name,
+        description: input.description,
+        areaId: input.areaId,
+        type: input.type,
+        suggestedDay: input.suggestedDay,
+        suggestedDayTime: input.suggestedDayTime,
+        dueDate: input.dueDate,
+        interval: input.interval,
+        onComplete: input.onComplete,
+        userId: ctx.session.user.id,
       });
     }),
   findAll: protectedProcedure.query(async ({ ctx }) => {
-    const measurables = await ctx.db.measurable.findMany({
-      where: { userId: ctx.session.user.id },
-      orderBy: { dueDate: "desc" },
+    const measurablesToReturn = await ctx.db.query.measurables.findMany({
+      where: eq(measurables.userId, ctx.session.user.id),
+      orderBy: desc(measurables.dueDate),
     });
 
-    measurables.sort((a, b) => {
+    measurablesToReturn.sort((a, b) => {
       if (!a.dueDate && !b.dueDate) return 0;
       if (!a.dueDate) return -1;
       if (!b.dueDate) return 1;
       return a.dueDate.getTime() - b.dueDate.getTime();
     });
 
-    return measurables;
+    return measurablesToReturn;
   }),
   findById: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
-      return ctx.db.measurable.findUnique({
-        where: { id: input, userId: ctx.session.user.id },
+      return ctx.db.query.measurables.findFirst({
+        where: and(
+          eq(measurables.id, input),
+          eq(measurables.userId, ctx.session.user.id),
+        ),
       });
     }),
   update: protectedProcedure
@@ -72,18 +79,18 @@ export const measurableRouter = createTRPCRouter({
         name: z.string().min(1).optional(),
         description: z.string().min(1).optional(),
         areaId: z.string().nullable(),
-        type: z.enum(MeasurableTypeEnum).optional(),
-        suggestedDay: z.enum(DayOfWeekEnum).nullable(),
-        suggestedDayTime: z.enum(DaytimeEnum).nullable(),
+        type: z.enum(measurableTypeEnum.enumValues).optional(),
+        suggestedDay: z.enum(dayOfWeekEnum.enumValues).nullable(),
+        suggestedDayTime: z.enum(daytimeEnum.enumValues).nullable(),
         dueDate: z.date().nullable(),
         interval: z.number().min(1).optional(),
-        onComplete: z.enum(OnCompleteEnum).nullable(),
+        onComplete: z.enum(onCompleteEnum.enumValues).nullable(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.measurable.update({
-        where: { id: input.id, userId: ctx.session.user.id },
-        data: {
+      return ctx.db
+        .update(measurables)
+        .set({
           name: input.name,
           description: input.description,
           areaId: input.areaId,
@@ -93,8 +100,13 @@ export const measurableRouter = createTRPCRouter({
           dueDate: input.dueDate,
           interval: input.interval,
           onComplete: input.onComplete,
-        },
-      });
+        })
+        .where(
+          and(
+            eq(measurables.id, input.id),
+            eq(measurables.userId, ctx.session.user.id),
+          ),
+        );
     }),
   complete: protectedProcedure
     .input(
@@ -119,19 +131,29 @@ export const measurableRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { id, weighIn, bloodPressureReading } = input;
-      const measurable = await ctx.db.measurable.findUnique({
-        where: { id, userId: ctx.session.user.id },
+      const measurable = await ctx.db.query.measurables.findFirst({
+        where: and(
+          eq(measurables.userId, ctx.session.user.id),
+          eq(measurables.id, id),
+        ),
       });
       if (!measurable) {
         throw new Error("Measurable not found");
       }
-      if (measurable.onComplete === OnCompleteEnum.Weigh_in && !weighIn) {
+      if (
+        measurable.onComplete ===
+          onCompleteEnum.enumValues.find((e) => e === "Weigh_in") &&
+        !weighIn
+      ) {
         throw new Error(
           "Weigh in data is required to complete this measurable",
         );
       }
       if (
-        measurable.onComplete === OnCompleteEnum.Blood_pressure_reading &&
+        measurable.onComplete ===
+          onCompleteEnum.enumValues.find(
+            (e) => e === "Blood_pressure_reading",
+          ) &&
         !bloodPressureReading
       ) {
         throw new Error(
@@ -162,70 +184,66 @@ export const measurableRouter = createTRPCRouter({
       const newType =
         measurable.type === "Seeking" ? "Countdown" : measurable.type;
 
-      const tx = ctx.db.$transaction(async (db) => {
-        const updatedMeasurable = await db.measurable.update({
-          where: { id: measurable.id, userId: ctx.session.user.id },
-          data: {
+      const tx = ctx.db.transaction(async (db) => {
+        const updatedMeasurable = await db
+          .update(measurables)
+          .set({
             type: newType,
             setDate: newSetDate,
             dueDate: newDueDate,
             interval: effectiveInterval,
-          },
-        });
+          })
+          .where(
+            and(
+              eq(measurables.id, measurable.id),
+              eq(measurables.userId, ctx.session.user.id),
+            ),
+          )
+          .returning();
 
-        const result = await db.result.create({
-          data: {
+        const result = await db
+          .insert(results)
+          .values({
             measurableId: id,
             userId: ctx.session.user.id,
             date: new Date(),
-            notes: `Completed ${updatedMeasurable.name}`,
-          },
-        });
+            notes: `Completed ${updatedMeasurable[0]!.name}`,
+          })
+          .returning();
         if (weighIn) {
-          const previousWeighIn = await db.weighIn.findFirst({
-            where: {
-              userId: ctx.session.user.id,
-            },
-            orderBy: {
-              date: "desc",
-            },
+          const previousWeighIn = await db.query.weighIns.findFirst({
+            where: eq(weighIns.userId, ctx.session.user.id),
+            orderBy: desc(weighIns.date),
           });
-          await db.weighIn.create({
-            data: {
-              userId: ctx.session.user.id,
-              date: weighIn.date,
-              weight: weighIn.weight,
-              bodyFatPercentage: weighIn.bodyFatPercentage,
-              previousWeighInId: previousWeighIn ? previousWeighIn.id : null,
-              resultId: result.id,
-            },
+
+          await db.insert(weighIns).values({
+            userId: ctx.session.user.id,
+            date: weighIn.date,
+            weight: weighIn.weight,
+            bodyFatPercentage: weighIn.bodyFatPercentage,
+            previousWeighInId: previousWeighIn ? previousWeighIn.id : null,
+            resultId: result[0]!.id,
           });
         } else if (bloodPressureReading) {
           const previousBloodPressureReading =
-            await db.bloodPressureReading.findFirst({
-              where: {
-                userId: ctx.session.user.id,
-                date: {
-                  lt: bloodPressureReading.date,
-                },
-              },
-              orderBy: {
-                date: "desc",
-              },
+            await db.query.bloodPressureReadings.findFirst({
+              where: and(
+                eq(bloodPressureReadings.userId, ctx.session.user.id),
+                lt(bloodPressureReadings.date, bloodPressureReading.date),
+              ),
+              orderBy: desc(bloodPressureReadings.date),
             });
           const category = determineCategory(bloodPressureReading);
-          await db.bloodPressureReading.create({
-            data: {
-              userId: ctx.session.user.id,
-              date: bloodPressureReading.date,
-              systolic: bloodPressureReading.systolic,
-              diastolic: bloodPressureReading.diastolic,
-              pulse: bloodPressureReading.pulse,
-              category: category as BloodPressureCategoryEnum,
-              previousBloodPressureReadingId:
-                previousBloodPressureReading?.id ?? null,
-              resultId: result.id,
-            },
+          await db.insert(bloodPressureReadings).values({
+            userId: ctx.session.user.id,
+            date: bloodPressureReading.date,
+            systolic: bloodPressureReading.systolic,
+            diastolic: bloodPressureReading.diastolic,
+            pulse: bloodPressureReading.pulse,
+            category: category, //as bloodPressureCategoryEnum,
+            previousBloodPressureReadingId:
+              previousBloodPressureReading?.id ?? null,
+            resultId: result[0]!.id,
           });
         }
 
@@ -240,9 +258,14 @@ export const measurableRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.measurable.delete({
-        where: { id: input, userId: ctx.session.user.id },
-      });
+      return ctx.db
+        .delete(measurables)
+        .where(
+          and(
+            eq(measurables.id, input),
+            eq(measurables.userId, ctx.session.user.id),
+          ),
+        );
     }),
 });
 

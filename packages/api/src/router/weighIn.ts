@@ -1,5 +1,8 @@
 import { z } from "zod/v4";
 
+import { and, eq } from "@stamina/db";
+import { weighIns, weightGoals } from "@stamina/db/schema";
+
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const WeighInRouter = createTRPCRouter({
@@ -97,20 +100,18 @@ export const WeighInRouter = createTRPCRouter({
   //   }),
   readById: protectedProcedure
     .input(z.object({ id: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const weighIn = await ctx.db.weighIn.findUnique({
-        where: {
-          id: input.id,
-          userId: ctx.session.user.id,
-        },
+    .query(({ ctx, input }) => {
+      return ctx.db.query.weighIns.findFirst({
+        where: and(
+          eq(weighIns.id, input.id),
+          eq(weighIns.userId, ctx.session.user.id),
+        ),
       });
-      return weighIn;
     }),
-  getWeightGoal: protectedProcedure.query(async ({ ctx }) => {
-    const weightGoal = await ctx.db.weightGoal.findFirst({
-      where: { userId: ctx.session.user.id },
+  getWeightGoal: protectedProcedure.query(({ ctx }) => {
+    return ctx.db.query.weightGoals.findFirst({
+      where: eq(weightGoals.userId, ctx.session.user.id),
     });
-    return weightGoal;
   }),
   setWeightGoal: protectedProcedure
     .input(
@@ -119,23 +120,21 @@ export const WeighInRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const currentGoal = await ctx.db.weightGoal.findFirst({
-        where: { userId: ctx.session.user.id },
+      const currentGoal = await ctx.db.query.weightGoals.findFirst({
+        where: eq(weightGoals.userId, ctx.session.user.id),
       });
       if (currentGoal) {
-        const updatedGoal = await ctx.db.weightGoal.update({
-          where: { id: currentGoal.id },
-          data: {
+        const updatedGoal = await ctx.db
+          .update(weightGoals)
+          .set({
             weight: input.weightGoal,
-          },
-        });
+          })
+          .where(eq(weightGoals.id, currentGoal.id));
         return updatedGoal;
       } else {
-        const newGoal = await ctx.db.weightGoal.create({
-          data: {
-            userId: ctx.session.user.id,
-            weight: input.weightGoal,
-          },
+        const newGoal = await ctx.db.insert(weightGoals).values({
+          userId: ctx.session.user.id,
+          weight: input.weightGoal,
         });
         return newGoal;
       }

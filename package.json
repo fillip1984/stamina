@@ -21,7 +21,7 @@
     "dev": "pnpm -r run dev",
     "dev:mobile": "pnpm --filter stamina-mobile run dev",
     "dev:web": "pnpm --filter stamina-web run dev",
-    "prod:db:push": "pnpm dotenv -e .env.prod -- prisma db push",
+    "prod:db:push": "pnpm dotenv -e .env.prod -- drizzle-kit push",
     "prod:deploy": "pnpm dotenv -e .env.prod -- sst deploy --stage prod",
     "start:web": "pnpm --filter stamina-web run start"
   },

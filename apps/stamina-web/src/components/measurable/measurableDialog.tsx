@@ -1,10 +1,5 @@
 "use client";
 
-import type {
-  DayOfWeekEnum,
-  DaytimeEnum,
-  OnCompleteEnum,
-} from "@prisma/client";
 import type { Day } from "date-fns";
 import { useContext, useEffect, useState } from "react";
 import { nextDay } from "date-fns";
