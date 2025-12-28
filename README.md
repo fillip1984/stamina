@@ -5,6 +5,7 @@ Another productivity tool attempt
 ## TODOs
 
 - [ ] - test out functionality, to see if dates are being calculated properly
+- [x] - keep up to date and switch to drizzle
 
 - [ ] Long term todos
   - [ ] - figure out when to use null vs undefined... running into issues where I have to convert nulls to undefined and I'm not sure which is correct
