@@ -1,5 +1,6 @@
+import type { VariantProps } from "class-variance-authority";
 import { Pressable } from "react-native";
-import { cva, VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 
 import { cn } from "~/styles/utils";
 

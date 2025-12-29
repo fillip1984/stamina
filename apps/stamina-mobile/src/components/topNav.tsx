@@ -1,10 +1,10 @@
-import React, { useContext } from "react";
+import type { NativeStackHeaderProps } from "@react-navigation/native-stack";
+import { useContext } from "react";
 import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { useQuery } from "@tanstack/react-query";
 
 import { AllAreas, AppContext } from "~/contexts/AppContext";

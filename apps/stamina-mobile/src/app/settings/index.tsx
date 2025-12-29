@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pressable, TextInput, View } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -24,8 +24,10 @@ export default function SettingsPage() {
   const setWeightGoalMutation = useMutation(
     trpc.weighIn.setWeightGoal.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries(trpc.weighIn.getWeightGoal.queryFilter());
-        queryClient.invalidateQueries(trpc.result.findAll.queryFilter());
+        void queryClient.invalidateQueries(
+          trpc.weighIn.getWeightGoal.queryFilter(),
+        );
+        void queryClient.invalidateQueries(trpc.result.findAll.queryFilter());
       },
     }),
   );
@@ -49,11 +51,13 @@ export default function SettingsPage() {
             onChangeText={setWeightGoal}
             onBlur={() => {
               if (weightGoal.trim() === "") {
-                setWeightGoalMutation.mutateAsync({ weightGoal: null });
+                void setWeightGoalMutation.mutateAsync({ weightGoal: null });
               } else {
                 const weight = parseFloat(weightGoal);
                 if (!isNaN(weight)) {
-                  setWeightGoalMutation.mutateAsync({ weightGoal: weight });
+                  void setWeightGoalMutation.mutateAsync({
+                    weightGoal: weight,
+                  });
                 }
               }
             }}

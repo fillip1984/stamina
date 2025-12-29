@@ -10,8 +10,9 @@ import {
 import "react-native-reanimated";
 import "~/styles/global.css";
 
+import type { AppStateStatus } from "react-native";
 import { useEffect, useState } from "react";
-import { AppState, AppStateStatus, Platform } from "react-native";
+import { AppState, Platform } from "react-native";
 
 import TopNav from "~/components/topNav";
 import { AppContextProvider } from "~/contexts/AppContext";

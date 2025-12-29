@@ -24,6 +24,7 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
     links: [
       loggerLink({
         enabled: (opts) =>
+          // eslint-disable-next-line no-restricted-properties
           process.env.NODE_ENV === "development" ||
           (opts.direction === "down" && opts.result instanceof Error),
         colorMode: "ansi",

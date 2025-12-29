@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from "react";
+import type React from "react";
+import { useContext, useEffect, useState } from "react";
 import { View } from "react-native";
 import Animated, { SlideInLeft } from "react-native-reanimated";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -15,8 +15,9 @@ import {
   startOfWeek,
 } from "date-fns";
 
-import { AreaType, MeasurableType } from "@stamina/api";
+import type { AreaType, MeasurableType } from "@stamina/api";
 import { calculateMeasurableProgress } from "@stamina/api/client";
+import { MeasurableTypeEnum } from "@stamina/db/schema";
 
 import Badge from "~/components/ui/badge";
 import Button from "~/components/ui/button";
@@ -110,12 +111,12 @@ export default function MeasurablesPage() {
       </View>
 
       {/* fabs */}
-      <Button
+      {/* <Button
         className="absolute right-4 bottom-4 h-12 w-12 rounded-full"
         onPress={() => {}}
       >
         <FontAwesome name="plus" size={18} color="black" />
-      </Button>
+      </Button> */}
     </Container>
   );
 }
@@ -189,12 +190,13 @@ const MeasureableCard = ({
         )}
 
         {/* render prgress label for tally and seeking modes */}
-        {(measurable.type === "Tally" || measurable.type === "Seeking") && (
+        {(measurable.type === MeasurableTypeEnum.Tally ||
+          measurable.type === MeasurableTypeEnum.Seeking) && (
           <View className="z-30 flex flex-row items-center">
             <Typography className="mr-2 text-2xl font-bold">
               {elapsedDays > 0 ? elapsedDays : 0}
             </Typography>
-            {measurable.type === "Tally" ? (
+            {measurable.type === MeasurableTypeEnum.Tally ? (
               <Typography className="text-xs">days and counting</Typography>
             ) : (
               <Typography className="text-xs">days since</Typography>

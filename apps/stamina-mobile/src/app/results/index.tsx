@@ -1,12 +1,13 @@
-import React, { ReactNode, useEffect, useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
+import { Linking, Pressable, ScrollView, View } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useQuery } from "@tanstack/react-query";
 
-import {
+import type {
   BloodPressureReadingType,
   ResultType,
   WeighInType,
@@ -72,6 +73,7 @@ const WeighInResult = ({ weighIn }: { weighIn: WeighInType }) => {
   const { data: lastWeighIn } = useQuery(
     trpc.weighIn.readById.queryOptions(
       {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         id: weighIn.previousWeighInId!,
       },
       {
@@ -303,7 +305,7 @@ const BloodPressureResult = ({
         <Pressable
           className="flex grow cursor-pointer"
           onPress={() =>
-            window.open(
+            Linking.openURL(
               "https://www.healthline.com/health/high-blood-pressure-hypertension/hypertension-related-conditions#Article-resources",
             )
           }

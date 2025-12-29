@@ -1,14 +1,14 @@
-import React from "react";
 import { Pressable, View } from "react-native";
 import { router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useQuery } from "@tanstack/react-query";
 
+import type { AreaType } from "@stamina/api";
+
 import Button from "~/components/ui/button";
 import Container from "~/components/ui/container";
 import Typography from "~/components/ui/typography";
 import { trpc } from "~/utils/api";
-import { AreaType } from "../../../../../packages/api/dist/types";
 
 export default function AreasPage() {
   const areas = useQuery(trpc.area.findAll.queryOptions());

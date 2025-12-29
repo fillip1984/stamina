@@ -1,7 +1,9 @@
 {
-  "extends": "expo/tsconfig.base",
+  "extends": "@stamina/tsconfig/base.json",
   "compilerOptions": {
-    "strict": true,
+    "jsx": "react-native",
+    "checkJs": false,
+    "moduleSuffixes": [".ios", ".android", ".native", ""],
     "paths": {
       "~/*": ["./src/*"]
     }
@@ -10,8 +12,11 @@
     "src",
     "**/*.ts",
     "**/*.tsx",
+    "**/*.js",
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
-    "nativewind-env.d.ts"
-  ]
+    "nativewind-env.d.ts",
+    "eslint.config.mts"
+  ],
+  "exclude": ["node_modules"]
 }

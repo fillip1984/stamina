@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TextInput, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -40,7 +40,6 @@ export default function AreaDetailPage() {
   };
   useEffect(() => {
     setIsValid(validateForm());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, description]);
 
   // MX: create/update area
