@@ -1,9 +1,11 @@
-/* eslint-disable no-undef */
 /* eslint-disable no-restricted-properties */
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod/v4";
 
 export const dbEnv = createEnv({
+  shared: {
+    NODE_ENV: z.enum(["development", "production"]).optional(),
+  },
   /**
    * Specify your server-side environment variables schema here. This way you can ensure the app
    * isn't built with invalid env vars.
@@ -11,7 +13,6 @@ export const dbEnv = createEnv({
   server: {
     DATABASE_URL: z.url(),
     DATABASE_SCHEMA: z.string(),
-    NODE_ENV: z.enum(["development", "production"]).optional(),
   },
   /**
    * You can't destruct `process.env` as a regular object in the Next.js edge runtimes (e.g.

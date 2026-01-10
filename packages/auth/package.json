@@ -17,14 +17,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@better-auth/expo": "^1.4.9",
+    "@better-auth/expo": "^1.4.10",
     "@stamina/db": "workspace:*",
     "@t3-oss/env-core": "^0.13.10",
-    "better-auth": "^1.4.9",
-    "zod": "^4.2.1"
+    "better-auth": "^1.4.10",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
-    "@better-auth/cli": "^1.4.9",
+    "@better-auth/cli": "^1.4.10",
     "@stamina/prettier-config": "workspace:*",
     "@stamina/tsconfig": "workspace:*",
     "eslint": "^9.39.2",

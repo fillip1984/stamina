@@ -13,6 +13,7 @@ export const env = createEnv({
       process.env.NODE_ENV === "production"
         ? z.string()
         : z.string().optional(),
+    AUTH_DISABLE_SIGN_UPS: z.string(),
     AUTH_GOOGLE_ID: z.string(),
     AUTH_GOOGLE_SECRET: z.string(),
     DATABASE_URL: z.url(),
@@ -40,6 +41,7 @@ export const env = createEnv({
    */
   runtimeEnv: {
     AUTH_SECRET: process.env.AUTH_SECRET,
+    AUTH_DISABLE_SIGN_UPS: process.env.AUTH_DISABLE_SIGN_UPS,
     AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID,
     AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,

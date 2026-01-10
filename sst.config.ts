@@ -22,6 +22,7 @@ export default $config({
         DATABASE_SCHEMA: process.env.DATABASE_SCHEMA,
         AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID,
         AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
+        AUTH_DISABLE_SIGN_UPS: process.env.AUTH_DISABLE_SIGN_UPS,
         AUTH_SECRET: process.env.AUTH_SECRET,
         AUTH_TRUST_HOST: "true",
         PRODUCTION_URL: process.env.PRODUCTION_URL,

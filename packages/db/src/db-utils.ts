@@ -1,9 +1,16 @@
 import { createId } from "@paralleldrive/cuid2";
 import { pgSchema, text, timestamp } from "drizzle-orm/pg-core";
 
-console.log("DB SCHEMA:", "stamina");
-export const appSchema = pgSchema("stamina");
+import { dbEnv } from "./dbEnv";
 
+/**
+ * Table schema is used to separate different applications using the same database.
+ */
+export const appSchema = pgSchema(dbEnv.DATABASE_SCHEMA);
+
+/**
+ * Base fields for all tables.
+ */
 export const baseFields = {
   // id: uuid().primaryKey().defaultRandom(),
   id: text()

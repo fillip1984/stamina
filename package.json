@@ -37,7 +37,7 @@
     "sst": "^3.17.25"
   },
   "devDependencies": {
-    "@eslint/compat": "^2.0.0",
+    "@eslint/compat": "^2.0.1",
     "@stamina/eslint-config": "workspace:*",
     "@stamina/prettier-config": "workspace:*",
     "@types/aws-lambda": "8.10.159",

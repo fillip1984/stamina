@@ -9,6 +9,7 @@ import { db } from "@stamina/db/client";
 export function initAuth(options: {
   baseUrl: string;
   secret: string | undefined;
+  disableSignUps: string | undefined;
 
   // githubClientId: string;
   // githubClientSecret: string;
@@ -39,10 +40,10 @@ export function initAuth(options: {
       // redirectURI: `${options.productionUrl}/api/auth/callback/github`,
       // },
       google: {
+        disableImplicitSignUp: options.disableSignUps === "true" ? true : false,
         clientId: options.googleClientId,
         clientSecret: options.googleClientSecret,
         redirectURI: `${options.baseUrl}/api/auth/callback/google`,
-        disableImplicitSignUp: true,
       },
     },
     trustedOrigins: ["stamina://", "expo://"],

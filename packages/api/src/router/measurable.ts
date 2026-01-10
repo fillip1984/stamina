@@ -1,15 +1,17 @@
 import { addDays, startOfDay } from "date-fns";
 import { z } from "zod/v4";
 
+import type { BloodPressureCategoryEnum } from "@stamina/db/enums";
 import { and, desc, eq, lt } from "@stamina/db";
 import {
-  BloodPressureCategoryEnum,
-  bloodPressureReadings,
   DayOfWeekEnum,
   DaytimeEnum,
-  measurables,
   MeasurableTypeEnum,
   OnCompleteEnum,
+} from "@stamina/db/enums";
+import {
+  bloodPressureReadings,
+  measurables,
   results,
   weighIns,
 } from "@stamina/db/schema";

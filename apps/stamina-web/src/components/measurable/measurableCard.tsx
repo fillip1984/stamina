@@ -14,7 +14,7 @@ import { TbTargetArrow } from "react-icons/tb";
 
 import type { MeasurableType } from "@stamina/api";
 import { calculateMeasurableProgress } from "@stamina/api/client";
-import { MeasurableTypeEnum } from "@stamina/db/schema";
+import { MeasurableTypeEnum } from "@stamina/db/enums";
 
 import { AppContext } from "~/contexts/AppContext";
 import { useModal } from "~/hooks/useModal";

@@ -9,7 +9,7 @@ import { IoScaleOutline } from "react-icons/io5";
 import { PiPersonBold } from "react-icons/pi";
 
 import type { MeasurableType } from "@stamina/api";
-import { OnCompleteEnum } from "@stamina/db/schema";
+import { OnCompleteEnum } from "@stamina/db/enums";
 
 import {
   Dialog,

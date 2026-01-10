@@ -8,6 +8,7 @@ export function authEnv() {
       // AUTH_GITHUB_SECRET: z.string().min(1),
       AUTH_GOOGLE_ID: z.string().min(1),
       AUTH_GOOGLE_SECRET: z.string().min(1),
+      AUTH_DISABLE_SIGN_UPS: z.string(),
       AUTH_SECRET:
         process.env.NODE_ENV === "production"
           ? z.string().min(1)

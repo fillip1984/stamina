@@ -19,9 +19,13 @@
       "types": "./dist/schema.d.ts",
       "default": "./src/schema.ts"
     },
+    "./enums": {
+      "types": "./dist/enums.d.ts",
+      "default": "./src/enums.ts"
+    },
     "./env": {
       "types": "./dist/env.d.ts",
-      "default": "./env.js"
+      "default": "./src/dbEnv.ts"
     }
   },
   "scripts": {
@@ -29,17 +33,17 @@
     "dev": "tsc",
     "format": "prettier --write . --ignore-path ../../.gitignore",
     "lint": "eslint",
-    "generate": "drizzle-kit generate",
-    "migrate": "drizzle-kit migrate",
-    "push": "drizzle-kit push",
-    "studio": "drizzle-kit studio",
+    "generate": "pnpm with-env drizzle-kit generate",
+    "migrate": "pnpm with-env drizzle-kit migrate",
+    "push": "pnpm with-env drizzle-kit push",
+    "studio": "pnpm with-env drizzle-kit studio",
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "@paralleldrive/cuid2": "^3.0.4",
+    "@paralleldrive/cuid2": "^3.0.6",
     "drizzle-orm": "^0.45.1",
-    "postgres": "^3.4.7",
-    "zod": "^4.2.1"
+    "postgres": "^3.4.8",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@stamina/prettier-config": "workspace:*",

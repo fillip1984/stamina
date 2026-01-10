@@ -2,12 +2,11 @@ import { z } from "zod/v4";
 
 import { and, eq } from "@stamina/db";
 import {
-  areas,
   DayOfWeekEnum,
   DaytimeEnum,
-  measurables,
   MeasurableTypeEnum,
-} from "@stamina/db/schema";
+} from "@stamina/db/enums";
+import { areas, measurables } from "@stamina/db/schema";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 

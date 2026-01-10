@@ -15,6 +15,7 @@ const baseUrl =
 export const auth = initAuth({
   baseUrl,
   secret: env.AUTH_SECRET,
+  disableSignUps: env.AUTH_DISABLE_SIGN_UPS,
   googleClientId: env.AUTH_GOOGLE_ID,
   googleClientSecret: env.AUTH_GOOGLE_SECRET,
 });

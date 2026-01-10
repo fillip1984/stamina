@@ -1,66 +1,14 @@
 import { relations } from "drizzle-orm";
-import {
-  index,
-  integer,
-  pgEnum,
-  real,
-  text,
-  timestamp,
-} from "drizzle-orm/pg-core";
 
 import { user } from "./auth-schema";
-import { appSchema, baseFields } from "./db-schema";
-
-// Enums, https://github.com/drizzle-team/drizzle-orm/discussions/1914
-export enum MeasurableTypeEnum {
-  Tally = "Tally",
-  Countdown = "Countdown",
-  Seeking = "Seeking",
-}
-export const measurableTypePgEnum = pgEnum(
-  "MeasurableTypeEnum",
-  MeasurableTypeEnum,
-);
-
-export enum DaytimeEnum {
-  Morning = "Morning",
-  Afternoon = "Afternoon",
-  Evening = "Evening",
-  Night = "Night",
-}
-export const daytimePgEnum = pgEnum("DaytimeEnum", DaytimeEnum);
-
-export enum DayOfWeekEnum {
-  Sunday = "Sunday",
-  Monday = "Monday",
-  Tuesday = "Tuesday",
-  Wednesday = "Wednesday",
-  Thursday = "Thursday",
-  Friday = "Friday",
-  Saturday = "Saturday",
-}
-export const dayOfWeekPgEnum = pgEnum("DayOfWeekEnum", DayOfWeekEnum);
-
-export enum OnCompleteEnum {
-  Note = "Note",
-  Weigh_in = "Weigh_in",
-  Blood_pressure_reading = "Blood_pressure_reading",
-  Runners_log = "Runners_log",
-}
-export const onCompletePgEnum = pgEnum("OnCompleteEnum", OnCompleteEnum);
-
-export enum BloodPressureCategoryEnum {
-  Low = "Low",
-  Normal = "Normal",
-  Elevated = "Elevated",
-  Hypertension_1 = "Hypertension_1",
-  Hypertension_2 = "Hypertension_2",
-  Hypertension_crisis = "Hypertension_crisis",
-}
-export const bloodPressureCategoryPgEnum = pgEnum(
-  "BloodPressureCategoryEnum",
-  BloodPressureCategoryEnum,
-);
+import { appSchema, baseFields } from "./db-utils";
+import {
+  bloodPressureCategoryPgEnum,
+  dayOfWeekPgEnum,
+  daytimePgEnum,
+  measurableTypePgEnum,
+  onCompletePgEnum,
+} from "./enums";
 
 // Tables
 export const areas = appSchema.table(
@@ -74,89 +22,101 @@ export const areas = appSchema.table(
       .notNull()
       .references(() => user.id),
   }),
-  (table) => [index().on(table.name, table.userId)],
+  // (table) => [index().on(table.name, table.userId)],
 );
 
 export const measurables = appSchema.table(
   "Measurable",
-  {
+  (t) => ({
     ...baseFields,
-    name: text("name").notNull(),
-    description: text("description").notNull(),
+    name: t.text("name").notNull(),
+    description: t.text("description").notNull(),
     type: measurableTypePgEnum("type").notNull(),
-    setDate: timestamp("setDate").notNull(),
-    dueDate: timestamp("dueDate"),
+    setDate: t.timestamp("setDate").notNull(),
+    dueDate: t.timestamp("dueDate"),
     suggestedDayTime: daytimePgEnum("suggestedDayTime"),
     suggestedDay: dayOfWeekPgEnum("suggestedDay"),
-    interval: integer("interval"),
+    interval: t.integer("interval"),
     onComplete: onCompletePgEnum("onComplete"),
-    areaId: text("areaId").references(() => areas.id, { onDelete: "set null" }),
-    userId: text("userId")
+    areaId: t
+      .text("areaId")
+      .references(() => areas.id, { onDelete: "set null" }),
+    userId: t
+      .text("userId")
       .notNull()
       .references(() => user.id),
-  },
-  (table) => ({
-    nameUserIdIdx: index().on(table.name, table.userId),
   }),
+  // (table) => ({
+  //   nameUserIdIdx: index().on(table.name, table.userId),
+  // }),
 );
 
 export const results = appSchema.table(
   "Result",
-  {
+  (t) => ({
     ...baseFields,
-    date: timestamp("date").notNull(),
-    notes: text("notes").notNull(),
-    measurableId: text("measurableId").notNull(),
-    userId: text("userId")
+    date: t.timestamp("date").notNull(),
+    notes: t.text("notes").notNull(),
+    measurableId: t.text("measurableId").notNull(),
+    userId: t
+      .text("userId")
       .notNull()
       .references(() => user.id),
-  },
-  (table) => ({
-    dateUserIdIdx: index().on(table.date, table.userId),
-    measurableIdIdx: index().on(table.measurableId),
   }),
+  // (table) => ({
+  //   dateUserIdIdx: index().on(table.date, table.userId),
+  //   measurableIdIdx: index().on(table.measurableId),
+  // }),
 );
 
-export const weighIns = appSchema.table("WeighIn", {
+export const weighIns = appSchema.table("WeighIn", (t) => ({
   ...baseFields,
-  date: timestamp("date").notNull(),
-  weight: real("weight").notNull(),
-  bodyFatPercentage: real("bodyFatPercentage"),
-  previousWeighInId: text("previousWeighInId"),
-  resultId: text("resultId")
+  date: t.timestamp("date").notNull(),
+  weight: t.real("weight").notNull(),
+  bodyFatPercentage: t.real("bodyFatPercentage"),
+  previousWeighInId: t.text("previousWeighInId"),
+  resultId: t
+    .text("resultId")
     .notNull()
     .unique()
     .references(() => results.id),
-  userId: text("userId")
+  userId: t
+    .text("userId")
     .notNull()
     .references(() => user.id),
-});
+}));
 
-export const weightGoals = appSchema.table("WeightGoal", {
+export const weightGoals = appSchema.table("WeightGoal", (t) => ({
   ...baseFields,
-  weight: real("weight"),
-  userId: text("userId")
+  weight: t.real("weight"),
+  userId: t
+    .text("userId")
     .notNull()
     .unique()
     .references(() => user.id),
-});
+}));
 
-export const bloodPressureReadings = appSchema.table("BloodPressureReading", {
-  ...baseFields,
-  date: timestamp("date").notNull(),
-  systolic: integer("systolic").notNull(),
-  diastolic: integer("diastolic").notNull(),
-  pulse: integer("pulse"),
-  category: bloodPressureCategoryPgEnum("category").notNull(),
-  previousBloodPressureReadingId: text("previousBloodPressureReadingId"),
-  resultId: text("resultId")
-    .notNull()
-    .unique()
-    .references(() => results.id),
-  userId: text("userId")
-    .notNull()
-    .references(() => user.id),
-});
+export const bloodPressureReadings = appSchema.table(
+  "BloodPressureReading",
+  (t) => ({
+    ...baseFields,
+    date: t.timestamp("date").notNull(),
+    systolic: t.integer("systolic").notNull(),
+    diastolic: t.integer("diastolic").notNull(),
+    pulse: t.integer("pulse"),
+    category: bloodPressureCategoryPgEnum("category").notNull(),
+    previousBloodPressureReadingId: t.text("previousBloodPressureReadingId"),
+    resultId: t
+      .text("resultId")
+      .notNull()
+      .unique()
+      .references(() => results.id),
+    userId: t
+      .text("userId")
+      .notNull()
+      .references(() => user.id),
+  }),
+);
 
 // Relations
 export const usersRelations = relations(user, ({ many, one }) => ({
@@ -211,3 +171,4 @@ export const bloodPressureReadingsRelations = relations(
 );
 
 export * from "./auth-schema";
+export * from "./enums";

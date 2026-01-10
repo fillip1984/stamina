@@ -13,8 +13,8 @@ import type {
   DayOfWeekEnum,
   DaytimeEnum,
   OnCompleteEnum,
-} from "@stamina/db/schema";
-import { MeasurableTypeEnum } from "@stamina/db/schema";
+} from "@stamina/db/enums";
+import { MeasurableTypeEnum } from "@stamina/db/enums";
 
 import {
   Dialog,
