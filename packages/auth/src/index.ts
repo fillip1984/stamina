@@ -1,8 +1,6 @@
 import type { BetterAuthOptions, BetterAuthPlugin } from "better-auth";
-import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { oAuthProxy } from "better-auth/plugins";
 
 import { db } from "@stamina/db/client";
 import * as schema from "@stamina/db/schema";
@@ -10,7 +8,7 @@ import * as schema from "@stamina/db/schema";
 export function initAuth<
   TExtraPlugins extends BetterAuthPlugin[] = [],
 >(options: {
-  baseUrl: string;
+  // baseUrl: string;
   secret: string | undefined;
 
   disableSignUps: string;
@@ -24,21 +22,21 @@ export function initAuth<
       provider: "pg",
       schema,
     }),
-    baseURL: options.baseUrl,
+    // baseURL: options.baseUrl,
     secret: options.secret,
-    plugins: [
-      oAuthProxy({
-        productionURL: options.baseUrl,
-        currentURL: "expo://",
-      }),
-      expo(),
-      ...(options.extraPlugins ?? []),
-    ],
+    // plugins: [
+    //   oAuthProxy({
+    //     productionURL: options.baseUrl,
+    //     currentURL: "expo://",
+    //   }),
+    //   expo(),
+    //   ...(options.extraPlugins ?? []),
+    // ],
     socialProviders: {
       google: {
         clientId: options.googleClientId,
         clientSecret: options.googleClientSecret,
-        redirectURI: `${options.baseUrl}/api/auth/callback/google`,
+        redirectURI: `http://localhost:3000/api/auth/callback/google`,
         disableImplicitSignUp: options.disableSignUps === "true",
       },
     },

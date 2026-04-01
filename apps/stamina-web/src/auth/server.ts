@@ -12,10 +12,10 @@ import { env } from "~/env";
 //   env.NODE_ENV === "production" && env.PRODUCTION_URL
 //     ? env.PRODUCTION_URL
 //     : "http://localhost:3000";
-const baseUrl = "http://localhost:3000";
+// const baseUrl = "http://localhost:3000";
 
 export const auth = initAuth({
-  baseUrl,
+  // baseUrl,
   secret: env.AUTH_SECRET,
   disableSignUps: env.AUTH_DISABLE_SIGN_UPS,
   googleClientId: env.AUTH_GOOGLE_ID,
