@@ -3,7 +3,7 @@ import "~/styles/globals.css";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 
-// import MeasurableDialog from "~/components/measurable/measurableDialog";
+import MeasurableDialog from "~/components/measurable/measurableDialog";
 import Fab from "~/components/nav/fab";
 import Nav from "~/components/nav/nav";
 import { AppContextProvider } from "~/contexts/AppContext";
@@ -33,7 +33,7 @@ export default function RootLayout({
                 <Nav />
                 {children}
               </div>
-              {/* <MeasurableDialog /> */}
+              <MeasurableDialog />
               <Fab />
             </ThemeProvider>
           </AppContextProvider>

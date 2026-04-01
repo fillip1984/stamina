@@ -15,7 +15,7 @@ import {
 import { TbTargetArrow } from "react-icons/tb";
 
 import { calculateMeasurableProgress } from "@stamina/api/client";
-import { MeasurableTypeEnumRAW } from "@stamina/db/schema";
+import { MeasurableEnum } from "@stamina/db/schema";
 
 import { AppContext } from "~/contexts/AppContext";
 import { useModal } from "~/hooks/useModal";
@@ -130,13 +130,13 @@ export default function MeasureableCard({
             )}
 
             {/* render prgress label for tally and seeking modes */}
-            {(measurable.type === MeasurableTypeEnumRAW[0] || //Tally
-              measurable.type === MeasurableTypeEnumRAW[1]) && ( //Seeking
+            {(measurable.type === MeasurableEnum.Tally || //Tally
+              measurable.type === MeasurableEnum.Seeking) && ( //Seeking
               <div className="z-30 flex items-center gap-1">
                 <span className="text-xl font-bold">
                   {elapsedDays > 0 ? elapsedDays : 0}
                 </span>
-                {measurable.type === MeasurableTypeEnumRAW[0] ? (
+                {measurable.type === MeasurableEnum.Tally ? (
                   <span className="text-xs">days and counting</span>
                 ) : (
                   <span className="text-xs">days since</span>

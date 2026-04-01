@@ -10,7 +10,7 @@ import { FaCalendarDay } from "react-icons/fa";
 import { IoScaleOutline } from "react-icons/io5";
 import { PiPersonBold } from "react-icons/pi";
 
-import { OnCompleteEnumRAW } from "@stamina/db/schema";
+import { OnCompleteEnum } from "@stamina/db/schema";
 
 import {
   Dialog,
@@ -41,9 +41,9 @@ export default function OnCompleteModal({
   measurable: MeasurableType;
   dismiss: () => void;
 }) {
-  if (OnCompleteEnumRAW[1] === measurable.onComplete) {
+  if (OnCompleteEnum.Weigh_in === measurable.onComplete) {
     return <WeighIn measurable={measurable} dismiss={dismiss} />;
-  } else if (OnCompleteEnumRAW[2] === measurable.onComplete) {
+  } else if (OnCompleteEnum.Blood_pressure_reading === measurable.onComplete) {
     return <BloodPressureReading measurable={measurable} dismiss={dismiss} />;
   } else {
     return null;

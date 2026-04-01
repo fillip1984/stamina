@@ -196,7 +196,6 @@ const AreaModal = ({
   // IX: init form state
   useEffect(() => {
     if (editableItem) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setName(editableItem.name);
       setDescription(editableItem.description);
       setMode("Update");
@@ -215,7 +214,6 @@ const AreaModal = ({
     return true;
   };
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsValid(validateForm());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, description]);

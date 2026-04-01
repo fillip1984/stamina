@@ -1,11 +1,11 @@
 import { user } from "./auth-schema";
 import { appSchema, baseFields } from "./base";
 import {
-  bloodPressureCategoryEnum,
-  dayOfWeekEnum,
-  daytimeEnum,
-  measurableTypeEnum,
-  onCompleteEnum,
+  bloodPressureCategoryPgEnum,
+  dayOfWeekPgEnum,
+  daytimePgEnum,
+  measurablePgEnum,
+  onCompletePgEnum,
 } from "./enums";
 
 export const areas = appSchema.table("Area", (t) => ({
@@ -22,13 +22,13 @@ export const measurables = appSchema.table("Measurable", (t) => ({
   ...baseFields,
   name: t.text("name").notNull(),
   description: t.text().notNull(),
-  type: measurableTypeEnum().notNull(),
+  type: measurablePgEnum().notNull(),
   setDate: t.timestamp().notNull(),
   dueDate: t.timestamp(),
-  suggestedDayTime: daytimeEnum(),
-  suggestedDay: dayOfWeekEnum(),
+  suggestedDayTime: daytimePgEnum(),
+  suggestedDay: dayOfWeekPgEnum(),
   interval: t.integer(),
-  onComplete: onCompleteEnum(),
+  onComplete: onCompletePgEnum(),
   areaId: t.text().references(() => areas.id, { onDelete: "set null" }),
   userId: t
     .text()
@@ -76,7 +76,7 @@ export const bloodPressureReadings = appSchema.table(
     systolic: t.integer().notNull(),
     diastolic: t.integer().notNull(),
     pulse: t.integer(),
-    category: bloodPressureCategoryEnum().notNull(),
+    category: bloodPressureCategoryPgEnum().notNull(),
     previousBloodPressureReadingId: t.text(),
     userId: t
       .text()

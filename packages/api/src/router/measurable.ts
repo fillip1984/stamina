@@ -3,13 +3,13 @@ import { z } from "zod/v4";
 
 import { and, eq } from "@stamina/db";
 import {
-  BLOOD_PRESSURE_ENUM,
+  BloodPressureCategoryEnum,
   bloodPressureReadings,
-  DayOfWeekEnumRAW,
-  DaytimeEnumRAW,
+  DayOfWeekEnum,
+  DaytimeEnum,
+  MeasurableEnum,
   measurables,
-  MeasurableTypeEnumRAW,
-  OnCompleteEnumRAW,
+  OnCompleteEnum,
   results,
   weighIns,
 } from "@stamina/db/schema";
@@ -24,12 +24,12 @@ export const measurableRouter = createTRPCRouter({
         name: z.string(),
         description: z.string(),
         areaId: z.string().nullable(),
-        type: z.enum(MeasurableTypeEnumRAW),
-        suggestedDay: z.enum(DayOfWeekEnumRAW).nullable(),
-        suggestedDayTime: z.enum(DaytimeEnumRAW).nullable(),
+        type: z.enum(MeasurableEnum),
+        suggestedDay: z.enum(DayOfWeekEnum).nullable(),
+        suggestedDayTime: z.enum(DaytimeEnum).nullable(),
         dueDate: z.date().nullable(),
         interval: z.number().min(1).optional(),
-        onComplete: z.enum(OnCompleteEnumRAW).nullable(),
+        onComplete: z.enum(OnCompleteEnum).nullable(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -76,12 +76,12 @@ export const measurableRouter = createTRPCRouter({
         name: z.string().min(1).optional(),
         description: z.string().min(1).optional(),
         areaId: z.string().nullable(),
-        type: z.enum(MeasurableTypeEnumRAW).optional(),
-        suggestedDay: z.enum(DayOfWeekEnumRAW).nullable(),
-        suggestedDayTime: z.enum(DaytimeEnumRAW).nullable(),
+        type: z.enum(MeasurableEnum).optional(),
+        suggestedDay: z.enum(DayOfWeekEnum).nullable(),
+        suggestedDayTime: z.enum(DaytimeEnum).nullable(),
         dueDate: z.date().nullable(),
         interval: z.number().min(1).optional(),
-        onComplete: z.enum(OnCompleteEnumRAW).nullable(),
+        onComplete: z.enum(OnCompleteEnum).nullable(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -135,7 +135,7 @@ export const measurableRouter = createTRPCRouter({
         throw new Error("Measurable not found");
       }
       if (
-        measurable.onComplete === OnCompleteEnumRAW[1] && // Weigh_in
+        measurable.onComplete === OnCompleteEnum.Weigh_in && // Weigh_in
         !weighIn
       ) {
         throw new Error(
@@ -143,7 +143,7 @@ export const measurableRouter = createTRPCRouter({
         );
       }
       if (
-        measurable.onComplete === OnCompleteEnumRAW[2] && // Blood_pressure_reading
+        measurable.onComplete === OnCompleteEnum.Blood_pressure_reading && // Blood_pressure_reading
         !bloodPressureReading
       ) {
         throw new Error(
@@ -161,9 +161,9 @@ export const measurableRouter = createTRPCRouter({
       const effectiveInterval = measurable.interval ?? interval;
       const newSetDate = startOfDay(measurable.dueDate ?? new Date());
       const newDueDate =
-        measurable.type === MeasurableTypeEnumRAW[1] //.Countdown
+        measurable.type === MeasurableEnum.Countdown
           ? startOfDay(addDays(newSetDate, effectiveInterval))
-          : measurable.type === MeasurableTypeEnumRAW[2] //.Seeking
+          : measurable.type === MeasurableEnum.Seeking
             ? startOfDay(addDays(newSetDate, elapsedDays))
             : undefined;
       // measurable.setDate = newSetDate;
@@ -172,8 +172,8 @@ export const measurableRouter = createTRPCRouter({
       // if we were seeking for interval and have set a dueDate, change to count down
       // if type was Countdown or Tally, leave alone
       const newType =
-        measurable.type === MeasurableTypeEnumRAW[2] //.Seeking
-          ? MeasurableTypeEnumRAW[1] //.Countdown
+        measurable.type === MeasurableEnum.Seeking
+          ? MeasurableEnum.Countdown
           : measurable.type;
 
       const tx = ctx.db.transaction(async (db) => {
@@ -272,18 +272,18 @@ export const measurableRouter = createTRPCRouter({
 
 const determineCategory = (bpr: { systolic: number; diastolic: number }) => {
   if (bpr.systolic > 180 || bpr.diastolic > 120) {
-    return BLOOD_PRESSURE_ENUM[5]; // "Hypertension_crisis"
+    return BloodPressureCategoryEnum.Hypertension_crisis; // "Hypertension_crisis"
   } else if (bpr.systolic >= 140 || bpr.diastolic >= 90) {
-    return BLOOD_PRESSURE_ENUM[4]; // "Hypertension_2"
+    return BloodPressureCategoryEnum.Hypertension_2; // "Hypertension_2"
   } else if (bpr.systolic >= 130) {
-    return BLOOD_PRESSURE_ENUM[3]; // "Hypertension_1"
+    return BloodPressureCategoryEnum.Hypertension_1; // "Hypertension_1"
   } else if (bpr.diastolic >= 80) {
-    return BLOOD_PRESSURE_ENUM[3]; // "Hypertension_1"
+    return BloodPressureCategoryEnum.Hypertension_1; // "Hypertension_1"
   } else if (bpr.systolic >= 120) {
-    return BLOOD_PRESSURE_ENUM[2]; // "Elevated"
+    return BloodPressureCategoryEnum.Elevated; // "Elevated"
   } else if (bpr.systolic >= 90) {
-    return BLOOD_PRESSURE_ENUM[1]; // "Normal"
+    return BloodPressureCategoryEnum.Normal; // "Normal"
   } else {
-    return BLOOD_PRESSURE_ENUM[0]; // "Low"
+    return BloodPressureCategoryEnum.Low; // "Low"
   }
 };

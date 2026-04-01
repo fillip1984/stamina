@@ -121,6 +121,7 @@ export default function Home() {
         <div className="mx-2 my-4 flex gap-2">
           {dateFilters.map((filter) => (
             <Button
+              key={filter}
               variant={selectedDateFilter === filter ? "default" : "outline"}
               onClick={() => setSelectedDateFilter(filter)}
             >
