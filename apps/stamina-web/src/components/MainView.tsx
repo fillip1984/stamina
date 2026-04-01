@@ -1,6 +1,8 @@
 "use client";
 
+import type { MeasurableType } from "@stamina/api";
 import { useContext, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   endOfWeek,
   interval,
@@ -13,10 +15,8 @@ import { isToday } from "date-fns/isToday";
 import { AnimatePresence, motion } from "motion/react";
 import { GiStoneStack } from "react-icons/gi";
 
-import type { MeasurableType } from "@stamina/api";
-
 import { AppContext } from "~/contexts/AppContext";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import MeasureableCard from "./measurable/measurableCard";
 import { Button } from "./ui/button";
 import {
@@ -32,23 +32,27 @@ import ScrollableContainer from "./ui/my-ui/scrollableContainer";
 
 export default function Home() {
   const { areaFilter } = useContext(AppContext);
-  const { data: areas, isLoading: isLoadingAreas } =
-    api.area.findAll.useQuery();
+
+  const trpc = useTRPC();
   const {
-    data: measurables,
-    isLoading: isLoadingMeasurables,
+    data: areas,
+    isLoading: isLoadingAreas,
     isError,
     refetch,
-  } = api.measurable.findAll.useQuery(undefined, {
-    enabled: !isLoadingAreas,
-    select: (data) =>
-      data.map((measurable) => ({
-        ...measurable,
-        areaName:
-          areas?.find((area) => area.id === measurable.areaId)?.name ??
-          "Uncategorized",
-      })),
-  });
+  } = useQuery(trpc.area.findAll.queryOptions());
+
+  const { data: measurables, isLoading: isLoadingMeasurables } = useQuery(
+    trpc.measurable.findAll.queryOptions(undefined, {
+      enabled: !isLoadingAreas,
+      select: (data) =>
+        data.map((measurable) => ({
+          ...measurable,
+          areaName:
+            areas?.find((area) => area.id === measurable.areaId)?.name ??
+            "Uncategorized",
+        })),
+    }),
+  );
 
   const [filteredMeasurables, setFilteredMeasurables] = useState<
     (MeasurableType & { areaName: string })[]
@@ -95,6 +99,7 @@ export default function Home() {
     } else if (selectedDateFilter === "All") {
       filtered = measurablesFilteredByArea;
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFilteredMeasurables(filtered);
   }, [measurables, selectedDateFilter, areaFilter]);
 

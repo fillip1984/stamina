@@ -14,9 +14,6 @@ export default $config({
     new sst.aws.Nextjs("stamina", {
       domain: "stamina.illizen.com",
       path: "./apps/stamina-web",
-      server: {
-        runtime: "nodejs22.x",
-      },
       environment: {
         DATABASE_URL: process.env.DATABASE_URL,
         DATABASE_SCHEMA: process.env.DATABASE_SCHEMA,

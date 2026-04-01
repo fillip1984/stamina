@@ -1,6 +1,6 @@
 import { z } from "zod/v4";
 
-import { and, asc, eq } from "@stamina/db";
+import { and, eq } from "@stamina/db";
 import { areas } from "@stamina/db/schema";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
@@ -22,19 +22,22 @@ export const areaRouter = createTRPCRouter({
     }),
   findAll: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.db.query.areas.findMany({
-      where: eq(areas.userId, ctx.session.user.id),
-      orderBy: asc(areas.name),
+      where: { userId: ctx.session.user.id },
+      // orderBy: asc(areas.name),
       columns: { id: true, name: true, description: true },
+      orderBy: {
+        name: "asc",
+      },
     });
   }),
   findById: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       return ctx.db.query.areas.findFirst({
-        where: and(
-          eq(areas.id, input.id),
-          eq(areas.userId, ctx.session.user.id),
-        ),
+        where: {
+          id: input.id,
+          userId: ctx.session.user.id,
+        },
       });
     }),
   update: protectedProcedure

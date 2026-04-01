@@ -1,52 +1,53 @@
-import type { BetterAuthOptions } from "better-auth";
+import type { BetterAuthOptions, BetterAuthPlugin } from "better-auth";
 import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { oAuthProxy } from "better-auth/plugins";
 
 import { db } from "@stamina/db/client";
+import * as schema from "@stamina/db/schema";
 
-export function initAuth(options: {
+export function initAuth<
+  TExtraPlugins extends BetterAuthPlugin[] = [],
+>(options: {
   baseUrl: string;
   secret: string | undefined;
-  disableSignUps: string | undefined;
 
-  // githubClientId: string;
-  // githubClientSecret: string;
+  disableSignUps: string;
 
   googleClientId: string;
   googleClientSecret: string;
+  extraPlugins?: TExtraPlugins;
 }) {
   const config = {
     database: drizzleAdapter(db, {
       provider: "pg",
+      schema,
     }),
     baseURL: options.baseUrl,
     secret: options.secret,
     plugins: [
       oAuthProxy({
-        /**
-         * Auto-inference blocked by https://github.com/better-auth/better-auth/pull/2891
-         */
-        currentURL: options.baseUrl,
         productionURL: options.baseUrl,
+        currentURL: "expo://",
       }),
       expo(),
+      ...(options.extraPlugins ?? []),
     ],
     socialProviders: {
-      // github: {
-      // clientId: options.githubClientId,
-      // clientSecret: options.githubClientSecret,
-      // redirectURI: `${options.productionUrl}/api/auth/callback/github`,
-      // },
       google: {
-        disableImplicitSignUp: options.disableSignUps === "true" ? true : false,
         clientId: options.googleClientId,
         clientSecret: options.googleClientSecret,
         redirectURI: `${options.baseUrl}/api/auth/callback/google`,
+        disableImplicitSignUp: options.disableSignUps === "true",
       },
     },
-    trustedOrigins: ["stamina://", "expo://"],
+    trustedOrigins: ["expo://"],
+    onAPIError: {
+      onError(error, ctx) {
+        console.error("BETTER AUTH API ERROR", error, ctx);
+      },
+    },
   } satisfies BetterAuthOptions;
 
   return betterAuth(config);

@@ -1,6 +1,5 @@
 import { z } from "zod/v4";
 
-import { eq } from "@stamina/db";
 import { results } from "@stamina/db/schema";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
@@ -18,7 +17,7 @@ export const resultRouter = createTRPCRouter({
     }),
   findAll: protectedProcedure.query(({ ctx }) => {
     return ctx.db.query.results.findMany({
-      where: eq(results.userId, ctx.session.user.id),
+      where: { userId: ctx.session.user.id },
       with: {
         bloodPressureReading: true,
         weighIn: true,

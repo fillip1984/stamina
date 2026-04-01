@@ -1,11 +1,7 @@
 {
   "name": "@stamina/db",
-  "version": "1.0.0",
   "private": true,
-  "description": "",
   "type": "module",
-  "license": "ISC",
-  "packageManager": "pnpm@10.11.1",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -16,42 +12,42 @@
       "default": "./src/client.ts"
     },
     "./schema": {
-      "types": "./dist/schema.d.ts",
-      "default": "./src/schema.ts"
-    },
-    "./enums": {
-      "types": "./dist/enums.d.ts",
-      "default": "./src/enums.ts"
-    },
-    "./env": {
-      "types": "./dist/env.d.ts",
-      "default": "./src/dbEnv.ts"
+      "types": "./dist/schema/index.d.ts",
+      "default": "./src/schema/index.ts"
     }
   },
+  "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "pnpm lint && tsc",
+    "clean": "git clean -xdf .cache  dist node_modules",
     "dev": "tsc",
-    "format": "prettier --write . --ignore-path ../../.gitignore",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
-    "generate": "pnpm with-env drizzle-kit generate",
-    "migrate": "pnpm with-env drizzle-kit migrate",
     "push": "pnpm with-env drizzle-kit push",
+    "push:prod": "pnpm dotenv -e ../../.env.prod -- drizzle-kit push",
     "studio": "pnpm with-env drizzle-kit studio",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "export": "pnpm with-env drizzle-kit export",
+    "upgrade": "pnpm with-env drizzle-kit up",
+    "relations": "pnpm with-env drizzle-kit pull",
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "@paralleldrive/cuid2": "^3.0.6",
-    "drizzle-orm": "^0.45.1",
-    "postgres": "^3.4.8",
-    "zod": "^4.3.5"
+    "@paralleldrive/cuid2": "^3.3.0",
+    "@t3-oss/env-nextjs": "^0.13.11",
+    "drizzle-orm": "1.0.0-beta.20",
+    "pg": "^8.20.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@stamina/eslint-config": "workspace:*",
     "@stamina/prettier-config": "workspace:*",
     "@stamina/tsconfig": "workspace:*",
-    "dotenv-cli": "^11.0.0",
-    "drizzle-kit": "^0.31.8",
+    "@types/node": "25.5.0",
+    "@types/pg": "^8.20.0",
+    "drizzle-kit": "1.0.0-beta.20",
     "eslint": "^9.39.2",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.1",
     "typescript": "^5.9.3"
   },
   "prettier": "@stamina/prettier-config"

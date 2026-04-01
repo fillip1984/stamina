@@ -1,6 +1,8 @@
 "use client";
 
+import type { MeasurableType } from "@stamina/api";
 import { useContext } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { motion } from "motion/react";
 import {
@@ -12,13 +14,12 @@ import {
 } from "react-icons/fa6";
 import { TbTargetArrow } from "react-icons/tb";
 
-import type { MeasurableType } from "@stamina/api";
 import { calculateMeasurableProgress } from "@stamina/api/client";
-import { MeasurableTypeEnum } from "@stamina/db/enums";
+import { MeasurableTypeEnumRAW } from "@stamina/db/schema";
 
 import { AppContext } from "~/contexts/AppContext";
 import { useModal } from "~/hooks/useModal";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import {
@@ -46,25 +47,46 @@ export default function MeasureableCard({
       measurable.dueDate ?? undefined,
     );
 
-  const utils = api.useUtils();
-  const { mutateAsync: completeMeasurable } =
-    api.measurable.complete.useMutation({
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const completeMeasurable = useMutation(
+    trpc.measurable.complete.mutationOptions({
       onSuccess: async () => {
-        await utils.measurable.findAll.invalidate();
-        await utils.result.findAll.invalidate();
+        await queryClient.invalidateQueries(
+          trpc.measurable.findAll.queryFilter(),
+        );
+        await queryClient.invalidateQueries(trpc.result.findAll.queryFilter());
       },
-    });
-  const { mutateAsync: deleteMeasurable } = api.measurable.delete.useMutation({
-    onSuccess: async () => {
-      await utils.measurable.findAll.invalidate();
-    },
-  });
+    }),
+  );
+  const deleteMeasurable = useMutation(
+    trpc.measurable.delete.mutationOptions({
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(
+          trpc.measurable.findAll.queryFilter(),
+        );
+      },
+    }),
+  );
+
+  // const { mutateAsync: completeMeasurable } =
+  //   api.measurable.complete.useMutation({
+  //     onSuccess: async () => {
+  //       await utils.measurable.findAll.invalidate();
+  //       await utils.result.findAll.invalidate();
+  //     },
+  //   });
+  // const { mutateAsync: deleteMeasurable } = api.measurable.delete.useMutation({
+  //   onSuccess: async () => {
+  //     await utils.measurable.findAll.invalidate();
+  //   },
+  // });
 
   const handleComplete = async () => {
     if (measurable.onComplete) {
       show();
     } else {
-      await completeMeasurable({ id: measurable.id });
+      await completeMeasurable.mutateAsync({ id: measurable.id });
     }
   };
 
@@ -108,13 +130,13 @@ export default function MeasureableCard({
             )}
 
             {/* render prgress label for tally and seeking modes */}
-            {(measurable.type === MeasurableTypeEnum.Tally ||
-              measurable.type === MeasurableTypeEnum.Seeking) && (
+            {(measurable.type === MeasurableTypeEnumRAW[0] || //Tally
+              measurable.type === MeasurableTypeEnumRAW[1]) && ( //Seeking
               <div className="z-30 flex items-center gap-1">
                 <span className="text-xl font-bold">
                   {elapsedDays > 0 ? elapsedDays : 0}
                 </span>
-                {measurable.type === MeasurableTypeEnum.Tally ? (
+                {measurable.type === MeasurableTypeEnumRAW[0] ? (
                   <span className="text-xs">days and counting</span>
                 ) : (
                   <span className="text-xs">days since</span>
@@ -213,7 +235,7 @@ export default function MeasureableCard({
               <DropdownMenuGroup>
                 <DropdownMenuItem
                   variant="destructive"
-                  onClick={() => deleteMeasurable(measurable.id)}
+                  onClick={() => deleteMeasurable.mutateAsync(measurable.id)}
                 >
                   <FaTrash />
                   Delete

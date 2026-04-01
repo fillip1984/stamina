@@ -1,6 +1,8 @@
 "use client";
 
+import type { MeasurableType } from "@stamina/api";
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChevronDownIcon } from "lucide-react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { BsHeartPulseFill } from "react-icons/bs";
@@ -8,8 +10,7 @@ import { FaCalendarDay } from "react-icons/fa";
 import { IoScaleOutline } from "react-icons/io5";
 import { PiPersonBold } from "react-icons/pi";
 
-import type { MeasurableType } from "@stamina/api";
-import { OnCompleteEnum } from "@stamina/db/enums";
+import { OnCompleteEnumRAW } from "@stamina/db/schema";
 
 import {
   Dialog,
@@ -22,7 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
 import { DialogFooter, DialogHeader } from "../ui/dialog";
@@ -40,9 +41,9 @@ export default function OnCompleteModal({
   measurable: MeasurableType;
   dismiss: () => void;
 }) {
-  if (OnCompleteEnum.Weigh_in === measurable.onComplete) {
+  if (OnCompleteEnumRAW[1] === measurable.onComplete) {
     return <WeighIn measurable={measurable} dismiss={dismiss} />;
-  } else if (OnCompleteEnum.Blood_pressure_reading === measurable.onComplete) {
+  } else if (OnCompleteEnumRAW[2] === measurable.onComplete) {
     return <BloodPressureReading measurable={measurable} dismiss={dismiss} />;
   } else {
     return null;
@@ -61,17 +62,30 @@ const WeighIn = ({
   const [weight, setWeight] = useState("");
   const [bodyFatPercentage, setBodyFatPercentage] = useState("");
 
-  const utils = api.useUtils();
-  const { mutate: completeWeighIn } = api.measurable.complete.useMutation({
-    onSuccess: async () => {
-      await utils.measurable.findAll.invalidate();
-      await utils.result.findAll.invalidate();
-      dismiss();
-    },
-  });
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const completeWeighIn = useMutation(
+    trpc.measurable.complete.mutationOptions({
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(
+          trpc.measurable.findAll.queryFilter(),
+        );
+        await queryClient.invalidateQueries(trpc.result.findAll.queryFilter());
+        dismiss();
+      },
+    }),
+  );
+  // const utils = api.useUtils();
+  // const { mutate: completeWeighIn } = api.measurable.complete.useMutation({
+  //   onSuccess: async () => {
+  //     await utils.measurable.findAll.invalidate();
+  //     await utils.result.findAll.invalidate();
+  //     dismiss();
+  //   },
+  // });
 
   const handleSaveWeighIn = () => {
-    completeWeighIn({
+    void completeWeighIn.mutateAsync({
       id: measurable.id,
       weighIn: {
         date,
@@ -169,18 +183,22 @@ const BloodPressureReading = ({
   const [diastolic, setDiastolic] = useState("");
   const [heartRate, setHeartRate] = useState("");
 
-  const utils = api.useUtils();
-  const { mutateAsync: completeBloodPressure } =
-    api.measurable.complete.useMutation({
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const completeBloodPressure = useMutation(
+    trpc.measurable.complete.mutationOptions({
       onSuccess: async () => {
-        await utils.measurable.findAll.invalidate();
-        await utils.result.findAll.invalidate();
+        await queryClient.invalidateQueries(
+          trpc.measurable.findAll.queryFilter(),
+        );
+        await queryClient.invalidateQueries(trpc.result.findAll.queryFilter());
         dismiss();
       },
-    });
+    }),
+  );
 
   const handleSaveBloodPressure = async () => {
-    await completeBloodPressure({
+    await completeBloodPressure.mutateAsync({
       id: measurable.id,
       bloodPressureReading: {
         date,

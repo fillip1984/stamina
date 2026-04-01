@@ -1,6 +1,5 @@
 {
   "name": "@stamina/api",
-  "version": "0.1.0",
   "private": true,
   "type": "module",
   "exports": {
@@ -15,28 +14,28 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
-    "clean": "git clean -xdf dist node_modules",
+    "build": "pnpm lint && tsc",
+    "clean": "git clean -xdf .cache  dist node_modules",
     "dev": "tsc",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@stamina/api": "workspace:*",
     "@stamina/auth": "workspace:*",
     "@stamina/db": "workspace:*",
-    "@trpc/server": "^11.8.1",
+    "@trpc/server": "^11.16.0",
     "date-fns": "^4.1.0",
     "superjson": "^2.2.6",
-    "zod": "^4.3.5"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@stamina/eslint-config": "workspace:*",
     "@stamina/prettier-config": "workspace:*",
     "@stamina/tsconfig": "workspace:*",
-    "@types/node": "^25.0.5",
+    "@types/node": "^25.5.0",
     "eslint": "^9.39.2",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.1",
     "typescript": "^5.9.3"
   },
   "prettier": "@stamina/prettier-config"

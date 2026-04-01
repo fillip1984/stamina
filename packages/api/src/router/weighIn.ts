@@ -1,7 +1,7 @@
 import { z } from "zod/v4";
 
 import { and, eq } from "@stamina/db";
-import { weighIns, weightGoals } from "@stamina/db/schema";
+import { weightGoals } from "@stamina/db/schema";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -102,15 +102,15 @@ export const WeighInRouter = createTRPCRouter({
     .input(z.object({ id: z.string() }))
     .query(({ ctx, input }) => {
       return ctx.db.query.weighIns.findFirst({
-        where: and(
-          eq(weighIns.id, input.id),
-          eq(weighIns.userId, ctx.session.user.id),
-        ),
+        where: {
+          id: input.id,
+          userId: ctx.session.user.id,
+        },
       });
     }),
   getWeightGoal: protectedProcedure.query(({ ctx }) => {
     return ctx.db.query.weightGoals.findFirst({
-      where: eq(weightGoals.userId, ctx.session.user.id),
+      where: { userId: ctx.session.user.id },
     });
   }),
   setWeightGoal: protectedProcedure
@@ -121,7 +121,7 @@ export const WeighInRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const currentGoal = await ctx.db.query.weightGoals.findFirst({
-        where: eq(weightGoals.userId, ctx.session.user.id),
+        where: { userId: ctx.session.user.id },
       });
       if (currentGoal) {
         const updatedGoal = await ctx.db
@@ -129,7 +129,12 @@ export const WeighInRouter = createTRPCRouter({
           .set({
             weight: input.weightGoal,
           })
-          .where(eq(weightGoals.id, currentGoal.id));
+          .where(
+            and(
+              eq(weightGoals.id, currentGoal.id),
+              eq(weightGoals.userId, ctx.session.user.id),
+            ),
+          );
         return updatedGoal;
       } else {
         const newGoal = await ctx.db.insert(weightGoals).values({

@@ -1,25 +1,19 @@
-import { createEnv } from "@t3-oss/env-nextjs";
+import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod/v4";
 
 export function authEnv() {
   return createEnv({
     server: {
-      // AUTH_GITHUB_ID: z.string().min(1),
-      // AUTH_GITHUB_SECRET: z.string().min(1),
       AUTH_GOOGLE_ID: z.string().min(1),
       AUTH_GOOGLE_SECRET: z.string().min(1),
-      AUTH_DISABLE_SIGN_UPS: z.string(),
       AUTH_SECRET:
         process.env.NODE_ENV === "production"
           ? z.string().min(1)
           : z.string().min(1).optional(),
+      AUTH_DISABLE_SIGN_UPS: z.string(),
       NODE_ENV: z.enum(["development", "production"]).optional(),
-      PRODUCTION_URL:
-        process.env.NODE_ENV === "production"
-          ? z.url().min(1)
-          : z.url().min(1).optional(),
     },
-    experimental__runtimeEnv: {},
+    runtimeEnv: process.env,
     skipValidation:
       !!process.env.CI || process.env.npm_lifecycle_event === "lint",
   });

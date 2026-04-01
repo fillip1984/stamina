@@ -1,12 +1,12 @@
 "use client";
 
+import type { AreaType, MeasurableType } from "@stamina/api";
 import type { ChangeEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FiDownloadCloud, FiUploadCloud } from "react-icons/fi";
 import { IoScaleOutline } from "react-icons/io5";
-
-import type { AreaType, MeasurableType } from "@stamina/api";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -16,7 +16,7 @@ import {
 } from "~/components/ui/input-group";
 import Header from "~/components/ui/my-ui/header";
 import ScrollableContainer from "~/components/ui/my-ui/scrollableContainer";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 
 export default function PreferencesPage() {
   return (
@@ -37,39 +37,61 @@ const ImportExportSection = () => {
   const router = useRouter();
 
   // export/import data stuff
-  const utils = api.useUtils();
-  const { mutate: exportData } = api.admin.exportData.useMutation({
-    onSuccess: (data) => {
-      // Create blob link to download
-      const url = window.URL.createObjectURL(new Blob([JSON.stringify(data)]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute(
-        "download",
-        `${new Date().toLocaleString()} stamina_backup.json`,
-      );
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const exportData = useMutation(
+    trpc.admin.exportData.mutationOptions({
+      onSuccess: (data) => {
+        // Create blob link to download
+        const url = window.URL.createObjectURL(
+          new Blob([JSON.stringify(data)]),
+        );
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute(
+          "download",
+          `${new Date().toLocaleString()} stamina_backup.json`,
+        );
 
-      // Append to html link element page
-      document.body.appendChild(link);
+        // Append to html link element page
+        document.body.appendChild(link);
 
-      // Start download
-      link.click();
+        // Start download
+        link.click();
 
-      // Clean up and remove the link
-      link.parentNode?.removeChild(link);
-    },
-  });
-  const { mutate: importData } = api.admin.importData.useMutation({
-    onSuccess: () => {
-      // toast.success("Vendor file uploaded", {
-      //   duration: 4000,
-      //   position: "top-center",
-      // });
-      void utils.measurable.invalidate();
-      void utils.area.invalidate();
-      void router.push("/");
-    },
-  });
+        // Clean up and remove the link
+        link.parentNode?.removeChild(link);
+      },
+    }),
+  );
+
+  const importData = useMutation(
+    trpc.admin.importData.mutationOptions({
+      onSuccess: () => {
+        // toast.success("Vendor file uploaded", {
+        //   duration: 4000,
+        //   position: "top-center",
+        // });
+        void queryClient.invalidateQueries(
+          trpc.measurable.findAll.queryFilter(),
+        );
+        void queryClient.invalidateQueries(trpc.area.findAll.queryFilter());
+        void router.push("/");
+      },
+    }),
+  );
+
+  // const { mutate: importData } = api.admin.importData.useMutation({
+  //   onSuccess: () => {
+  //     // toast.success("Vendor file uploaded", {
+  //     //   duration: 4000,
+  //     //   position: "top-center",
+  //     // });
+  //     void utils.measurable.invalidate();
+  //     void utils.area.invalidate();
+  //     void router.push("/");
+  //   },
+  // });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const triggerFileBrowse = () => {
@@ -115,7 +137,7 @@ const ImportExportSection = () => {
       interval: measurable.interval ?? undefined,
     }));
 
-    importData({ areas, measurables });
+    void importData.mutateAsync({ areas, measurables });
   };
 
   return (
@@ -126,7 +148,7 @@ const ImportExportSection = () => {
         <Button variant="outline" onClick={triggerFileBrowse}>
           Import Data <FiUploadCloud />
         </Button>
-        <Button variant="outline" onClick={() => exportData()}>
+        <Button variant="outline" onClick={() => exportData.mutateAsync()}>
           Export Data <FiDownloadCloud />
         </Button>
       </div>
@@ -144,20 +166,38 @@ const ImportExportSection = () => {
 
 const WeightGoalsSection = () => {
   const [weightGoal, setWeightGoal] = useState("");
-  const utils = api.useUtils();
-  const { data: existingWeightGoal } = api.weighIn.getWeightGoal.useQuery();
+
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const existingWeightGoal = useQuery(
+    trpc.weighIn.getWeightGoal.queryOptions(),
+  );
+
+  // const { data: existingWeightGoal } = api.weighIn.getWeightGoal.useQuery();
   useEffect(() => {
-    if (existingWeightGoal?.weight) {
-      setWeightGoal(existingWeightGoal.weight.toString());
+    if (existingWeightGoal.data?.weight) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setWeightGoal(existingWeightGoal.data.weight.toString());
     }
   }, [existingWeightGoal]);
-  const { mutate: setWeightGoalMutate } = api.weighIn.setWeightGoal.useMutation(
-    {
+
+  const updateWeightGoal = useMutation(
+    trpc.weighIn.setWeightGoal.mutationOptions({
       onSuccess: () => {
-        void utils.weighIn.invalidate();
+        void queryClient.invalidateQueries(
+          trpc.weighIn.getWeightGoal.queryFilter(),
+        );
       },
-    },
+    }),
   );
+
+  // const { mutate: setWeightGoalMutate } = api.weighIn.setWeightGoal.useMutation(
+  //   {
+  //     onSuccess: () => {
+  //       void utils.weighIn.invalidate();
+  //     },
+  //   },
+  // );
 
   return (
     <div className="flex w-full flex-col gap-2">
@@ -173,11 +213,11 @@ const WeightGoalsSection = () => {
           placeholder="180.2"
           onBlur={() => {
             if (weightGoal.trim() === "") {
-              setWeightGoalMutate({ weightGoal: null });
+              updateWeightGoal.mutate({ weightGoal: null });
             } else {
               const weight = parseFloat(weightGoal);
               if (!isNaN(weight)) {
-                setWeightGoalMutate({ weightGoal: weight });
+                updateWeightGoal.mutate({ weightGoal: weight });
               }
             }
           }}

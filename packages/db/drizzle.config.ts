@@ -1,15 +1,23 @@
 import type { Config } from "drizzle-kit";
 
-import { dbEnv } from "./src/dbEnv";
+if (!process.env.DATABASE_URL) {
+  throw new Error("Missing DATABASE_URL");
+}
 
-// const nonPoolingUrl = process.env.DATABASE_URL.replace(":6543", ":5432");
+if (!process.env.DATABASE_SCHEMA) {
+  throw new Error("Missing DATABASE_SCHEMA");
+}
+
+const nonPoolingUrl = process.env.DATABASE_URL.replace(":6543", ":5432");
+
+// TODO: you have to change dbCredentials to individual sections to work on prod: https://github.com/drizzle-team/drizzle-orm/issues/4527
 export default {
-  schema: "./src/schema.ts",
+  schema: "./src/schema/index.ts",
   dialect: "postgresql",
   dbCredentials: {
-    url: dbEnv.DATABASE_URL,
-    ssl: dbEnv.NODE_ENV === "production" ? "require" : "prefer",
+    url: nonPoolingUrl,
+    ssl: process.env.NODE_ENV === "production" ? "require" : "prefer",
   },
-  schemaFilter: [dbEnv.DATABASE_SCHEMA],
+  schemaFilter: [`${process.env.DATABASE_SCHEMA}`],
   casing: "camelCase",
 } satisfies Config;

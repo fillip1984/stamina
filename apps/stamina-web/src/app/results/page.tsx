@@ -1,7 +1,13 @@
 "use client";
 
+import type {
+  BloodPressureReadingType,
+  ResultType,
+  WeighInType,
+} from "@stamina/api";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Trophy } from "lucide-react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { BsHeartPulseFill, BsJournalMedical } from "react-icons/bs";
@@ -12,26 +18,21 @@ import { LuHeartPulse } from "react-icons/lu";
 import { PiPersonBold } from "react-icons/pi";
 import { TbTargetArrow } from "react-icons/tb";
 
-import type {
-  BloodPressureReadingType,
-  ResultType,
-  WeighInType,
-} from "@stamina/api";
-
 import { Item, ItemContent, ItemMedia } from "~/components/ui/item";
 import Header from "~/components/ui/my-ui/header";
 import LoadingAndRetry from "~/components/ui/my-ui/loadingAndRetry";
 import ScrollableContainer from "~/components/ui/my-ui/scrollableContainer";
 import { Separator } from "~/components/ui/separator";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 
 export default function ResultsPage() {
+  const trpc = useTRPC();
   const {
     data: results,
     isLoading,
     isError,
     refetch,
-  } = api.result.findAll.useQuery();
+  } = useQuery(trpc.result.findAll.queryOptions());
 
   if (isLoading || isError) {
     return (
@@ -84,29 +85,32 @@ export default function ResultsPage() {
 }
 
 const WeighInResult = ({ weighIn }: { weighIn: WeighInType }) => {
-  const { data: weightGoal } = api.weighIn.getWeightGoal.useQuery();
-  const { data: lastWeighIn } = api.weighIn.readById.useQuery(
-    {
+  const trpc = useTRPC();
+  const weightGoal = useQuery(trpc.weighIn.getWeightGoal.queryOptions());
+  const lastWeighIn = useQuery(
+    trpc.weighIn.readById.queryOptions(
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      id: weighIn.previousWeighInId!,
-    },
-    {
-      enabled: !!weighIn.previousWeighInId,
-    },
+      { id: weighIn.previousWeighInId! },
+      {
+        enabled: !!weighIn.previousWeighInId,
+      },
+    ),
   );
+
   const [weightTrendValue, setWeightTrendValue] = useState<number | null>(null);
   const [bodyFatTrendValue, setBodyFatTrendValue] = useState<number | null>(
     null,
   );
 
   useEffect(() => {
-    if (lastWeighIn) {
-      const weightDiff = (weighIn.weight - lastWeighIn.weight).toFixed(2);
+    if (lastWeighIn.data) {
+      const weightDiff = (weighIn.weight - lastWeighIn.data.weight).toFixed(2);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWeightTrendValue(Number(weightDiff));
 
-      if (weighIn.bodyFatPercentage && lastWeighIn.bodyFatPercentage) {
+      if (weighIn.bodyFatPercentage && lastWeighIn.data.bodyFatPercentage) {
         const bodyFatDiff = (
-          weighIn.bodyFatPercentage - lastWeighIn.bodyFatPercentage
+          weighIn.bodyFatPercentage - lastWeighIn.data.bodyFatPercentage
         ).toFixed(2);
         setBodyFatTrendValue(Number(bodyFatDiff));
       }
@@ -173,18 +177,20 @@ const WeighInResult = ({ weighIn }: { weighIn: WeighInType }) => {
                 : "down"
         }
       />
-      {weightGoal?.weight && (
+      {weightGoal.data?.weight && (
         <StatCard
           title={
             <>
               <TbTargetArrow className="text-yellow-300" />
               Goal
-              <span className="text-sm lowercase">{weightGoal.weight} lbs</span>
+              <span className="text-sm lowercase">
+                {weightGoal.data.weight} lbs
+              </span>
             </>
           }
           primaryValue={
-            weightGoal.weight
-              ? (weighIn.weight - weightGoal.weight).toFixed(2)
+            weightGoal.data.weight
+              ? (weighIn.weight - weightGoal.data.weight).toFixed(2)
               : "N/A"
           }
           primaryFooter="lbs to go"
@@ -199,16 +205,17 @@ const BloodPressureResult = ({
 }: {
   bloodPressureReading: BloodPressureReadingType;
 }) => {
-  const { data: lastBloodPressureReading } =
-    api.bloodPressureReading.readById.useQuery(
-      {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        id: bloodPressureReading.previousBloodPressureReadingId!,
-      },
+  const trpc = useTRPC();
+  const lastBloodPressureReading = useQuery(
+    trpc.bloodPressureReading.readById.queryOptions(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      { id: bloodPressureReading.previousBloodPressureReadingId! },
       {
         enabled: !!bloodPressureReading.previousBloodPressureReadingId,
       },
-    );
+    ),
+  );
+
   const [systolicTrendValue, setSystolicTrendValue] = useState<number | null>(
     null,
   );
@@ -217,23 +224,24 @@ const BloodPressureResult = ({
   );
   const [pulseTrendValue, setPulseTrendValue] = useState<number | null>(null);
   useEffect(() => {
-    if (lastBloodPressureReading) {
+    if (lastBloodPressureReading.data) {
       const systolicDiff = (
-        bloodPressureReading.systolic - lastBloodPressureReading.systolic
+        bloodPressureReading.systolic - lastBloodPressureReading.data.systolic
       ).toFixed(2);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSystolicTrendValue(Number(systolicDiff));
 
       const diastolicDiff = (
-        bloodPressureReading.diastolic - lastBloodPressureReading.diastolic
+        bloodPressureReading.diastolic - lastBloodPressureReading.data.diastolic
       ).toFixed(2);
       setDiastolicTrendValue(Number(diastolicDiff));
 
       if (
         bloodPressureReading.pulse !== null &&
-        lastBloodPressureReading.pulse !== null
+        lastBloodPressureReading.data.pulse !== null
       ) {
         const pulseDiff = (
-          bloodPressureReading.pulse - lastBloodPressureReading.pulse
+          bloodPressureReading.pulse - lastBloodPressureReading.data.pulse
         ).toFixed(2);
         setPulseTrendValue(Number(pulseDiff));
       }

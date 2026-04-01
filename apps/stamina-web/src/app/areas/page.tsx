@@ -1,13 +1,13 @@
 "use client";
 
+import type { AreaType } from "@stamina/api";
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { FaEye, FaPlus, FaTrash } from "react-icons/fa";
 import { FaEllipsisVertical, FaPencil } from "react-icons/fa6";
 import { GiStoneStack } from "react-icons/gi";
-
-import type { AreaType } from "@stamina/api";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -50,18 +50,25 @@ import ScrollableContainer from "~/components/ui/my-ui/scrollableContainer";
 import { Spinner } from "~/components/ui/spinner";
 import { Textarea } from "~/components/ui/textarea";
 import { useModal } from "~/hooks/useModal";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 
 export default function AreaPage() {
   const { isOpen, show, hide, showWithItem, editableItem } =
     useModal<AreaType>();
 
+  // const {
+  //   data: areas,
+  //   isLoading,
+  //   isError,
+  //   refetch,
+  // } = api.area.findAll.useQuery();
+  const trpc = useTRPC();
   const {
     data: areas,
     isLoading,
     isError,
     refetch,
-  } = api.area.findAll.useQuery();
+  } = useQuery(trpc.area.findAll.queryOptions());
 
   if (isLoading || isError) {
     return (
@@ -113,12 +120,20 @@ export default function AreaPage() {
 }
 
 const AreaCard = ({ area, edit }: { area: AreaType; edit: () => void }) => {
-  const utils = api.useUtils();
-  const { mutateAsync: deleteArea } = api.area.delete.useMutation({
-    onSuccess: async () => {
-      await utils.area.findAll.invalidate();
-    },
-  });
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  // const { mutateAsync: deleteArea } = api.area.delete.useMutation({
+  //   onSuccess: async () => {
+  //     await queryClient.invalidateQueries(trpc.area.pathFilter());
+  //   },
+  // });
+  const deleteArea = useMutation(
+    trpc.area.delete.mutationOptions({
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(trpc.area.pathFilter());
+      },
+    }),
+  );
 
   return (
     <Item variant="outline" className="bg-card flex w-full grow">
@@ -152,7 +167,7 @@ const AreaCard = ({ area, edit }: { area: AreaType; edit: () => void }) => {
             <DropdownMenuGroup>
               <DropdownMenuItem
                 variant="destructive"
-                onClick={() => deleteArea({ id: area.id })}
+                onClick={() => deleteArea.mutateAsync({ id: area.id })}
               >
                 <FaTrash />
                 Delete
@@ -181,6 +196,7 @@ const AreaModal = ({
   // IX: init form state
   useEffect(() => {
     if (editableItem) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setName(editableItem.name);
       setDescription(editableItem.description);
       setMode("Update");
@@ -199,38 +215,46 @@ const AreaModal = ({
     return true;
   };
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsValid(validateForm());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, description]);
 
   // MX: create/update area
-  const utils = api.useUtils();
-  const { mutateAsync: createArea, isPending: isCreating } =
-    api.area.create.useMutation({
+  const queryClient = useQueryClient();
+  const trpc = useTRPC();
+  const createArea = useMutation(
+    trpc.area.create.mutationOptions({
       onSuccess: async () => {
-        await utils.area.findAll.invalidate();
+        await queryClient.invalidateQueries(trpc.area.pathFilter());
         hide();
       },
-    });
-  const { mutateAsync: updateArea, isPending: isUpdating } =
-    api.area.update.useMutation({
+    }),
+  );
+  const updateArea = useMutation(
+    trpc.area.update.mutationOptions({
       onSuccess: async () => {
-        await utils.area.findAll.invalidate();
+        await queryClient.invalidateQueries(trpc.area.pathFilter());
         hide();
       },
-    });
+    }),
+  );
 
   const handleSubmit = async (e?: FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
     if (!isValid) return;
 
     if (editableItem && mode === "Update") {
-      await updateArea({
+      await updateArea.mutateAsync({
         ...editableItem,
         name: name.trim(),
         description: description.trim(),
       });
     } else {
-      await createArea({ name: name.trim(), description: description.trim() });
+      await createArea.mutateAsync({
+        name: name.trim(),
+        description: description.trim(),
+      });
     }
   };
 
@@ -271,9 +295,9 @@ const AreaModal = ({
           </DialogClose>
           <Button
             onClick={() => handleSubmit()}
-            disabled={!isValid || isCreating || isUpdating}
+            disabled={!isValid || createArea.isPending || updateArea.isPending}
           >
-            {isCreating || isUpdating ? <Spinner /> : mode}
+            {createArea.isPending || updateArea.isPending ? <Spinner /> : mode}
           </Button>
         </DialogFooter>
       </DialogContent>

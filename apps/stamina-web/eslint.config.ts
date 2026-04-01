@@ -6,7 +6,7 @@ import { reactConfig } from "@stamina/eslint-config/react";
 
 export default defineConfig(
   {
-    ignores: [".next/**"],
+    ignores: [".next/**", "src/components/ui/**"],
   },
   baseConfig,
   reactConfig,

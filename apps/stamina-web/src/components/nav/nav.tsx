@@ -3,13 +3,14 @@
 import { useContext } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { TrophyIcon } from "lucide-react";
 import { SiGoogletasks } from "react-icons/si";
 import { TbCategory } from "react-icons/tb";
 
 import { authClient } from "~/auth/client";
 import { AllAreas, AppContext } from "~/contexts/AppContext";
-import { api } from "~/trpc/react";
+import { useTRPC } from "~/trpc/react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 
@@ -22,9 +23,12 @@ export default function Nav() {
     { name: "Results", href: "/results" },
   ];
 
-  const { data: areas, isLoading } = api.area.findAll.useQuery(undefined, {
-    enabled: !!session,
-  });
+  const trpc = useTRPC();
+  const { data: areas, isLoading } = useQuery(
+    trpc.area.findAll.queryOptions(undefined, {
+      enabled: !!session,
+    }),
+  );
 
   const { areaFilter, setAreaFilter } = useContext(AppContext);
 

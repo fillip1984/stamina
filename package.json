@@ -1,50 +1,46 @@
 {
-  "name": "stamina",
+  "name": "stamina-monorepo",
   "private": true,
-  "type": "module",
   "engines": {
-    "node": ">=22.14.0",
-    "pnpm": ">=10.11.1"
+    "node": ">=24.11.0",
+    "pnpm": ">=10.29.1"
   },
-  "packageManager": "pnpm@10.11.1",
-  "pnpm": {
-    "overrides": {
-      "lightningcss": "1.30.1"
-    }
-  },
+  "packageManager": "pnpm@10.29.1",
   "scripts": {
-    "build": "pnpm -r run build",
-    "build:packages": "pnpm --filter '!./apps/**' run build",
-    "build:mobile": "pnpm --filter !stamina-web run build",
-    "build:web": "pnpm --filter !stamina-mobile run build",
-    "clean": "git clean -xdf",
     "auth:generate": "pnpm -F @stamina/auth generate",
-    "format": "pnpm -r run format",
-    "lint": "pnpm -r run lint",
-    "db:generate": "pnpm --filter db run generate",
-    "db:push": "pnpm --filter db run push",
-    "db:studio": "pnpm --filter db run studio",
+    "build": "pnpm -r build",
+    "build:mobile": "pnpm -F !web run build:production",
+    "build:packages": "pnpm -F './packages/**' run build",
+    "build:web": "pnpm -F \"!@stamina/mobile\" run build",
+    "clean": "git clean -xdf node_modules",
+    "clean:workspaces": "pnpm -r clean",
+    "db:export": "pnpm -F @stamina/db export",
+    "db:push": "pnpm -F @stamina/db push",
+    "db:studio": "pnpm -F @stamina/db studio",
+    "db:upgrade": "pnpm -F @stamina/db upgrade",
     "dev": "pnpm -r run dev",
-    "dev:mobile": "pnpm --filter stamina-mobile run dev",
-    "dev:web": "pnpm --filter stamina-web run dev",
-    "prod:db:push": "pnpm dotenv -e .env.prod -- drizzle-kit push",
+    "format": "pnpm -r format",
+    "format:fix": "pnpm -r format",
+    "ios": "pnpm -F mobile run ios",
+    "lint": "pnpm -r lint",
+    "lint:fix": "pnpm -r lint",
+    "lint:ws": "pnpm dlx sherif@latest",
+    "preinstall": "npx only-allow pnpm",
+    "prod:db:push": "pnpm -F @stamina/db push:prod",
     "prod:deploy": "pnpm dotenv -e .env.prod -- sst deploy --stage prod",
     "prod:nuke": "pnpm dotenv -e .env.prod -- sst remove --stage prod",
-    "start:web": "pnpm --filter stamina-web run start",
-    "preinstall": "npx only-allow pnpm"
-  },
-  "dependencies": {
-    "sst": "^3.17.25"
+    "typecheck": "pnpm -r typecheck",
+    "update-all": "pnpm -r update --latest"
   },
   "devDependencies": {
-    "@eslint/compat": "^2.0.1",
-    "@stamina/eslint-config": "workspace:*",
     "@stamina/prettier-config": "workspace:*",
-    "@types/aws-lambda": "8.10.159",
+    "@types/aws-lambda": "8.10.161",
     "dotenv-cli": "^11.0.0",
-    "eslint": "^9.39.2",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.1",
     "typescript": "^5.9.3"
   },
-  "prettier": "@stamina/prettier-config"
+  "prettier": "@stamina/prettier-config",
+  "dependencies": {
+    "sst": "4.5.12"
+  }
 }

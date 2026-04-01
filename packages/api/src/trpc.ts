@@ -8,7 +8,7 @@
  */
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
-import z, { ZodError } from "zod/v4";
+import { z, ZodError } from "zod/v4";
 
 import type { Auth } from "@stamina/auth";
 import { db } from "@stamina/db/client";
@@ -25,6 +25,7 @@ import { db } from "@stamina/db/client";
  *
  * @see https://trpc.io/docs/server/context
  */
+
 export const createTRPCContext = async (opts: {
   headers: Headers;
   auth: Auth;
@@ -39,8 +40,6 @@ export const createTRPCContext = async (opts: {
     db,
   };
 };
-export type trpcContextShape = Awaited<ReturnType<typeof createTRPCContext>>;
-
 /**
  * 2. INITIALIZATION
  *
@@ -60,12 +59,6 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
     },
   }),
 });
-
-/**
- * Create a server-side caller
- * @see https://trpc.io/docs/server/server-side-calls
- */
-export const createCallerFactory = t.createCallerFactory;
 
 /**
  * 3. ROUTER & PROCEDURE (THE IMPORTANT BIT)

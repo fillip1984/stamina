@@ -1,22 +1,26 @@
 import { z } from "zod/v4";
 
-import { and, eq } from "@stamina/db";
 import {
-  DayOfWeekEnum,
-  DaytimeEnum,
-  MeasurableTypeEnum,
-} from "@stamina/db/enums";
-import { areas, measurables } from "@stamina/db/schema";
+  areas,
+  DayOfWeekEnumRAW,
+  DaytimeEnumRAW,
+  measurables,
+  MeasurableTypeEnumRAW,
+} from "@stamina/db/schema";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const adminRouter = createTRPCRouter({
   exportData: protectedProcedure.mutation(async ({ ctx }) => {
     const areasToExport = await ctx.db.query.areas.findMany({
-      where: eq(areas.userId, ctx.session.user.id), //{ userId: ctx.session.user.id },
+      where: {
+        userId: ctx.session.user.id,
+      },
     });
     const measurablesToExport = await ctx.db.query.measurables.findMany({
-      where: eq(measurables.userId, ctx.session.user.id), //{ userId: ctx.session.user.id },
+      where: {
+        userId: ctx.session.user.id,
+      },
     });
 
     return {
@@ -41,9 +45,9 @@ export const adminRouter = createTRPCRouter({
             name: z.string(),
             description: z.string(),
             areaId: z.string().nullable(),
-            suggestedDay: z.enum(DayOfWeekEnum).nullable(),
-            suggestedDayTime: z.enum(DaytimeEnum).nullable(),
-            type: z.enum(MeasurableTypeEnum),
+            suggestedDay: z.enum(DayOfWeekEnumRAW).nullable(),
+            suggestedDayTime: z.enum(DaytimeEnumRAW).nullable(),
+            type: z.enum(MeasurableTypeEnumRAW),
             dueDate: z.date().nullable(),
             interval: z.number().min(1).optional(),
           }),
@@ -53,10 +57,10 @@ export const adminRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       for (const area of input.areas) {
         const existingArea = await ctx.db.query.areas.findFirst({
-          where: and(
-            eq(areas.id, area.id),
-            eq(areas.userId, ctx.session.user.id),
-          ),
+          where: {
+            id: area.id,
+            userId: ctx.session.user.id,
+          },
         });
         if (!existingArea) {
           await ctx.db.insert(areas).values({
@@ -70,10 +74,10 @@ export const adminRouter = createTRPCRouter({
 
       for (const measurable of input.measurables) {
         const existingMeasurable = await ctx.db.query.measurables.findFirst({
-          where: and(
-            eq(measurables.id, measurable.id),
-            eq(measurables.userId, ctx.session.user.id),
-          ),
+          where: {
+            id: measurable.id,
+            userId: ctx.session.user.id,
+          },
         });
         if (existingMeasurable) continue;
 

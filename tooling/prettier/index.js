@@ -16,7 +16,7 @@ const config = {
     "^(expo(.*)$)|^(expo$)",
     "<THIRD_PARTY_MODULES>",
     "",
-    "<TYPES>^@stamina",
+    "<TYPES>^@todo",
     "^@stamina/(.*)$",
     "",
     "<TYPES>^[.|..|~]",

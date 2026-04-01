@@ -1,8 +1,7 @@
 "use client";
 
-import { createContext, useEffect, useState } from "react";
-
 import type { AreaType } from "@stamina/api";
+import { createContext, useEffect, useState } from "react";
 
 interface AppContextType {
   areaFilter: AreaType | null;
@@ -57,6 +56,7 @@ export function AppContextProvider({
   const [measurableIdToEdit, setMeasurableIdToEdit] = useState<string>("");
   useEffect(() => {
     if (measurableIdToEdit !== "") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsCreateMeasurableModalOpen(true);
     }
   }, [measurableIdToEdit]);

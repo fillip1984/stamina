@@ -1,12 +1,15 @@
 import { createId } from "@paralleldrive/cuid2";
 import { pgSchema, text, timestamp } from "drizzle-orm/pg-core";
 
-import { dbEnv } from "./dbEnv";
+// if (!process.env.DATABASE_SCHEMA) {
+//   throw new Error("Missing DATABASE_SCHEMA");
+// }
 
 /**
  * Table schema is used to separate different applications using the same database.
  */
-export const appSchema = pgSchema(dbEnv.DATABASE_SCHEMA);
+// export const appSchema = pgSchema(process.env.DATABASE_SCHEMA);
+export const appSchema = pgSchema("stamina");
 
 /**
  * Base fields for all tables.
