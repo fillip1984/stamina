@@ -1,3 +1,8 @@
+import type {
+  BloodPressureReadingType,
+  ResultType,
+  WeighInType,
+} from "@stamina/api";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { Linking, Pressable, ScrollView, View } from "react-native";
@@ -6,12 +11,6 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useQuery } from "@tanstack/react-query";
-
-import type {
-  BloodPressureReadingType,
-  ResultType,
-  WeighInType,
-} from "@stamina/api";
 
 import Container from "~/components/ui/container";
 import Typography from "~/components/ui/typography";
@@ -89,6 +88,7 @@ const WeighInResult = ({ weighIn }: { weighIn: WeighInType }) => {
   useEffect(() => {
     if (lastWeighIn) {
       const weightDiff = (weighIn.weight - lastWeighIn.weight).toFixed(2);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWeightTrendValue(Number(weightDiff));
 
       if (weighIn.bodyFatPercentage && lastWeighIn.bodyFatPercentage) {
@@ -217,6 +217,7 @@ const BloodPressureResult = ({
       const systolicDiff = (
         bloodPressureReading.systolic - lastBloodPressureReading.systolic
       ).toFixed(2);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSystolicTrendValue(Number(systolicDiff));
 
       const diastolicDiff = (

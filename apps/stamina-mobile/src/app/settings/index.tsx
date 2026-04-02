@@ -16,6 +16,7 @@ export default function SettingsPage() {
   );
   useEffect(() => {
     if (existingWeightGoal?.weight) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWeightGoal(existingWeightGoal.weight.toString());
     }
   }, [existingWeightGoal]);

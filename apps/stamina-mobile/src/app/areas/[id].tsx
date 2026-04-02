@@ -40,6 +40,7 @@ export default function AreaDetailPage() {
   };
   useEffect(() => {
     setIsValid(validateForm());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, description]);
 
   // MX: create/update area
