@@ -8,10 +8,14 @@ import { initAuth } from "@stamina/auth";
 
 import { env } from "~/env";
 
-const baseUrl =
-  env.NODE_ENV === "production" && env.PRODUCTION_URL
-    ? env.PRODUCTION_URL
-    : "http://localhost:3000";
+// const baseUrl =
+//   env.NODE_ENV === "production" && env.PRODUCTION_URL
+//     ? env.PRODUCTION_URL
+//     : "http://localhost:3000";
+console.log(
+  "Hardcoding auth base URL to https://stamina.illizen.com for now...",
+);
+const baseUrl = "https://stamina.illizen.com";
 
 export const auth = initAuth({
   baseUrl,
@@ -22,6 +26,7 @@ export const auth = initAuth({
   extraPlugins: [nextCookies()],
 });
 
-export const getSession = cache(async () =>
-  auth.api.getSession({ headers: await headers() }),
-);
+export const getSession = cache(async () => {
+  console.log("Getting session with headers...");
+  return auth.api.getSession({ headers: await headers() });
+});
