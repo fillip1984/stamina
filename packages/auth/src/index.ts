@@ -42,10 +42,17 @@ export function initAuth<
         disableImplicitSignUp: options.disableSignUps === "true",
       },
     },
-    trustedOrigins: ["expo://"],
+    trustedOrigins: ["expo://", options.baseUrl],
     onAPIError: {
       onError(error, ctx) {
         console.error("BETTER AUTH API ERROR", error, ctx);
+      },
+    },
+    logger: {
+      disabled: false,
+      level: "debug",
+      log: (level, message, ...args) => {
+        console.log(`better-auth [${level}] ${message}`, ...args);
       },
     },
   } satisfies BetterAuthOptions;

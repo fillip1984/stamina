@@ -38,7 +38,7 @@ export const db = drizzle({
   client: pool,
   ...schema,
   ...relations,
-  logger: process.env.NODE_ENV !== "production",
+  // logger: process.env.NODE_ENV !== "production",
 });
 
 // const result = await db.execute("select 1");
