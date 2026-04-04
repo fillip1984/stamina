@@ -7,7 +7,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: "expo",
   version: "0.1.0",
   orientation: "portrait",
-  icon: "./assets/icon-light.png",
+  icon: "./src/assets/images/icon-light.png",
   userInterfaceStyle: "automatic",
   updates: {
     fallbackToCacheTimeout: 0,
@@ -17,18 +17,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: "com.fillip1984.stamina",
     supportsTablet: true,
     icon: {
-      light: "./assets/icon-light.png",
-      dark: "./assets/icon-dark.png",
+      light: "./src/assets/images/icon-light.png",
+      dark: "./src/assets/images/icon-dark.png",
     },
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
-    },
-  },
-  android: {
-    package: "com.fillip1984.stamina",
-    adaptiveIcon: {
-      foregroundImage: "./assets/icon-light.png",
-      backgroundColor: "#1F104A",
     },
   },
   experiments: {
@@ -45,17 +38,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       "expo-splash-screen",
       {
         backgroundColor: "#E4E4E7",
-        image: "./assets/icon-light.png",
+        image: "./src/assets/images/icon-light.png",
         dark: {
           backgroundColor: "#18181B",
-          image: "./assets/icon-dark.png",
+          image: "./src/assets/images/icon-dark.png",
         },
       },
     ],
   ],
   extra: {
     eas: {
-      projectId: "d698e671-62a2-4e28-80a2-8a7bce2d2561",
+      projectId: "e0d276b6-3409-49e4-a7d4-381f6b952aad",
     },
   },
 });
