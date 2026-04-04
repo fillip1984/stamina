@@ -7,7 +7,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: "expo",
   version: "0.1.0",
   orientation: "portrait",
-  icon: "./src/assets/images/icon-light.png",
+  icon: "./src/assets/images/logo.png",
   userInterfaceStyle: "automatic",
   updates: {
     fallbackToCacheTimeout: 0,
@@ -17,8 +17,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: "com.fillip1984.stamina",
     supportsTablet: true,
     icon: {
-      light: "./src/assets/images/icon-light.png",
-      dark: "./src/assets/images/icon-dark.png",
+      light: "./src/assets/images/logo.png",
+      dark: "./src/assets/images/logo.png",
     },
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
@@ -27,7 +27,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   experiments: {
     tsconfigPaths: true,
     typedRoutes: true,
-    reactCanary: true,
     reactCompiler: true,
   },
   plugins: [
@@ -38,10 +37,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       "expo-splash-screen",
       {
         backgroundColor: "#E4E4E7",
-        image: "./src/assets/images/icon-light.png",
+        image: "./src/assets/images/logo.png",
         dark: {
           backgroundColor: "#18181B",
-          image: "./src/assets/images/icon-dark.png",
+          image: "./src/assets/images/logo.png",
         },
       },
     ],

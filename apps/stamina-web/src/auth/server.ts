@@ -8,14 +8,10 @@ import { initAuth } from "@stamina/auth";
 
 import { env } from "~/env";
 
-// const baseUrl =
-//   env.NODE_ENV === "production" && env.PRODUCTION_URL
-//     ? env.PRODUCTION_URL
-//     : "http://localhost:3000";
-console.log(
-  "Hardcoding auth base URL to https://stamina.illizen.com for now...",
-);
-const baseUrl = "https://stamina.illizen.com";
+const baseUrl =
+  env.NODE_ENV === "production" && env.PRODUCTION_URL
+    ? env.PRODUCTION_URL
+    : "http://localhost:3000";
 
 export const auth = initAuth({
   baseUrl,

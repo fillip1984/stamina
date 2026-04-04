@@ -1,13 +1,31 @@
 import { useEffect, useRef, useState } from "react";
-import { Pressable, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
+import { router } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import Container from "~/components/ui/container";
 import Typography from "~/components/ui/typography";
 import { trpc } from "~/utils/api";
+import { authClient } from "~/utils/auth";
 
 export default function SettingsPage() {
+  // const { data, isPending } = authClient.useSession();
+  // useEffect(() => {
+  // if (!isPending && data?.user) {
+  //   router.push("/measurables");
+  // }
+  // }, [data, isPending]);
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/");
+        },
+      },
+    });
+  };
+
   const [weightGoal, setWeightGoal] = useState("");
   const weightGoalInputRef = useRef<TextInput>(null);
 
@@ -68,6 +86,14 @@ export default function SettingsPage() {
           />
           <Typography variant={"muted"}>lbs</Typography>
         </Pressable>
+        <View className="flex items-center justify-center">
+          <Pressable
+            className="my-2 rounded-xl bg-sky-400 p-2"
+            onPress={handleLogout}
+          >
+            <Text className="text-2xl text-white">Logout</Text>
+          </Pressable>
+        </View>
       </View>
     </Container>
   );
