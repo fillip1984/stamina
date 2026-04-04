@@ -52,6 +52,7 @@ export function initAuth<
       disabled: false,
       level: "debug",
       log: (level, message, ...args) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         console.log(`better-auth [${level}] ${message}`, ...args);
       },
     },
