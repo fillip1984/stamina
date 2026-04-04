@@ -27,6 +27,13 @@ export const auth = initAuth({
 });
 
 export const getSession = cache(async () => {
-  console.log("Getting session with headers...");
-  return auth.api.getSession({ headers: await headers() });
+  try {
+    console.log("Getting session with headers...");
+    const ses = auth.api.getSession({ headers: await headers() });
+    console.log({ ses });
+    return ses;
+  } catch (error) {
+    console.error("Error getting session:", error);
+    throw error;
+  }
 });
